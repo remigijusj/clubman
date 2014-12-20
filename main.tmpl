@@ -1,0 +1,628 @@
+{{define "topnav"}}
+  <nav class="top-bar" data-topbar role="navigation">
+    <ul class="title-area">
+      <li class="name">
+        <h1><a href="/"><img src="img/logo.gif" /></a></h1>
+      </li>
+      <li class="toggle-topbar menu-icon"><a href="#"><span></span></a></li>
+    </ul>
+    <section class="top-bar-section">
+      <ul class="right">
+      {{ if .user }}
+        <li><a href="/calendar">Kalender</a></li>
+        <li><a href="/list">Hold</a></li>
+        <li><a href="#">Mine tilmeldinger</a></li>
+        <li class="has-dropdown">
+          <a href="#">Administration</a>
+          <ul class="dropdown">
+            <li><a href="#">Logs</a></li>
+            <li><a href="#">Brugere</a></li>
+          </ul>
+        </li>
+        <li class="has-dropdown">
+          <a href="/profile">Rediger profil</a>
+          <ul class="dropdown">
+            <li><a href="/logout">Log ud</a></li>
+          </ul>
+        </li>
+      {{ else }}
+        <li><a href="/signup">Opret bruger</a></li>
+        <li><a href="/forgot">Glemt adgangskode</a></li>
+        <li><a href="/login">Log ind</a></li>
+      {{ end }}
+      </ul>
+    </section>
+  </nav>
+{{end}}
+{{define "alert"}}
+  <div class="row">
+    <div class="large-6 medium-8 columns">
+      <div data-alert class="alert-box radius {{.Kind}}">
+        {{.Message}}
+        <a href="#" class="close">&times;</a>
+      </div>
+    </div>
+  </div>
+{{end}}
+{{define "login"}}
+  <div class="row">
+    <div class="large-6 medium-8 columns">
+      <h4>Log ind</h4>
+      <p class="form-description">
+        Velkommen til Nykredit Fitness Tilmeldingssystem. Her kan medlemmer af Nykredit Fitness tilmelde sig til fitness hold i Glaskuben.
+        Er du ny bruger kan du oprette dig i systemet ved at klikke på 'Opret bruger'.
+        Er du allerede oprettet kan du logge ind med dit brugernavn og adgangskode.
+      </p>
+      <div class="panel">
+        <form action="/login" method="POST">
+          <div class="row">
+            <div class="small-4 columns">
+              <label for="email">E-mail</label>
+            </div>
+            <div class="small-8 columns">
+              <input id="email" name="email" type="text" placeholder="" />
+            </div>
+          </div>
+          <div class="row">
+            <div class="small-4 columns">
+              <label for="password">Adgangskode</label>
+            </div>
+            <div class="small-8 columns">
+              <input id="password" name="password" type="password" placeholder="" />
+            </div>
+          </div>
+          <div class="row end">
+            <div class="small-4 columns">
+              <input type="submit" class="button tiny radius" value="Log ind" />
+            </div>
+            <div class="small-8 columns">
+              <a href="/forgot"><small>Glemt adgangskode</small></a>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+{{end}}
+{{define "forgot"}}
+  <div class="row">
+    <div class="large-6 medium-8 columns">
+      <h4>Glemt adgangskode</h4>
+      <p class="form-description">
+        Indtast alle detaljer i boksen neden under, og derefter vil systemet generere en ny adgangskode til dig og sende den til din email.
+      </p>
+      <div class="panel">
+        <form action="/forgot" method="POST">
+          <div class="row">
+            <div class="small-4 columns">
+              <label for="email">E-mail</label>
+            </div>
+            <div class="small-8 columns">
+              <input id="email" name="email" type="text" placeholder="" />
+            </div>
+            <div class="small-12 columns description">
+              Den email du brugte da du oprettede din bruger.
+            </div>
+          </div>
+          <div class="row end">
+            <div class="columns">
+              <input type="submit" class="button tiny radius" value="Forespørg" />
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+{{end}}
+{{define "signup"}}
+  <div class="row">
+    <div class="large-6 medium-8 columns">
+      <h4>Opret ny bruger</h4>
+      <div class="panel">
+        <form action="/signup" method="POST">
+          <div class="row">
+            <div class="small-4 columns">
+              <label for="name">Navn</label>
+            </div>
+            <div class="small-8 columns">
+              <input id="name" name="name" type="text" placeholder="Anders Andersen" />
+            </div>
+            <div class="small-12 columns description">
+              Dit rigtige navn som vil blive brugt til at repræsentere dig forskellige steder på siden, i lister, i emails og etc.
+            </div>
+          </div>
+          <div class="row">
+            <div class="small-4 columns">
+              <label for="email">E-mail</label>
+            </div>
+            <div class="small-8 columns">
+              <input id="email" name="email" type="text" placeholder="min@e-mail.dk" />
+            </div>
+            <div class="small-12 columns description">
+              Din email vil blive brugt til at kontakte dig omkring hold og mere.
+            </div>
+          </div>
+          <div class="row">
+            <div class="small-4 columns">
+              <label for="mobile">Mobil nr.</label>
+            </div>
+            <div class="small-8 columns">
+              <input id="mobile" name="mobile" type="text" placeholder="+45 11223344" />
+            </div>
+            <div class="small-12 columns description">
+              Dit mobil telefon nummer vil blive brugt til at kontakte dig og til at minde dig om hold og mere.
+            </div>
+          </div>
+          <div class="row">
+            <div class="small-4 columns">
+              <label for="password">Adgangskode</label>
+            </div>
+            <div class="small-8 columns">
+              <input type="password" style="display:none" />
+              <input id="password" name="password" type="password" placeholder="WT36yUX8STxP" />
+            </div>
+            <div class="small-12 columns description">
+              Den adgangskode du vil bruge til at logge ind i systemet.
+            </div>
+          </div>
+          <div class="row end">
+            <div class="columns">
+              <input type="submit" class="button tiny radius" value="Opret" />
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+{{end}}
+{{define "profile"}}
+  <div class="row">
+    <div class="large-6 medium-8 columns">
+      <h4>Rediger din profil</h4>
+      <div class="panel">
+        <form action="/profile" method="POST">
+          <div class="row">
+            <div class="small-4 columns">
+              <label for="name">Navn</label>
+            </div>
+            <div class="small-8 columns">
+              <input id="name" name="name" type="text" placeholder="Anders Andersen" />
+            </div>
+            <div class="small-12 columns description">
+              Dit navn vil blive brugt forskellige steder.
+            </div>
+          </div>
+          <div class="row">
+            <div class="small-4 columns">
+              <label for="email">E-mail</label>
+            </div>
+            <div class="small-8 columns">
+              <input id="email" name="email" type="text" placeholder="min@e-mail.dk" />
+            </div>
+            <div class="small-12 columns description">
+              Din email vil blive brugt til at kontakte dig.
+            </div>
+          </div>
+          <div class="row">
+            <div class="small-4 columns">
+              <label for="password">Adgangskode</label>
+            </div>
+            <div class="small-8 columns">
+              <input type="password" style="display:none" />
+              <input id="password" name="password" type="password" placeholder="" />
+            </div>
+            <div class="small-12 columns description">
+              Indtast en ny adgangskode her, hvis du ønsker at ændre din personale adgangskode for siden.
+            </div>
+          </div>
+          <div class="row">
+            <div class="small-4 columns">
+              <label for="mobile">Mobil nr.</label>
+            </div>
+            <div class="small-8 columns">
+              <input id="mobile" name="mobile" type="text" placeholder="+45 11223344" />
+            </div>
+            <div class="small-12 columns description">
+              Dit mobil telefon nummer vil blive brugt til at minde dig om ting og til generel kontakt.
+            </div>
+          </div>
+          <div class="row">
+            <div class="small-4 columns">
+              <label for="language">Sprog</label>
+            </div>
+            <div class="small-8 columns">
+              <select id="language" name="language">
+                <option value="da">Dansk</option>
+                <option value="en">English</option>
+              </select>
+            </div>
+            <div class="small-12 columns description">
+              Sproget som du foretrækker at se siden i.
+            </div>
+          </div>
+          <div class="row end">
+            <div class="columns">
+              <input type="submit" class="button tiny radius" value="Gem" />
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+{{end}}
+{{define "welcome"}}
+  <div class="row">
+    <div class="columns">
+      <h4>Velkommen!</h4>
+    </div>
+  </div>
+{{end}}
+{{define "list"}}
+  <div class="row">
+    <div class="large-8 columns">
+      <h4>Lektioner</h4>
+
+      <table class="list">
+        <thead>
+          <tr>
+            <td>Lektion</td>
+            <td>Hold</td>
+            <td>Dato</td>
+            <td>Tid start</td>
+            <td>Tid slut</td>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <a href="#">Lektion 3852</a>
+            </td>
+            <td>
+              <a href="#">Stram op</a>
+            </td>
+            <td>
+              13/11 2014
+            </td>
+            <td>
+              07:00
+            </td>
+            <td>
+              08:00
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <a href="#">Lektion 4016</a>
+            </td>
+            <td>
+              <a href="#">Zumba</a>
+            </td>
+            <td>
+              13/11 2014
+            </td>
+            <td>
+              16:30
+            </td>
+            <td>
+              17:30
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <a href="#">Lektion 4063</a>
+            </td>
+            <td>
+              <a href="#">Quick styrke</a>
+            </td>
+            <td>
+              13/11 2014
+            </td>
+            <td>
+              17:30
+            </td>
+            <td>
+              18:00
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <a href="#">Lektion 3659</a>
+            </td>
+            <td>
+              <a href="#">XXXX</a>
+            </td>
+            <td>
+              13/11 2014
+            </td>
+            <td>
+              21:00
+            </td>
+            <td>
+              22:00
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <a href="#">Lektion 3852</a>
+            </td>
+            <td>
+              <a href="#">Stram op</a>
+            </td>
+            <td>
+              14/11 2014
+            </td>
+            <td>
+              07:00
+            </td>
+            <td>
+              08:00
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <a href="#">Lektion 4016</a>
+            </td>
+            <td>
+              <a href="#">Zumba</a>
+            </td>
+            <td>
+              14/11 2014
+            </td>
+            <td>
+              16:30
+            </td>
+            <td>
+              17:30
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <a href="#">Lektion 4063</a>
+            </td>
+            <td>
+              <a href="#">Quick styrke</a>
+            </td>
+            <td>
+              14/11 2014
+            </td>
+            <td>
+              17:30
+            </td>
+            <td>
+              18:00
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <a href="#">Lektion 3659</a>
+            </td>
+            <td>
+              <a href="#">XXXX</a>
+            </td>
+            <td>
+              14/11 2014
+            </td>
+            <td>
+              21:00
+            </td>
+            <td>
+              22:00
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+{{end}}
+{{define "calendar"}}
+  <div class="row">
+    <div class="columns">
+      <h4>Kalender</h4>
+
+      <ul class="calendar">
+        <li class="title">December</li>
+        <li class="day-header">
+          <div class="small-1 medium-1 large-1 day">
+              <span class="show-for-medium-up">Mandag</span>
+              <span class="show-for-small">Man</span>
+          </div>
+          <div class="small-1 medium-1 large-1 day">
+              <span class="show-for-medium-up">Tirsdag</span>
+              <span class="show-for-small">Tir</span>
+          </div>
+          <div class="small-1 medium-1 large-1 day">
+              <span class="show-for-medium-up">Onsdag</span>
+              <span class="show-for-small">Ons</span>
+          </div>
+          <div class="small-1 medium-1 large-1 day">
+              <span class="show-for-large-up">Torsdag</span>
+              <span class="show-for-medium-down">Tor</span>
+          </div>
+          <div class="small-1 medium-1 large-1 day">
+              <span class="show-for-medium-up">Fredag</span>
+              <span class="show-for-small">Fre</span>
+          </div>
+          <div class="small-1 medium-1 large-1 day">
+              <span class="show-for-medium-up">Lørdag</span>
+              <span class="show-for-small">Lør</span>
+          </div>
+          <div class="small-1 medium-1 large-1 day">
+              <span class="show-for-medium-up">Søndag</span>
+              <span class="show-for-small">Søn</span>
+          </div>
+        </li>
+        <!--
+        <li class="week">
+          <div class="small-1 medium-1 large-1 day previous-month">27</div>
+        </li>
+        -->
+        <li class="week">
+          <div class="small-1 medium-1 large-1 day today">
+            <div class="num">1</div>
+          </div>
+          <div class="small-1 medium-1 large-1 day">
+            <div class="num">2</div>
+          </div>
+          <div class="small-1 medium-1 large-1 day active">
+            <div class="num">3</div>
+            <div class="inner">
+              Ryghold
+            </div>
+          </div>
+          <div class="small-1 medium-1 large-1 day">
+            <div class="num">4</div>
+            <div class="inner">
+              Spinning<br/>
+              Zumba
+            </div>
+          </div>
+          <div class="small-1 medium-1 large-1 day">
+            <div class="num">5</div>
+          </div>
+          <div class="small-1 medium-1 large-1 day">
+            <div class="num">6</div>
+          </div>
+          <div class="small-1 medium-1 large-1 day">
+            <div class="num">7</div>
+          </div>
+        </li>
+        <li class="week">
+          <div class="small-1 medium-1 large-1 day">
+            <div class="num">8</div>
+          </div>
+          <div class="small-1 medium-1 large-1 day">
+            <div class="num">9</div>
+          </div>
+          <div class="small-1 medium-1 large-1 day active">
+            <div class="num">10</div>
+            <div class="inner">
+              Ryghold<br/>
+              Stram op ...
+            </div>
+          </div>
+          <div class="small-1 medium-1 large-1 day">
+            <div class="num">11</div>
+            <div class="inner">
+              Spinning<br/>
+              Zumba
+            </div>
+          </div>
+          <div class="small-1 medium-1 large-1 day">
+            <div class="num">12</div>
+          </div>
+          <div class="small-1 medium-1 large-1 day">
+            <div class="num">13</div>
+          </div>
+          <div class="small-1 medium-1 large-1 day">
+            <div class="num">14</div>
+          </div>
+        </li>
+        <li class="week">
+          <div class="small-1 medium-1 large-1 day">15</div>
+          <div class="small-1 medium-1 large-1 day">16</div>
+          <div class="small-1 medium-1 large-1 day">17</div>
+          <div class="small-1 medium-1 large-1 day">18</div>
+          <div class="small-1 medium-1 large-1 day">19</div>
+          <div class="small-1 medium-1 large-1 day">20</div>
+          <div class="small-1 medium-1 large-1 day">21</div>
+        </li>
+        <li class="week">
+          <div class="small-1 medium-1 large-1 day">22</div>
+          <div class="small-1 medium-1 large-1 day">23</div>
+          <div class="small-1 medium-1 large-1 day">24</div>
+          <div class="small-1 medium-1 large-1 day">25</div>
+          <div class="small-1 medium-1 large-1 day">26</div>
+          <div class="small-1 medium-1 large-1 day">27</div>
+          <div class="small-1 medium-1 large-1 day">28</div>
+        </li>
+        <li class="week">
+          <div class="small-1 medium-1 large-1 day">
+            <div class="num">29</div>
+          </div>
+          <div class="small-1 medium-1 large-1 day">
+            <div class="num">30</div>
+          </div>
+          <div class="small-1 medium-1 large-1 day">
+            <div class="num">31</div>
+          </div>
+          <div class="small-1 medium-1 large-1 day next-month">
+            <div class="num">1</div>
+            <div class="inner">
+              Spinning<br/>
+              Zumba
+            </div>
+          </div>
+          <div class="small-1 medium-1 large-1 day next-month">
+            <div class="num">2</div>
+          </div>
+          <div class="small-1 medium-1 large-1 day next-month">
+            <div class="num">3</div>
+          </div>
+          <div class="small-1 medium-1 large-1 day next-month">
+            <div class="num">4</div>
+          </div>
+        </li>
+      </ul>
+      <div class="description">
+        For at få vist mere information om en dag - klik på den.
+      </div>
+    </div>
+  </div>
+{{end}}
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nykredit Fitness</title>
+    <link rel="stylesheet" href="css/app.css">
+    <script src="js/modernizr.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.6.2/html5shiv.js"></script>
+      <script src="//s3.amazonaws.com/nwapi/nwmatcher/nwmatcher-1.2.5-min.js"></script>
+      <script src="//html5base.googlecode.com/svn-history/r38/trunk/js/selectivizr-1.0.3b.js"></script>
+      <script src="//cdnjs.cloudflare.com/ajax/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+
+    <div class="row page-wrap">
+      <div class="large-12 columns">
+
+        {{ template "topnav" . }}
+        <div class="top-corner"></div>
+
+        {{ with .alert }}
+          {{ template "alert" . }}
+        {{ end }}
+
+        {{ if eq .page "login" }}
+          {{ template "login" }}
+        {{ else if eq .page "forgot" }}
+          {{ template "forgot" }}
+        {{ else if eq .page "signup" }}
+          {{ template "signup" }}
+        {{ else if eq .page "profile" }}
+          {{ template "profile" }}
+        {{ else if eq .page "list" }}
+          {{ template "list" }}
+        {{ else if eq .page "calendar" }}
+          {{ template "calendar" }}
+        {{ else }}
+          {{ template "welcome" }}
+        {{ end }}
+
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="large-12 columns text-center footer">
+        <a href="#">Nykredit Fitness</a>
+      </div>
+    </div>
+
+    <script src="js/jquery.min.js"></script>
+    <script src="js/foundation.min.js"></script>
+    <script>$(document).foundation()</script>
+  </body>
+</html>
