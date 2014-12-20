@@ -4,6 +4,7 @@ import (
   "errors"
   "log"
 
+  "code.google.com/p/go.crypto/bcrypt"
   "github.com/gin-gonic/gin"
   "github.com/gin-gonic/gin/binding"
 )
@@ -28,7 +29,7 @@ type ProfileForm struct {
   Name     string `form:"name"     binding:"required"`
   Email    string `form:"email"    binding:"required"`
   Mobile   string `form:"mobile"   binding:"required"`
-  Password string `form:"password" binding:"required"`
+  Password string `form:"password"`
   Language string `form:"language"`
 }
 
@@ -38,7 +39,7 @@ func handleLogin(c *gin.Context) {
     displayError(c, "Please enter email and password")
     return
   }
-  user_id, err := loginUser(form)
+  user_id, err := loginUser(&form)
   if err != nil {
     displayError(c, err.Error())
   } else {
@@ -58,7 +59,7 @@ func handleForgot(c *gin.Context) {
     displayError(c, "Please enter your email")
     return
   }
-  err := sendResetLink(form)
+  err := sendResetLink(&form)
   if err != nil {
     displayError(c, "Reminder email could not be sent")
   } else {
@@ -72,9 +73,9 @@ func handleSignup(c *gin.Context) {
     displayError(c, "Please provide all details")
     return
   }
-  err := createUser(form)
+  err := createUser(&form)
   if err != nil {
-    displayError(c, "User could not be created. Perhaps email is already used.")
+    displayError(c, err.Error())
   } else {
     forwardTo(c, "/login", "Please login with the entered credentials")
   }
@@ -82,14 +83,11 @@ func handleSignup(c *gin.Context) {
 
 func fetchProfile(c *gin.Context) {
   var form ProfileForm
-  user, _ := c.Get("user");
-  if user_id, ok := user.(*int); ok {
-    err := query["user_select"].QueryRow(*user_id).Scan(&form.Name, &form.Email, &form.Mobile, &form.Language)
+  if user_id, ok := currentUserId(c); ok {
+    err := query["user_select"].QueryRow(user_id).Scan(&form.Name, &form.Email, &form.Mobile, &form.Language)
     if err != nil {
       log.Printf("[APP] PROFILE error: %s, %#v\n", err, form)
     }
-  } else {
-    log.Printf("[APP] PROFILE error: user=%#v\n", user)
   }
   c.Set("form", form)
 }
@@ -100,9 +98,12 @@ func handleProfile(c *gin.Context) {
     displayError(c, "Please provide all details")
     return
   }
-  err := updateUser(form)
+  err := errors.New("")
+  if user_id, ok := currentUserId(c); ok {
+    err = updateUser(&form, user_id)
+  }
   if err != nil {
-    displayError(c, "User could not be updated. Perhaps email is already used.")
+    displayError(c, err.Error())
   } else {
     forwardTo(c, "/", "User profile has been updated.")
   }
@@ -110,21 +111,23 @@ func handleProfile(c *gin.Context) {
 
 // --- user actions ---
 
-func loginUser(form LoginForm) (int, error) {
+func loginUser(form *LoginForm) (int, error) {
   var user_id int
   var user_password string
-  err := query["password_select"].QueryRow(form.Email).Scan(&user_id, &user_password)
+  err := query["credentials"].QueryRow(form.Email).Scan(&user_id, &user_password)
   if err != nil {
     log.Printf("[APP] LOGIN failure: %#v, %#v\n", err, form.Email)
     return 0, errors.New("Invalid password or email")
-  } else if user_password != form.Password { // TODO: security!
+  }
+  err = bcrypt.CompareHashAndPassword([]byte(user_password), []byte(form.Password))
+  if err != nil {
     return 0, errors.New("Invalid password or email")
   } else {
     return user_id, nil
   }
 }
 
-func sendResetLink(form ForgotForm) error {
+func sendResetLink(form *ForgotForm) error {
   log.Printf("=> RESET\n   %#v\n", form.Email) // <<< DEBUG
   // <<< send email
   return nil
@@ -138,16 +141,61 @@ func resetPassword() error {
 }
 */
 
-func createUser(form SignupForm) error {
-  log.Printf("=> CREATE\n   %#v, %#v, %#v, %#v\n", form.Name, form.Email, form.Mobile, form.Password) // <<< DEBUG
-  // TODO: validate values
-  _, err := query["user_insert"].Exec(form.Name, form.Email, form.Mobile, form.Password)
-  return err
+func createUser(form *SignupForm) error {
+  err := validateUser(form.Name, form.Email, form.Mobile, form.Password, false)
+  if err != nil {
+    return err
+  }
+  form.Password = hashPassword(form.Password)
+  _, err = query["user_insert"].Exec(form.Name, form.Email, form.Mobile, form.Password)
+  if err != nil {
+    return errors.New("User could not be created. Perhaps email is already used.")
+  }
+  return nil
 }
 
-func updateUser(form ProfileForm) error {
-  log.Printf("=> UPDATE\n   %#v, %#v, %#v, %#v\n", form.Name, form.Email, form.Mobile, form.Password) // <<< DEBUG
-  // TODO: check password, conditionally
-  _, err := query["user_update"].Exec(form.Name, form.Email, form.Mobile, form.Password, form.Language, form.Email)
-  return err
+func updateUser(form *ProfileForm, user_id int) error {
+  err := validateUser(form.Name, form.Email, form.Mobile, form.Password, true)
+  if err != nil {
+    return err
+  }
+  ok := checkFormPassword(form, user_id)
+  if !ok {
+    return errors.New("User could not be updated. Password is invalid.")
+  }
+  _, err = query["user_update"].Exec(form.Name, form.Email, form.Mobile, form.Password, form.Language, user_id)
+  if err != nil {
+    return errors.New("User could not be updated. Perhaps email is already used.")
+  }
+  return nil
+}
+
+func validateUser(name, email, mobile, password string, allowEmpty bool) error {
+  log.Printf("=> VALIDATE\n   %#v, %#v, %#v, %#v\n", name, email, mobile, password) // <<< DEBUG
+  return nil
+}
+
+func checkFormPassword(form *ProfileForm, user_id int) bool {
+  if form.Password != "" {
+    form.Password = hashPassword(form.Password)
+    if form.Password == "" {
+      return false
+    }
+  } else {
+    var currentPassword string
+    err := query["password_select"].QueryRow(user_id).Scan(&currentPassword)
+    if err != nil {
+      return false
+    }
+    form.Password = currentPassword
+  }
+  return true
+}
+
+func hashPassword(password string) string {
+  hash, err := bcrypt.GenerateFromPassword([]byte(password), bcryptCost)
+  if err != nil {
+    log.Printf("[APP] BCRYPT error: %s\n", err)
+  }
+  return string(hash)
 }

@@ -21,6 +21,7 @@ func forwardTo(c *gin.Context, route string, message string) {
   c.Redirect(302, route)
 }
 
+
 // --- session methods ---
 
 func setSessionAuthInfo(c *gin.Context, user_id int) {
@@ -59,4 +60,15 @@ func deleteSession(c *gin.Context) {
   session, _ := cookie.Get(c.Request, sessionKey)
   defer session.Save(c.Request, c.Writer)
   session.Options.MaxAge = -1
+}
+
+func currentUserId(c *gin.Context) (int, bool) {
+  user, _ := c.Get("user")
+  user_id, ok := user.(*int)
+  if ok {
+    return *user_id, true
+  } else {
+    log.Printf("[APP] CUR_USER error: user=%#v\n", user)
+    return -1, false
+  }
 }

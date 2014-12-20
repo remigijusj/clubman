@@ -17,6 +17,7 @@ const (
   cookieAuth = "nk-fitness#nk-fitness#nk-fitness" // 32 bytes
   cookieEncr = "nk-fitness$nk-fitness$nk-fitness" // 32 bytes
   sessionKey = "session"
+  bcryptCost = 10
 )
 
 var db *sql.DB
@@ -46,11 +47,12 @@ func init() {
 
 func prepareSQL() {
   query = make(map[string]*sql.Stmt, 5)
-  query["password_select"], _ = db.Prepare("SELECT id, password FROM users WHERE email=?")
+  query["credentials"], _ = db.Prepare("SELECT id, password FROM users WHERE email=?")
+  query["password_select"], _ = db.Prepare("SELECT password FROM users WHERE id=?")
   query["password_update"], _ = db.Prepare("UPDATE users SET password=? WHERE email=?")
   query["user_select"], _ = db.Prepare("SELECT name, email, mobile, language FROM users WHERE id=?")
   query["user_insert"], _ = db.Prepare("INSERT INTO users(name, email, mobile, password) values (?, ?, ?, ?)")
-  query["user_update"], _ = db.Prepare("UPDATE users SET name=?, email=?, mobile=?, password=?, language=? WHERE email=?")
+  query["user_update"], _ = db.Prepare("UPDATE users SET name=?, email=?, mobile=?, password=?, language=? WHERE id=?")
 }
 
 func main() {
@@ -120,13 +122,14 @@ func authRequired() gin.HandlerFunc {
 }
 
 // --- TODO list ---
-// ~ display form values (password)
-//   remind email - reset password
-//   security: bcypt, scrypt, salt?
-//   user status handling (admin/normal)
-//   i18n
+//   reminder email - reset password
+//   validate user
+//   user status handling (unconfirmed/normal/admin)
+//   i18n: via setSessionAlert, tmpl
 
 // --- NICE list ---
+//   captcha
 //   form validation in JS
-//   pjax double render
-//   proper logging
+//   pjax + double render
+//   asset bundle, gzip, inline
+//   permanent log file
