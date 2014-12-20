@@ -186,7 +186,7 @@
               <label for="name">Navn</label>
             </div>
             <div class="small-8 columns">
-              <input id="name" name="name" type="text" placeholder="Anders Andersen" />
+              <input id="name" name="name" type="text" value="{{.Name}}" placeholder="Anders Andersen" />
             </div>
             <div class="small-12 columns description">
               Dit navn vil blive brugt forskellige steder.
@@ -197,7 +197,7 @@
               <label for="email">E-mail</label>
             </div>
             <div class="small-8 columns">
-              <input id="email" name="email" type="text" placeholder="min@e-mail.dk" />
+              <input id="email" name="email" type="text" value="{{.Email}}" placeholder="min@e-mail.dk" />
             </div>
             <div class="small-12 columns description">
               Din email vil blive brugt til at kontakte dig.
@@ -220,7 +220,7 @@
               <label for="mobile">Mobil nr.</label>
             </div>
             <div class="small-8 columns">
-              <input id="mobile" name="mobile" type="text" placeholder="+45 11223344" />
+              <input id="mobile" name="mobile" type="text" value="{{.Mobile}}" placeholder="+45 11223344" />
             </div>
             <div class="small-12 columns description">
               Dit mobil telefon nummer vil blive brugt til at minde dig om ting og til generel kontakt.
@@ -232,8 +232,8 @@
             </div>
             <div class="small-8 columns">
               <select id="language" name="language">
-                <option value="da">Dansk</option>
-                <option value="en">English</option>
+                <option value="da" {{if eq .Language "da"}}selected{{end}}>Dansk</option>
+                <option value="en" {{if eq .Language "en"}}selected{{end}}>English</option>
               </select>
             </div>
             <div class="small-12 columns description">
@@ -603,7 +603,7 @@
         {{ else if eq .page "signup" }}
           {{ template "signup" }}
         {{ else if eq .page "profile" }}
-          {{ template "profile" }}
+          {{ template "profile" .form }}
         {{ else if eq .page "list" }}
           {{ template "list" }}
         {{ else if eq .page "calendar" }}

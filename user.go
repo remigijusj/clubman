@@ -2,7 +2,7 @@ package main
 
 import (
   "errors"
-  "fmt"
+  "log"
 
   "github.com/gin-gonic/gin"
   "github.com/gin-gonic/gin/binding"
@@ -80,6 +80,20 @@ func handleSignup(c *gin.Context) {
   }
 }
 
+func fetchProfile(c *gin.Context) {
+  var form ProfileForm
+  user, _ := c.Get("user");
+  if user_id, ok := user.(*int); ok {
+    err := query["user_select"].QueryRow(*user_id).Scan(&form.Name, &form.Email, &form.Mobile, &form.Language)
+    if err != nil {
+      log.Printf("[APP] PROFILE error: %s, %#v\n", err, form)
+    }
+  } else {
+    log.Printf("[APP] PROFILE error: user=%#v\n", user)
+  }
+  c.Set("form", form)
+}
+
 func handleProfile(c *gin.Context) {
   var form ProfileForm
   if ok := c.BindWith(&form, binding.Form); !ok {
@@ -90,7 +104,7 @@ func handleProfile(c *gin.Context) {
   if err != nil {
     displayError(c, "User could not be updated. Perhaps email is already used.")
   } else {
-    forwardTo(c, "/login", "User profile has been updated.")
+    forwardTo(c, "/", "User profile has been updated.")
   }
 }
 
@@ -99,11 +113,11 @@ func handleProfile(c *gin.Context) {
 func loginUser(form LoginForm) (int, error) {
   var user_id int
   var user_password string
-  err := query["user_password"].QueryRow(form.Email).Scan(&user_id, &user_password)
+  err := query["password_select"].QueryRow(form.Email).Scan(&user_id, &user_password)
   if err != nil {
-    fmt.Printf("LOGIN FAIL: %#v, %#v\n", err, form.Email)
+    log.Printf("[APP] LOGIN failure: %#v, %#v\n", err, form.Email)
     return 0, errors.New("Invalid password or email")
-  } else if user_password != form.Password { // <<< security!
+  } else if user_password != form.Password { // TODO: security!
     return 0, errors.New("Invalid password or email")
   } else {
     return user_id, nil
@@ -111,27 +125,29 @@ func loginUser(form LoginForm) (int, error) {
 }
 
 func sendResetLink(form ForgotForm) error {
-  fmt.Printf("RESET: %#v\n", form.Email)
+  log.Printf("=> RESET\n   %#v\n", form.Email) // <<< DEBUG
   // <<< send email
   return nil
 }
 
 /*
 func resetPassword() error {
-  fmt.Printf("%#v\n", form.Email)
-  // <<< query["user_password_reset"].Exec(form.Email)
+  log.Printf("%#v\n", form.Email)
+  // <<< query["password_update"].Exec(form.Email)
   return nil
 }
 */
 
 func createUser(form SignupForm) error {
-  fmt.Printf("CREATE: %#v, %#v, %#v, %#v\n", form.Name, form.Email, form.Mobile, form.Password)
+  log.Printf("=> CREATE\n   %#v, %#v, %#v, %#v\n", form.Name, form.Email, form.Mobile, form.Password) // <<< DEBUG
+  // TODO: validate values
   _, err := query["user_insert"].Exec(form.Name, form.Email, form.Mobile, form.Password)
   return err
 }
 
 func updateUser(form ProfileForm) error {
-  fmt.Printf("UPDATE: %#v, %#v, %#v, %#v\n", form.Name, form.Email, form.Mobile, form.Password)
+  log.Printf("=> UPDATE\n   %#v, %#v, %#v, %#v\n", form.Name, form.Email, form.Mobile, form.Password) // <<< DEBUG
+  // TODO: check password, conditionally
   _, err := query["user_update"].Exec(form.Name, form.Email, form.Mobile, form.Password, form.Language, form.Email)
   return err
 }
