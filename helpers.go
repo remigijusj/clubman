@@ -1,8 +1,17 @@
 package main
 
 import (
+  "crypto/rand"
+  "fmt"
   "log"
+
+  "code.google.com/p/go.crypto/bcrypt"
   "github.com/gin-gonic/gin"
+)
+
+const (
+  sessionKey = "session"
+  bcryptCost = 10
 )
 
 // --- controller helpers ---
@@ -71,4 +80,28 @@ func currentUserId(c *gin.Context) (int, bool) {
     log.Printf("[APP] CUR_USER error: user=%#v\n", user)
     return -1, false
   }
+}
+
+// --- password-related ---
+
+func hashPassword(password string) string {
+  hash, err := bcrypt.GenerateFromPassword([]byte(password), bcryptCost)
+  if err != nil {
+    log.Printf("[APP] BCRYPT error: %s\n", err)
+  }
+  return string(hash)
+}
+
+func comparePassword(stored, given string) bool {
+  err := bcrypt.CompareHashAndPassword([]byte(stored), []byte(given))
+  if err != nil {
+    log.Printf("[APP] BCRYPT error: %s\n", err)
+  }
+  return err == nil
+}
+
+func generateToken(size int) string {
+  b := make([]byte, size)
+  rand.Read(b)
+  return fmt.Sprintf("%x", b)
 }

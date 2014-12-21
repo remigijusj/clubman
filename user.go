@@ -4,7 +4,6 @@ import (
   "errors"
   "log"
 
-  "code.google.com/p/go.crypto/bcrypt"
   "github.com/gin-gonic/gin"
   "github.com/gin-gonic/gin/binding"
 )
@@ -16,6 +15,12 @@ type LoginForm struct {
 
 type ForgotForm struct {
   Email    string `form:"email"    binding:"required"`
+}
+
+type ResetsForm struct {
+  Token    string `form:"token"    binding:"required"`
+  Email    string `form:"email"    binding:"required"`
+  Password string `form:"password" binding:"required"`
 }
 
 type SignupForm struct {
@@ -59,11 +64,22 @@ func handleForgot(c *gin.Context) {
     displayError(c, "Please enter your email")
     return
   }
-  err := sendResetLink(&form)
-  if err != nil {
+  ok := sendResetLink(&form)
+  if !ok {
     displayError(c, "Reminder email could not be sent")
   } else {
-    forwardTo(c, "/login", "Please check your inbox for reminder email")
+    forwardTo(c, "/login", "Email with instructions was sent to "+form.Email)
+  }
+}
+
+func handleReset(c *gin.Context) {
+  q := c.Request.URL.Query()
+  user_id, err := resetLinkLogin(q.Get("token"), q.Get("email"))
+  if err == nil {
+    setSessionAuthInfo(c, user_id)
+    forwardTo(c, "/profile", "Please enter new password and click save")
+  } else {
+    forwardTo(c, "/login", "Password reset request is invalid or expired") // TODO: warning
   }
 }
 
@@ -114,32 +130,49 @@ func handleProfile(c *gin.Context) {
 func loginUser(form *LoginForm) (int, error) {
   var user_id int
   var user_password string
-  err := query["credentials"].QueryRow(form.Email).Scan(&user_id, &user_password)
+  err := query["credentials_get"].QueryRow(form.Email).Scan(&user_id, &user_password)
   if err != nil {
     log.Printf("[APP] LOGIN failure: %#v, %#v\n", err, form.Email)
     return 0, errors.New("Invalid password or email")
   }
-  err = bcrypt.CompareHashAndPassword([]byte(user_password), []byte(form.Password))
-  if err != nil {
+  ok := comparePassword(user_password, form.Password)
+  if !ok {
     return 0, errors.New("Invalid password or email")
   } else {
     return user_id, nil
   }
 }
 
-func sendResetLink(form *ForgotForm) error {
-  log.Printf("=> RESET\n   %#v\n", form.Email) // <<< DEBUG
-  // <<< send email
-  return nil
+// NOTE: we don't reveal if email is missing or another problem occured
+// TODO: add extensive logging
+func sendResetLink(form *ForgotForm) bool {
+  token := generateToken(16)
+  res, err := query["password_forgot"].Exec(token, form.Email)
+  if err != nil {
+    return false
+  }
+  num, err := res.RowsAffected()
+  if num == 0 || err != nil {
+    return false
+  }
+  go sendResetEmail(form.Email, token)
+  return true
 }
 
-/*
-func resetPassword() error {
-  log.Printf("%#v\n", form.Email)
-  // <<< query["password_update"].Exec(form.Email)
-  return nil
+// TODO: maybe reset old password?
+func resetLinkLogin(token, email string) (int, error) {
+  var user_id int
+  err := query["password_resets"].QueryRow(token, email).Scan(&user_id)
+  if err == nil {
+    _, err = query["password_forgot"].Exec("", email)
+  }
+  if err == nil {
+    // TODO: internal logging
+  } else {
+    log.Printf("[APP] RESETS error: %s, token=%s, email=%s\n", err, token, email)
+  }
+  return user_id, err
 }
-*/
 
 func createUser(form *SignupForm) error {
   err := validateUser(form.Name, form.Email, form.Mobile, form.Password, false)
@@ -190,12 +223,4 @@ func checkFormPassword(form *ProfileForm, user_id int) bool {
     form.Password = currentPassword
   }
   return true
-}
-
-func hashPassword(password string) string {
-  hash, err := bcrypt.GenerateFromPassword([]byte(password), bcryptCost)
-  if err != nil {
-    log.Printf("[APP] BCRYPT error: %s\n", err)
-  }
-  return string(hash)
 }

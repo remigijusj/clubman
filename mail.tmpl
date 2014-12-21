@@ -1,0 +1,9 @@
+{{define "reset_subject"}}
+Password reset for {{serverHost}}
+{{end}}
+
+{{define "reset_message"}}
+<p><b>You have requested password reset for {{serverHost}}</b></p>"
+<p>Please click the link and change your password:</p>
+<p><a href="{{url}}">{{url}}</a></p>
+{{end}}

@@ -13,11 +13,11 @@ import (
 )
 
 const (
+  serverHost = "nk-fitness.dk"
+  serverRoot = "http://nk-fitness.dk"
   cookieHost = ""
   cookieAuth = "nk-fitness#nk-fitness#nk-fitness" // 32 bytes
   cookieEncr = "nk-fitness$nk-fitness$nk-fitness" // 32 bytes
-  sessionKey = "session"
-  bcryptCost = 10
 )
 
 var db *sql.DB
@@ -45,11 +45,13 @@ func init() {
   }
 }
 
+// TODO: ad-hoc struct
 func prepareSQL() {
   query = make(map[string]*sql.Stmt, 5)
-  query["credentials"], _ = db.Prepare("SELECT id, password FROM users WHERE email=?")
+  query["credentials_get"], _ = db.Prepare("SELECT id, password FROM users WHERE email=?")
   query["password_select"], _ = db.Prepare("SELECT password FROM users WHERE id=?")
-  query["password_update"], _ = db.Prepare("UPDATE users SET password=? WHERE email=?")
+  query["password_forgot"], _ = db.Prepare("UPDATE users SET reset_token=? WHERE email=?")
+  query["password_resets"], _ = db.Prepare("SELECT id FROM users WHERE reset_token=? AND email=?")
   query["user_select"], _ = db.Prepare("SELECT name, email, mobile, language FROM users WHERE id=?")
   query["user_insert"], _ = db.Prepare("INSERT INTO users(name, email, mobile, password) values (?, ?, ?, ?)")
   query["user_update"], _ = db.Prepare("UPDATE users SET name=?, email=?, mobile=?, password=?, language=? WHERE id=?")
@@ -68,13 +70,13 @@ func main() {
     s.Static("/js", "./js")
   }
 
-  r.GET("/login", displayPage)
-  r.GET("/forgot", displayPage)
-  // r.GET("/reset_password", displayPage)
+  r.GET("/login",  displayPage)
   r.GET("/signup", displayPage)
-  r.POST("/login", handleLogin)
-  r.POST("/forgot", handleForgot)
+  r.GET("/forgot", displayPage)
+  r.GET("/resets",  handleReset)
+  r.POST("/login",  handleLogin)
   r.POST("/signup", handleSignup)
+  r.POST("/forgot", handleForgot)
 
   a := r.Group("/", authRequired())
   {
@@ -122,14 +124,16 @@ func authRequired() gin.HandlerFunc {
 }
 
 // --- TODO list ---
-//   reminder email - reset password
-//   validate user
 //   user status handling (unconfirmed/normal/admin)
+//   users management
+//   validate user fields, forms
 //   i18n: via setSessionAlert, tmpl
 
 // --- NICE list ---
 //   captcha
+//   reset expiration
 //   form validation in JS
 //   pjax + double render
 //   asset bundle, gzip, inline
 //   permanent log file
+//   config file
