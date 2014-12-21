@@ -14,6 +14,10 @@ const (
   bcryptCost = 10
 )
 
+type Alert struct {
+  Kind, Message string
+}
+
 // --- controller helpers ---
 
 func displayError(c *gin.Context, message string) {
