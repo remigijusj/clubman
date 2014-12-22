@@ -28,6 +28,7 @@ var queries = map[string]string{
   "user_select":     "SELECT name, email, mobile, language FROM users WHERE id=?",
   "user_insert":     "INSERT INTO users(name, email, mobile, password) values (?, ?, ?, ?)",
   "user_update":     "UPDATE users SET name=?, email=?, mobile=?, password=?, language=? WHERE id=?",
+  "user_list":       "SELECT id, name, email FROM users",
 }
 
 var query map[string]*sql.Stmt
@@ -69,23 +70,19 @@ func main() {
 }
 
 func displayPage(c *gin.Context) {
-  obj := gin.H{}
-  obj["page"] = c.Request.URL.Path[1:]
+  setPage(c)
+
+  obj := gin.H(c.Keys)
   obj["alert"] = getSessionAlert(c)
-  if user, _ := c.Get("user"); user != nil {
-    obj["user"] = user
-  }
-  if form, _ := c.Get("form"); form != nil {
-    log.Printf("=> FORM:\n   %#v\n", form) // <<< DEBUG
-    obj["form"] = form
-  }
+  log.Printf("=> BINDING\n   %#v\n", obj) // <<< DEBUG
+
   c.HTML(200, "main.tmpl", obj)
 }
 
 func authRequired() gin.HandlerFunc {
   return func(c *gin.Context) {
-    if user := getSessionAuthInfo(c); user != nil {
-      c.Set("user", user)
+    if user_id := getSessionAuthInfo(c); user_id != nil {
+      c.Set("self", *user_id)
       return
     }
     if c.Request.URL.Path != "/" {
@@ -121,6 +118,12 @@ func defineRoutes(r *gin.Engine) {
     a.GET("/logout", handleLogout)
     a.GET("/profile", fetchProfile, displayPage)
     a.POST("/profile", handleProfile)
+
+    // TODO: admin group
+    a.GET("/users", fetchUsersList, displayPage)
+    a.GET("/users/:user_id/profile", fetchUserProfile, displayPage)
+    //a.POST("/users/:user_id/profile", handleUserProfile)
+    //a.POST("/users/:user_id/delete", handleUserDelete)
 
     a.GET("/list", displayPage)
     a.GET("/calendar", displayPage)

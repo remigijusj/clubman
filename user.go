@@ -3,6 +3,7 @@ package main
 import (
   "errors"
   "log"
+  "strconv"
 
   "github.com/gin-gonic/gin"
   "github.com/gin-gonic/gin/binding"
@@ -36,6 +37,12 @@ type ProfileForm struct {
   Mobile   string `form:"mobile"   binding:"required"`
   Password string `form:"password"`
   Language string `form:"language"`
+}
+
+type UserRecord struct {
+  Id       int
+  Name     string
+  Email    string
 }
 
 func handleLogin(c *gin.Context) {
@@ -98,14 +105,16 @@ func handleSignup(c *gin.Context) {
 }
 
 func fetchProfile(c *gin.Context) {
-  var form ProfileForm
+  var form *ProfileForm
   if user_id, ok := currentUserId(c); ok {
-    err := query["user_select"].QueryRow(user_id).Scan(&form.Name, &form.Email, &form.Mobile, &form.Language)
-    if err != nil {
-      log.Printf("[APP] PROFILE error: %s, %#v\n", err, form)
-    }
+    form = getUser(user_id)
   }
-  c.Set("form", form)
+  if form != nil {
+    c.Set("form", *form)
+  } else {
+    forwardTo(c, "/", "Critical error happened. Please contact website admin.")
+    c.Abort(0)
+  }
 }
 
 func handleProfile(c *gin.Context) {
@@ -122,6 +131,45 @@ func handleProfile(c *gin.Context) {
     displayError(c, err.Error())
   } else {
     forwardTo(c, "/", "User profile has been updated.")
+  }
+}
+
+func fetchUsersList(c *gin.Context) {
+  rows, err := query["user_list"].Query()
+  if err != nil {
+    log.Printf("[APP] USER_LIST error: %s\n", err)
+    return
+  }
+  defer rows.Close()
+  list := []UserRecord{}
+  for rows.Next() {
+    var item UserRecord
+    err := rows.Scan(&item.Id, &item.Name, &item.Email)
+    if err != nil {
+      log.Printf("[APP] USER_LIST error: %s\n", err)
+    } else {
+      list = append(list, item)
+    }
+  }
+  if err := rows.Err(); err != nil {
+    log.Printf("[APP] USER_LIST error: %s\n", err)
+  }
+  c.Set("list", list)
+}
+
+func fetchUserProfile(c *gin.Context) {
+  var form *ProfileForm
+  user := c.Params.ByName("user_id")
+  if user_id, err := strconv.Atoi(user); err == nil {
+    form = getUser(user_id)
+  }
+  if form != nil {
+    c.Set("page", "users_profile") // override
+    c.Set("user", user)
+    c.Set("form", *form)
+  } else {
+    forwardTo(c, "/users", "ERROR: user profile not found.") // <<< warning
+    c.Abort(0)
   }
 }
 
@@ -201,6 +249,16 @@ func updateUser(form *ProfileForm, user_id int) error {
     return errors.New("User could not be updated. Perhaps email is already used.")
   }
   return nil
+}
+
+func getUser(user_id int) *ProfileForm {
+  var form ProfileForm
+  err := query["user_select"].QueryRow(user_id).Scan(&form.Name, &form.Email, &form.Mobile, &form.Language)
+  if err != nil {
+    log.Printf("[APP] PROFILE error: %s, %#v\n", err, form)
+    return nil
+  }
+  return &form
 }
 
 func validateUser(name, email, mobile, password string, allowEmpty bool) error {

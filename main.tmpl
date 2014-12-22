@@ -2,13 +2,13 @@
   <nav class="top-bar" data-topbar role="navigation">
     <ul class="title-area">
       <li class="name">
-        <h1><a href="/"><img src="img/logo.gif" /></a></h1>
+        <h1><a href="/"><img src="/img/logo.gif" /></a></h1>
       </li>
       <li class="toggle-topbar menu-icon"><a href="#"><span></span></a></li>
     </ul>
     <section class="top-bar-section">
       <ul class="right">
-      {{ if .user }}
+      {{ if .self }}
         <li><a href="/calendar">Kalender</a></li>
         <li><a href="/list">Hold</a></li>
         <li><a href="#">Mine tilmeldinger</a></li>
@@ -16,7 +16,7 @@
           <a href="#">Administration</a>
           <ul class="dropdown">
             <li><a href="#">Logs</a></li>
-            <li><a href="#">Brugere</a></li>
+            <li><a href="/users">Brugere</a></li>
           </ul>
         </li>
         <li class="has-dropdown">
@@ -175,74 +175,95 @@
     </div>
   </div>
 {{end}}
+{{define "profile_fields"}}
+  <div class="row">
+    <div class="small-4 columns">
+      <label for="name">Navn</label>
+    </div>
+    <div class="small-8 columns">
+      <input id="name" name="name" type="text" value="{{.Name}}" placeholder="Anders Andersen" />
+    </div>
+    <div class="small-12 columns description">
+      Dit navn vil blive brugt forskellige steder.
+    </div>
+  </div>
+  <div class="row">
+    <div class="small-4 columns">
+      <label for="email">E-mail</label>
+    </div>
+    <div class="small-8 columns">
+      <input id="email" name="email" type="text" value="{{.Email}}" placeholder="min@e-mail.dk" />
+    </div>
+    <div class="small-12 columns description">
+      Din email vil blive brugt til at kontakte dig.
+    </div>
+  </div>
+  <div class="row">
+    <div class="small-4 columns">
+      <label for="password">Adgangskode</label>
+    </div>
+    <div class="small-8 columns">
+      <input type="password" style="display:none" />
+      <input id="password" name="password" type="password" placeholder="" />
+    </div>
+    <div class="small-12 columns description">
+      Indtast en ny adgangskode her, hvis du ønsker at ændre din personale adgangskode for siden.
+    </div>
+  </div>
+  <div class="row">
+    <div class="small-4 columns">
+      <label for="mobile">Mobil telefon</label>
+    </div>
+    <div class="small-8 columns">
+      <input id="mobile" name="mobile" type="text" value="{{.Mobile}}" placeholder="+45 11223344" />
+    </div>
+    <div class="small-12 columns description">
+      Dit mobil telefon nummer vil blive brugt til at minde dig om ting og til generel kontakt.
+    </div>
+  </div>
+  <div class="row">
+    <div class="small-4 columns">
+      <label for="language">Sprog</label>
+    </div>
+    <div class="small-8 columns">
+      <select id="language" name="language">
+        <option value="da" {{if eq .Language "da"}}selected{{end}}>Dansk</option>
+        <option value="en" {{if eq .Language "en"}}selected{{end}}>English</option>
+      </select>
+    </div>
+    <div class="small-12 columns description">
+      Sproget som du foretrækker at se siden i.
+    </div>
+  </div>
+{{end}}
 {{define "profile"}}
   <div class="row">
     <div class="large-6 medium-8 columns">
       <h4>Rediger din profil</h4>
       <div class="panel">
         <form action="/profile" method="POST">
-          <div class="row">
-            <div class="small-4 columns">
-              <label for="name">Navn</label>
-            </div>
-            <div class="small-8 columns">
-              <input id="name" name="name" type="text" value="{{.Name}}" placeholder="Anders Andersen" />
-            </div>
-            <div class="small-12 columns description">
-              Dit navn vil blive brugt forskellige steder.
-            </div>
-          </div>
-          <div class="row">
-            <div class="small-4 columns">
-              <label for="email">E-mail</label>
-            </div>
-            <div class="small-8 columns">
-              <input id="email" name="email" type="text" value="{{.Email}}" placeholder="min@e-mail.dk" />
-            </div>
-            <div class="small-12 columns description">
-              Din email vil blive brugt til at kontakte dig.
-            </div>
-          </div>
-          <div class="row">
-            <div class="small-4 columns">
-              <label for="password">Adgangskode</label>
-            </div>
-            <div class="small-8 columns">
-              <input type="password" style="display:none" />
-              <input id="password" name="password" type="password" placeholder="" />
-            </div>
-            <div class="small-12 columns description">
-              Indtast en ny adgangskode her, hvis du ønsker at ændre din personale adgangskode for siden.
-            </div>
-          </div>
-          <div class="row">
-            <div class="small-4 columns">
-              <label for="mobile">Mobil telefon</label>
-            </div>
-            <div class="small-8 columns">
-              <input id="mobile" name="mobile" type="text" value="{{.Mobile}}" placeholder="+45 11223344" />
-            </div>
-            <div class="small-12 columns description">
-              Dit mobil telefon nummer vil blive brugt til at minde dig om ting og til generel kontakt.
-            </div>
-          </div>
-          <div class="row">
-            <div class="small-4 columns">
-              <label for="language">Sprog</label>
-            </div>
-            <div class="small-8 columns">
-              <select id="language" name="language">
-                <option value="da" {{if eq .Language "da"}}selected{{end}}>Dansk</option>
-                <option value="en" {{if eq .Language "en"}}selected{{end}}>English</option>
-              </select>
-            </div>
-            <div class="small-12 columns description">
-              Sproget som du foretrækker at se siden i.
-            </div>
-          </div>
+          {{template "profile_fields" .form }}
           <div class="row end">
             <div class="columns">
               <input type="submit" class="button tiny radius" value="Gem" />
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+{{end}}
+{{define "users_profile"}}
+  <div class="row">
+    <div class="large-6 medium-8 columns">
+      <h4>Rediger bruger profil</h4>
+      <div class="panel">
+        <form action="/users/{{.user}}/profile" method="POST">
+          {{template "profile_fields" .form }}
+          <div class="row end">
+            <div class="columns">
+              <input type="submit" class="button tiny radius" value="Gem" />
+              <input type="button" class="button tiny radius delete" value="Slet" />
             </div>
           </div>
         </form>
@@ -259,6 +280,38 @@
   <div class="row">
     <div class="columns">
       <p>You have logged-in to nk-fitness.dk</p>
+    </div>
+  </div>
+{{end}}
+{{define "users"}}
+  <div class="row">
+    <div class="large-8 columns">
+      <h4>Brugere</h4>
+
+      <table class="list">
+        <thead>
+          <tr>
+            <td>Navn</td>
+            <td>E-mail</td>
+            <td>Actions</td>
+          </tr>
+        </thead>
+        <tbody>
+          {{range .}}
+          <tr>
+            <td>
+              <a href="/users/{{.Id}}/show">{{.Name}}</a>
+            </td>
+            <td>
+              {{.Email}}
+            </td>
+            <td>
+              <a href="/users/{{.Id}}/profile">Rediger</a>
+            </td>
+          </tr>
+          {{end}}
+        </tbody>
+      </table>
     </div>
   </div>
 {{end}}
@@ -580,8 +633,8 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Nykredit Fitness</title>
-    <link rel="stylesheet" href="css/app.css">
-    <script src="js/modernizr.js"></script>
+    <link rel="stylesheet" href="/css/app.css">
+    <script src="/js/modernizr.js"></script>
     <!--[if lt IE 9]>
       <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.6.2/html5shiv.js"></script>
       <script src="//s3.amazonaws.com/nwapi/nwmatcher/nwmatcher-1.2.5-min.js"></script>
@@ -590,7 +643,6 @@
     <![endif]-->
   </head>
   <body>
-
     <div class="row page-wrap">
       <div class="large-12 columns">
 
@@ -608,7 +660,11 @@
         {{ else if eq .page "signup" }}
           {{ template "signup" }}
         {{ else if eq .page "profile" }}
-          {{ template "profile" .form }}
+          {{ template "profile" . }}
+        {{ else if eq .page "users_profile" }}
+          {{ template "users_profile" . }}
+        {{ else if eq .page "users" }}
+          {{ template "users" .list }}
         {{ else if eq .page "list" }}
           {{ template "list" }}
         {{ else if eq .page "calendar" }}
@@ -626,8 +682,9 @@
       </div>
     </div>
 
-    <script src="js/jquery.min.js"></script>
-    <script src="js/foundation.min.js"></script>
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/foundation.min.js"></script>
+    <script src="/js/app.js"></script>
     <script>$(document).foundation()</script>
   </body>
 </html>

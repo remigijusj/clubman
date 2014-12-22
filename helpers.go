@@ -4,6 +4,7 @@ import (
   "crypto/rand"
   "fmt"
   "log"
+  "strings"
 
   "code.google.com/p/go.crypto/bcrypt"
   "github.com/gin-gonic/gin"
@@ -19,6 +20,16 @@ type Alert struct {
 }
 
 // --- controller helpers ---
+
+func setPage(c *gin.Context) {
+  p, _ := c.Get("page")
+  if page, ok := p.(string); ok {
+    return
+  }
+  path := c.Request.URL.Path
+  idx := strings.LastIndex(path, "/")
+  c.Set("page", path[idx+1:])
+}
 
 func displayError(c *gin.Context, message string) {
   if len(message) > 0 {
@@ -43,6 +54,7 @@ func setSessionAuthInfo(c *gin.Context, user_id int) {
   session.Values["user_id"] = user_id
 }
 
+// TODO: moreinfo, struct?
 func getSessionAuthInfo(c *gin.Context) *int {
   session, _ := cookie.Get(c.Request, sessionKey)
   log.Printf("=> SESSION\n   %#v, %#v\n", session.Values, session.Options) // <<< DEBUG
@@ -76,10 +88,10 @@ func deleteSession(c *gin.Context) {
 }
 
 func currentUserId(c *gin.Context) (int, bool) {
-  user, _ := c.Get("user")
-  user_id, ok := user.(*int)
+  user, _ := c.Get("self")
+  user_id, ok := user.(int)
   if ok {
-    return *user_id, true
+    return user_id, true
   } else {
     log.Printf("[APP] CUR_USER error: user=%#v\n", user)
     return -1, false
