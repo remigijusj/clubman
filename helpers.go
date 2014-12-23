@@ -22,13 +22,16 @@ type Alert struct {
 // --- controller helpers ---
 
 func setPage(c *gin.Context) {
-  p, _ := c.Get("page")
-  if page, ok := p.(string); ok {
+  if _, err := c.Get("page"); err == nil {
     return
   }
-  path := c.Request.URL.Path
-  idx := strings.LastIndex(path, "/")
-  c.Set("page", path[idx+1:])
+  tokens := strings.Split(c.Request.URL.Path[1:], "/")
+  switch {
+  case len(tokens) == 1:
+    c.Set("page", tokens[0])
+  case len(tokens) > 1:
+    c.Set("page", tokens[0] + "_" + tokens[1])
+  }
 }
 
 func displayError(c *gin.Context, message string) {
@@ -41,6 +44,13 @@ func displayError(c *gin.Context, message string) {
 func forwardTo(c *gin.Context, route string, message string) {
   if len(message) > 0 {
     setSessionAlert(c, &Alert{"success", message})
+  }
+  c.Redirect(302, route)
+}
+
+func forwardWarning(c *gin.Context, route string, message string) {
+  if len(message) > 0 {
+    setSessionAlert(c, &Alert{"warning", message})
   }
   c.Redirect(302, route)
 }
@@ -96,6 +106,11 @@ func currentUserId(c *gin.Context) (int, bool) {
     log.Printf("[APP] CUR_USER error: user=%#v\n", user)
     return -1, false
   }
+}
+
+func isAuthenticated(c *gin.Context) bool {
+  _, err := c.Get("self")
+  return err == nil
 }
 
 // --- password-related ---

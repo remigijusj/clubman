@@ -26,8 +26,9 @@ var queries = map[string]string{
   "password_forgot": "UPDATE users SET reset_token=? WHERE email=?",
   "password_resets": "SELECT id FROM users WHERE reset_token=? AND email=?",
   "user_select":     "SELECT name, email, mobile, language FROM users WHERE id=?",
-  "user_insert":     "INSERT INTO users(name, email, mobile, password) values (?, ?, ?, ?)",
+  "user_insert":     "INSERT INTO users(name, email, mobile, password, language) values (?, ?, ?, ?, ?)",
   "user_update":     "UPDATE users SET name=?, email=?, mobile=?, password=?, language=? WHERE id=?",
+  "user_delete":     "DELETE FROM users WHERE id=?",
   "user_list":       "SELECT id, name, email FROM users",
 }
 
@@ -81,8 +82,8 @@ func displayPage(c *gin.Context) {
 
 func authRequired() gin.HandlerFunc {
   return func(c *gin.Context) {
-    if user_id := getSessionAuthInfo(c); user_id != nil {
-      c.Set("self", *user_id)
+    if self_id := getSessionAuthInfo(c); self_id != nil {
+      c.Set("self", *self_id)
       return
     }
     if c.Request.URL.Path != "/" {
@@ -104,27 +105,30 @@ func defineRoutes(r *gin.Engine) {
   }
 
   r.GET("/login",  displayPage)
-  r.GET("/signup", displayPage)
   r.GET("/forgot", displayPage)
+  r.GET("/signup", displayPage)
   r.GET("/resets",  handleReset)
   r.POST("/login",  handleLogin)
-  r.POST("/signup", handleSignup)
   r.POST("/forgot", handleForgot)
+  r.POST("/signup", handleUserCreate)
 
   a := r.Group("/", authRequired())
   {
     // TODO: redirect to welcome?
     a.GET("/", displayPage)
     a.GET("/logout", handleLogout)
-    a.GET("/profile", fetchProfile, displayPage)
+    a.GET("/profile", getProfile, displayPage)
     a.POST("/profile", handleProfile)
 
     // TODO: admin group
-    a.GET("/users", fetchUsersList, displayPage)
-    a.GET("/users/:user_id/profile", fetchUserProfile, displayPage)
-    //a.POST("/users/:user_id/profile", handleUserProfile)
-    //a.POST("/users/:user_id/delete", handleUserDelete)
+    a.GET("/users", getUsersList, displayPage)
+    a.GET("/users/create", newUserForm, displayPage)
+    a.POST("/users/create", handleUserCreate)
+    a.GET("/users/update/:id", getUserForm, displayPage)
+    a.POST("/users/update/:id", handleUserProfile)
+    a.POST("/users/delete/:id", handleUserDelete)
 
+    // TODO: implement
     a.GET("/list", displayPage)
     a.GET("/calendar", displayPage)
   }

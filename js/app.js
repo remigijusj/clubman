@@ -1,8 +1,9 @@
 $(function(){
   // support DELETE button in forms
   $('input.delete').click(function(){
-    var form = $(this).closest('form');
-    var action = form.prop('action').replace(/\w+$/, 'delete');
+    var el = $(this);
+    var form = el.closest('form');
+    var action = el.data('action');
     form.prop('action', action).submit();
   });
 });
