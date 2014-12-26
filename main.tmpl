@@ -8,7 +8,7 @@
     </ul>
     <section class="top-bar-section">
       <ul class="right">
-      {{ if .self }}
+      {{ with .self }}
         <li><a href="/calendar">Calendar</a></li>
         <li><a href="/list">Hold</a></li>
         <li><a href="#">My assignments</a></li>
@@ -20,7 +20,7 @@
           </ul>
         </li>
         <li class="has-dropdown">
-          <a href="#">Name ({{.self}})</a>
+          <a href="#">{{.Name}}</a>
           <ul class="dropdown">
             <li><a href="/profile">Edit profile</a></li>
             <li><a href="/logout">Log out</a></li>
@@ -269,7 +269,7 @@
           <div class="row end">
             <div class="columns">
               <input type="submit" class="button tiny radius" value="Save" />
-              {{if ne .user .self}}
+              {{if ne .user .self.Id}}
                 <input type="button" class="button tiny radius delete" value="Delete" data-action="/users/delete/{{.user}}" />
               {{end}}
             </div>
@@ -323,6 +323,7 @@
           </tr>
         </thead>
         <tbody>
+          {{ $selfId := .self.Id }}
           {{range .list}}
           <tr>
             <td>
@@ -332,7 +333,9 @@
               {{.Email}}
             </td>
             <td>
+              {{if ne .Id $selfId }}
               <a href="/users/update/{{.Id}}">Edit</a>
+              {{end}}
             </td>
           </tr>
           {{end}}

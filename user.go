@@ -28,19 +28,19 @@ type UserRecord struct {
   Email    string
 }
 
-func loginUser(form *LoginForm) (int, error) {
-  var user_id int
+func loginUserByForm(form *LoginForm) (*AuthInfo, error) {
+  var auth AuthInfo
   var user_password string
-  err := query["credentials_get"].QueryRow(form.Email).Scan(&user_id, &user_password)
+  err := query["credentials_get"].QueryRow(form.Email).Scan(&user_password, &auth.Id, &auth.Name, &auth.Status)
   if err != nil {
     log.Printf("[APP] LOGIN failure: %#v, %#v\n", err, form.Email)
-    return 0, errors.New("Invalid password or email")
+    return nil, errors.New("Invalid password or email")
   }
   ok := comparePassword(user_password, form.Password)
   if !ok {
-    return 0, errors.New("Invalid password or email")
+    return nil, errors.New("Invalid password or email")
   } else {
-    return user_id, nil
+    return &auth, nil
   }
 }
 
@@ -61,9 +61,9 @@ func sendResetLink(form *ForgotForm) bool {
 }
 
 // TODO: maybe reset old password?
-func resetLinkLogin(token, email string) (int, error) {
-  var user_id int
-  err := query["password_resets"].QueryRow(token, email).Scan(&user_id)
+func loginUserByToken(token, email string) (*AuthInfo, error) {
+  var auth AuthInfo
+  err := query["password_resets"].QueryRow(token, email).Scan(&auth.Id, &auth.Name, &auth.Status)
   if err == nil {
     _, err = query["password_forgot"].Exec("", email)
   }
@@ -72,7 +72,30 @@ func resetLinkLogin(token, email string) (int, error) {
   } else {
     log.Printf("[APP] RESETS error: %s, token=%s, email=%s\n", err, token, email)
   }
-  return user_id, err
+  return &auth, err
+}
+
+func listUsers() []UserRecord {
+  list := []UserRecord{}
+  rows, err := query["user_list"].Query()
+  if err != nil {
+    log.Printf("[APP] USER_LIST error: %s\n", err)
+    return list
+  }
+  defer rows.Close()
+  for rows.Next() {
+    var item UserRecord
+    err := rows.Scan(&item.Id, &item.Name, &item.Email)
+    if err != nil {
+      log.Printf("[APP] USER_LIST error: %s\n", err)
+    } else {
+      list = append(list, item)
+    }
+  }
+  if err := rows.Err(); err != nil {
+    log.Printf("[APP] USER_LIST error: %s\n", err)
+  }
+  return list
 }
 
 func createUser(form *ProfileForm) error {
@@ -113,7 +136,7 @@ func deleteUser(user_id int) error {
   return nil
 }
 
-func getUser(user_id int) *ProfileForm {
+func fetchUserProfile(user_id int) *ProfileForm {
   var form ProfileForm
   err := query["user_select"].QueryRow(user_id).Scan(&form.Name, &form.Email, &form.Mobile, &form.Language)
   if err != nil {

@@ -1,8 +1,6 @@
 package main
 
 import (
-  "errors"
-  "log"
   "strconv"
 
   "github.com/gin-gonic/gin"
@@ -15,11 +13,11 @@ func handleLogin(c *gin.Context) {
     displayError(c, "Please enter email and password")
     return
   }
-  user_id, err := loginUser(&form)
+  auth, err := loginUserByForm(&form)
   if err != nil {
     displayError(c, err.Error())
   } else {
-    setSessionAuthInfo(c, user_id)
+    setSessionAuthInfo(c, auth)
     forwardTo(c, "/", "")
   }
 }
@@ -45,26 +43,26 @@ func handleForgot(c *gin.Context) {
 
 func handleReset(c *gin.Context) {
   q := c.Request.URL.Query()
-  user_id, err := resetLinkLogin(q.Get("token"), q.Get("email"))
-  if err == nil {
-    setSessionAuthInfo(c, user_id)
-    forwardTo(c, "/profile", "Please enter new password and click save")
+  auth, err := loginUserByToken(q.Get("token"), q.Get("email"))
+  if err != nil {
+    forwardWarning(c, "/login", "Password reset request is invalid or expired")
   } else {
-    forwardTo(c, "/login", "Password reset request is invalid or expired") // TODO: warning
+    setSessionAuthInfo(c, auth)
+    forwardTo(c, "/profile", "Please enter new password and click save")
   }
 }
 
-// TODO: eliminate *, error from getUser
+// TODO: eliminate *, error from fetchUserProfile
 func getProfile(c *gin.Context) {
   var form *ProfileForm
   if user_id, ok := currentUserId(c); ok {
-    form = getUser(user_id)
+    form = fetchUserProfile(user_id)
   }
-  if form != nil {
-    c.Set("form", *form)
-  } else {
+  if form == nil {
     forwardTo(c, "/", "Critical error happened. Please contact website admin.")
     c.Abort(0)
+  } else {
+    c.Set("form", *form)
   }
 }
 
@@ -74,7 +72,7 @@ func handleProfile(c *gin.Context) {
     displayError(c, "Please provide all details")
     return
   }
-  err := errors.New("")
+  var err error
   if user_id, ok := currentUserId(c); ok {
     err = updateUser(&form, user_id)
   }
@@ -85,48 +83,31 @@ func handleProfile(c *gin.Context) {
   }
 }
 
-// TODO: refactor to user.go (query)
+// TODO: filter, search
 func getUsersList(c *gin.Context) {
-  rows, err := query["user_list"].Query()
-  if err != nil {
-    log.Printf("[APP] USER_LIST error: %s\n", err)
-    return
-  }
-  defer rows.Close()
-  list := []UserRecord{}
-  for rows.Next() {
-    var item UserRecord
-    err := rows.Scan(&item.Id, &item.Name, &item.Email)
-    if err != nil {
-      log.Printf("[APP] USER_LIST error: %s\n", err)
-    } else {
-      list = append(list, item)
-    }
-  }
-  if err := rows.Err(); err != nil {
-    log.Printf("[APP] USER_LIST error: %s\n", err)
-  }
+  list := listUsers()
   c.Set("list", list)
 }
 
 func newUserForm(c *gin.Context) {
-  c.Set("form", ProfileForm{})
+  form := ProfileForm{}
+  c.Set("form", form)
 }
 
-// TODO: eliminate *, error from getUser
+// TODO: eliminate *, error from fetchUserProfile
 func getUserForm(c *gin.Context) {
   var form *ProfileForm
   user := c.Params.ByName("id")
   user_id, err := strconv.Atoi(user)
   if err == nil {
-    form = getUser(user_id)
+    form = fetchUserProfile(user_id)
   }
-  if form != nil {
-    c.Set("user", user_id)
-    c.Set("form", *form)
-  } else {
+  if form == nil {
     forwardWarning(c, "/users", "ERROR: user profile not found.")
     c.Abort(0)
+  } else {
+    c.Set("user", user_id)
+    c.Set("form", *form)
   }
 }
 
@@ -149,7 +130,7 @@ func handleUserCreate(c *gin.Context) {
 }
 
 // TODO: de-duplicate with handleProfile
-func handleUserProfile(c *gin.Context) {
+func handleUserUpdate(c *gin.Context) {
   var form ProfileForm
   if ok := c.BindWith(&form, binding.Form); !ok {
     displayError(c, "Please provide all details")

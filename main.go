@@ -21,10 +21,10 @@ const (
 )
 
 var queries = map[string]string{
-  "credentials_get": "SELECT id, password FROM users WHERE email=?",
+  "credentials_get": "SELECT password, id, name, status FROM users WHERE email=?",
   "password_select": "SELECT password FROM users WHERE id=?",
   "password_forgot": "UPDATE users SET reset_token=? WHERE email=?",
-  "password_resets": "SELECT id FROM users WHERE reset_token=? AND email=?",
+  "password_resets": "SELECT id, name, status FROM users WHERE reset_token=? AND email=?",
   "user_select":     "SELECT name, email, mobile, language FROM users WHERE id=?",
   "user_insert":     "INSERT INTO users(name, email, mobile, password, language) values (?, ?, ?, ?, ?)",
   "user_update":     "UPDATE users SET name=?, email=?, mobile=?, password=?, language=? WHERE id=?",
@@ -38,6 +38,7 @@ var cookie *sessions.CookieStore
 func init() {
   log.SetFlags(0)
   gob.Register(&Alert{})
+  gob.Register(&AuthInfo{})
 }
 
 func prepareQueries() {
@@ -82,8 +83,8 @@ func displayPage(c *gin.Context) {
 
 func authRequired() gin.HandlerFunc {
   return func(c *gin.Context) {
-    if self_id := getSessionAuthInfo(c); self_id != nil {
-      c.Set("self", *self_id)
+    if auth := getSessionAuthInfo(c); auth != nil {
+      c.Set("self", *auth)
       return
     }
     if c.Request.URL.Path != "/" {
@@ -125,7 +126,7 @@ func defineRoutes(r *gin.Engine) {
     a.GET("/users/create", newUserForm, displayPage)
     a.POST("/users/create", handleUserCreate)
     a.GET("/users/update/:id", getUserForm, displayPage)
-    a.POST("/users/update/:id", handleUserProfile)
+    a.POST("/users/update/:id", handleUserUpdate)
     a.POST("/users/delete/:id", handleUserDelete)
 
     // TODO: implement

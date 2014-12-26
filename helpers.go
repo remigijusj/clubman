@@ -19,6 +19,12 @@ type Alert struct {
   Kind, Message string
 }
 
+type AuthInfo struct {
+  Id     int
+  Name   string
+  Status int
+}
+
 // --- controller helpers ---
 
 func setPage(c *gin.Context) {
@@ -58,18 +64,17 @@ func forwardWarning(c *gin.Context, route string, message string) {
 
 // --- session methods ---
 
-func setSessionAuthInfo(c *gin.Context, user_id int) {
+func setSessionAuthInfo(c *gin.Context, auth *AuthInfo) {
   session, _ := cookie.Get(c.Request, sessionKey)
   defer session.Save(c.Request, c.Writer)
-  session.Values["user_id"] = user_id
+  session.Values["auth"] = auth
 }
 
-// TODO: moreinfo, struct?
-func getSessionAuthInfo(c *gin.Context) *int {
+func getSessionAuthInfo(c *gin.Context) *AuthInfo {
   session, _ := cookie.Get(c.Request, sessionKey)
   log.Printf("=> SESSION\n   %#v, %#v\n", session.Values, session.Options) // <<< DEBUG
-  if user_id, ok := session.Values["user_id"].(int); ok {
-    return &user_id
+  if auth, ok := session.Values["auth"].(*AuthInfo); ok {
+    return auth
   }
   return nil
 }
@@ -98,12 +103,12 @@ func deleteSession(c *gin.Context) {
 }
 
 func currentUserId(c *gin.Context) (int, bool) {
-  user, _ := c.Get("self")
-  user_id, ok := user.(int)
+  self, _ := c.Get("self")
+  auth, ok := self.(AuthInfo)
   if ok {
-    return user_id, true
+    return auth.Id, true
   } else {
-    log.Printf("[APP] CUR_USER error: user=%#v\n", user)
+    log.Printf("[APP] CUR_USER error: self=%#v\n", self)
     return -1, false
   }
 }
