@@ -10,15 +10,17 @@
       <ul class="right">
       {{ with .self }}
         <li><a href="/calendar">Calendar</a></li>
-        <li><a href="/list">Hold</a></li>
+        <li><a href="/list">Classes</a></li>
         <li><a href="#">My assignments</a></li>
+        {{if eq .Status 2}}
         <li class="has-dropdown">
           <a href="#">Administrator</a>
           <ul class="dropdown">
             <li><a href="#">Activity logs</a></li>
-            <li><a href="/users">Users</a></li>
+            <li><a href="/users">Users list</a></li>
           </ul>
         </li>
+        {{end}}
         <li class="has-dropdown">
           <a href="#">{{.Name}}</a>
           <ul class="dropdown">
@@ -51,9 +53,9 @@
       <h4>Sign in</h4>
 
       <p class="form-description">
-        Velkommen til Nykredit Fitness Tilmeldingssystem. Her kan medlemmer af Nykredit Fitness tilmelde sig til fitness hold i Glaskuben.
-        Er du ny bruger kan du oprette dig i systemet ved at klikke på 'Opret bruger'.
-        Er du allerede oprettet kan du logge ind med dit brugernavn og adgangskode.
+        Welcome to Nykredit Fitness Tilmeldingssystem. Here members of Nykredit Fitness can sign up for fitness classes at Glaskuben.
+        If you are a new user, then you can create yourself in the system by clicking 'Create user'.
+        If you already have a user, then you can log in with your username and password.
       </p>
       <div class="panel">
         <form action="/login" method="POST">
@@ -92,7 +94,7 @@
       <h4>Forgot password</h4>
 
       <p class="form-description">
-        Indtast alle detaljer i boksen neden under, og derefter vil systemet generere en ny adgangskode til dig og sende den til din email.
+        Please enter your email and the system will send you login instructions.
       </p>
       <div class="panel">
         <form action="/forgot" method="POST">
@@ -104,7 +106,7 @@
               <input id="email" name="email" type="text" placeholder="" />
             </div>
             <div class="small-12 columns description">
-              Den email du brugte da du oprettede din bruger.
+              The email you used when you created the user.
             </div>
           </div>
           <div class="row end">
@@ -132,7 +134,7 @@
               <input id="name" name="name" type="text" placeholder="Anders Andersen" />
             </div>
             <div class="small-12 columns description">
-              Dit rigtige navn som vil blive brugt til at repræsentere dig forskellige steder på siden, i lister, i emails og etc.
+              "Your real name which will be used to represent you various placed on the site, lists, emails etc.
             </div>
           </div>
           <div class="row">
@@ -143,7 +145,7 @@
               <input id="email" name="email" type="text" placeholder="my@email.com" />
             </div>
             <div class="small-12 columns description">
-              Din email vil blive brugt til at kontakte dig omkring hold og mere.
+              Your email which will be used to contact you regarding classes and more.
             </div>
           </div>
           <div class="row">
@@ -154,7 +156,7 @@
               <input id="mobile" name="mobile" type="text" placeholder="+45 11223344" />
             </div>
             <div class="small-12 columns description">
-              Dit mobil telefon nummer vil blive brugt til at kontakte dig og til at minde dig om hold og mere.
+              Your mobile phone number which will be used to contact you and notify you about various classes and more.
             </div>
           </div>
           <div class="row">
@@ -166,7 +168,7 @@
               <input id="password" name="password" type="password" placeholder="WT36yUX8STxP" />
             </div>
             <div class="small-12 columns description">
-              Den adgangskode du vil bruge til at logge ind i systemet.
+              The password which you will use to log in to system.
             </div>
           </div>
           <div class="row end">
@@ -179,16 +181,16 @@
     </div>
   </div>
 {{end}}
-{{define "profile_fields"}}
+{{define "profile_form"}}
   <div class="row">
     <div class="small-4 columns">
       <label for="name">Name</label>
     </div>
     <div class="small-8 columns">
-      <input id="name" name="name" type="text" value="{{.Name}}" placeholder="Anders Andersen" />
+      <input id="name" name="name" type="text" value="{{.form.Name}}" placeholder="Anders Andersen" />
     </div>
     <div class="small-12 columns description">
-      Dit navn vil blive brugt forskellige steder.
+      The real name of the user.
     </div>
   </div>
   <div class="row">
@@ -196,10 +198,10 @@
       <label for="email">Email</label>
     </div>
     <div class="small-8 columns">
-      <input id="email" name="email" type="text" value="{{.Email}}" placeholder="min@e-mail.dk" />
+      <input id="email" name="email" type="text" value="{{.form.Email}}" placeholder="min@e-mail.dk" />
     </div>
     <div class="small-12 columns description">
-      Din email vil blive brugt til at kontakte dig.
+      The email of the user which will be used for sending email and to log in.
     </div>
   </div>
   <div class="row">
@@ -211,7 +213,7 @@
       <input id="password" name="password" type="password" placeholder="" />
     </div>
     <div class="small-12 columns description">
-      Indtast en ny adgangskode her, hvis du ønsker at ændre din personale adgangskode for siden.
+      The password which the user will have to use to identify himself/herself.
     </div>
   </div>
   <div class="row">
@@ -219,10 +221,10 @@
       <label for="mobile">Mobile phone</label>
     </div>
     <div class="small-8 columns">
-      <input id="mobile" name="mobile" type="text" value="{{.Mobile}}" placeholder="+45 11223344" />
+      <input id="mobile" name="mobile" type="text" value="{{.form.Mobile}}" placeholder="+45 11223344" />
     </div>
     <div class="small-12 columns description">
-      Dit mobil telefon nummer vil blive brugt til at minde dig om ting og til generel kontakt.
+      The mobile phonenumber of the user which will be used to send reminders and more.
     </div>
   </div>
   <div class="row">
@@ -231,14 +233,33 @@
     </div>
     <div class="small-8 columns">
       <select id="language" name="language">
-        <option value="da" {{if eq .Language "da"}}selected{{end}}>Dansk</option>
-        <option value="en" {{if eq .Language "en"}}selected{{end}}>English</option>
+        <option value="da" {{if eq .form.Language "da"}}selected{{end}}>Dansk</option>
+        <option value="en" {{if eq .form.Language "en"}}selected{{end}}>English</option>
       </select>
     </div>
     <div class="small-12 columns description">
-      Sproget som du foretrækker at se siden i.
+      The language you would prefer to view the site in.
     </div>
   </div>
+  {{if and (eq .self.Status 2) (ne .page "profile")}}
+  <div class="row">
+    <div class="small-4 columns">
+      <label for="status">Status</label>
+    </div>
+    <div class="small-8 columns">
+      <select id="status" name="status">
+        <option value="-2" {{if eq .form.Status -2}}selected{{end}}>Deactivated</option>
+        <option value="-1" {{if eq .form.Status -1}}selected{{end}}>Waiting</option>
+        <option value="0" {{if eq .form.Status 0}}selected{{end}}>Regular user</option>
+        <option value="1" {{if eq .form.Status 1}}selected{{end}}>Instructor</option>
+        <option value="2" {{if eq .form.Status 2}}selected{{end}}>Administrator</option>
+      </select>
+    </div>
+    <div class="small-12 columns description">
+      The type of the user controls which things in the system the user has access to.
+    </div>
+  </div>
+  {{end}}
 {{end}}
 {{define "profile"}}
   <div class="row">
@@ -247,7 +268,7 @@
 
       <div class="panel">
         <form action="/profile" method="POST">
-          {{template "profile_fields" .form }}
+          {{template "profile_form" . }}
           <div class="row end">
             <div class="columns">
               <input type="submit" class="button tiny radius" value="Save" />
@@ -265,7 +286,7 @@
 
       <div class="panel">
         <form action="/users/update/{{.user}}" method="POST">
-          {{template "profile_fields" .form }}
+          {{template "profile_form" . }}
           <div class="row end">
             <div class="columns">
               <input type="submit" class="button tiny radius" value="Save" />
@@ -287,7 +308,7 @@
 
       <div class="panel">
         <form action="/users/create" method="POST">
-          {{template "profile_fields" .form }}
+          {{template "profile_form" . }}
           <div class="row end">
             <div class="columns">
               <input type="submit" class="button tiny radius" value="Create" />
@@ -302,7 +323,7 @@
 {{define "welcome"}}
   <div class="row">
     <div class="columns">
-      <h4>Welcome!</h4>
+      <h4>Welcome {{.self.Name}}!</h4>
     </div>
   </div>
   <div class="row">
@@ -705,11 +726,11 @@
           {{ template "users_update" . }}
 
         {{ else if eq .page "list" }}
-          {{ template "list" }}
+          {{ template "list" . }}
         {{ else if eq .page "calendar" }}
-          {{ template "calendar" }}
+          {{ template "calendar" . }}
         {{ else }}
-          {{ template "welcome" }}
+          {{ template "welcome" . }}
         {{ end }}
 
       </div>

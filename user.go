@@ -5,6 +5,14 @@ import (
   "log"
 )
 
+const (
+  StatusDisabled   = -2
+  StatusWaiting    = -1
+  StatusRegular    = 0
+  StatusInstructor = 1
+  StatusAdmin      = 2
+)
+
 type LoginForm struct {
   Email    string `form:"email"    binding:"required"`
   Password string `form:"password" binding:"required"`
@@ -20,6 +28,7 @@ type ProfileForm struct {
   Mobile   string `form:"mobile"   binding:"required"`
   Password string `form:"password"`
   Language string `form:"language"`
+  Status   int    `form:"status"`
 }
 
 type UserRecord struct {
@@ -98,7 +107,7 @@ func listUsers() []UserRecord {
 }
 
 func createUser(form *ProfileForm) error {
-  err := validateUser(form.Name, form.Email, form.Mobile, form.Password, false)
+  err := validateUser(form.Name, form.Email, form.Mobile, form.Password, false, form.Status)
   if err != nil {
     return err
   }
@@ -112,7 +121,7 @@ func createUser(form *ProfileForm) error {
 }
 
 func updateUser(form *ProfileForm, user_id int) error {
-  err := validateUser(form.Name, form.Email, form.Mobile, form.Password, true)
+  err := validateUser(form.Name, form.Email, form.Mobile, form.Password, true, form.Status)
   if err != nil {
     return err
   }
@@ -164,7 +173,7 @@ func checkFormPassword(form *ProfileForm, user_id int) bool {
   return true
 }
 
-func validateUser(name, email, mobile, password string, allowEmpty bool) error {
+func validateUser(name, email, mobile, password string, allowEmpty bool, status int) error {
   log.Printf("=> VALIDATE\n   %#v, %#v, %#v, %#v\n", name, email, mobile, password) // <<< DEBUG
   // TODO: implement
   return nil
