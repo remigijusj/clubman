@@ -52,20 +52,21 @@ func handleReset(c *gin.Context) {
   }
 }
 
-// TODO: eliminate *, error from fetchUserProfile
 func getProfile(c *gin.Context) {
-  var form *ProfileForm
+  var form ProfileForm
+  var err error
   if user_id, ok := currentUserId(c); ok {
-    form = fetchUserProfile(user_id)
+    form, err = fetchUserProfile(user_id)
   }
-  if form == nil {
+  if err != nil {
     forwardTo(c, "/", "Critical error happened. Please contact website admin.")
     c.Abort(0)
   } else {
-    c.Set("form", *form)
+    c.Set("form", form)
   }
 }
 
+// NOTE: similar to handleUserUpdate
 func handleProfile(c *gin.Context) {
   var form ProfileForm
   if ok := c.BindWith(&form, binding.Form); !ok {
@@ -94,20 +95,19 @@ func newUserForm(c *gin.Context) {
   c.Set("form", form)
 }
 
-// TODO: eliminate *, error from fetchUserProfile
 func getUserForm(c *gin.Context) {
-  var form *ProfileForm
+  var form ProfileForm
   user := c.Params.ByName("id")
   user_id, err := strconv.Atoi(user)
   if err == nil {
-    form = fetchUserProfile(user_id)
+    form, err = fetchUserProfile(user_id)
   }
-  if form == nil {
+  if err != nil {
     forwardWarning(c, "/users", "ERROR: user profile not found.")
     c.Abort(0)
   } else {
     c.Set("user", user_id)
-    c.Set("form", *form)
+    c.Set("form", form)
   }
 }
 
@@ -129,7 +129,7 @@ func handleUserCreate(c *gin.Context) {
   }
 }
 
-// TODO: de-duplicate with handleProfile
+// NOTE: similar to handleProfile
 func handleUserUpdate(c *gin.Context) {
   var form ProfileForm
   if ok := c.BindWith(&form, binding.Form); !ok {

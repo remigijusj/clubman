@@ -136,14 +136,13 @@ func deleteUser(user_id int) error {
   return nil
 }
 
-func fetchUserProfile(user_id int) *ProfileForm {
+func fetchUserProfile(user_id int) (ProfileForm, error) {
   var form ProfileForm
   err := query["user_select"].QueryRow(user_id).Scan(&form.Name, &form.Email, &form.Mobile, &form.Language)
   if err != nil {
     log.Printf("[APP] PROFILE error: %s, %#v\n", err, form)
-    return nil
   }
-  return &form
+  return form, err
 }
 
 func checkFormPassword(form *ProfileForm, user_id int) bool {
