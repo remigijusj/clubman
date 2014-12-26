@@ -4,6 +4,9 @@ $(function(){
     var el = $(this);
     var form = el.closest('form');
     var action = el.data('action');
-    form.prop('action', action).submit();
+    var consent = el.data('confirm');
+    if (!consent || confirm(consent)) {
+      form.prop('action', action).submit();
+    }
   });
 });

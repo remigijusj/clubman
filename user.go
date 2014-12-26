@@ -33,7 +33,7 @@ func loginUserByForm(form *LoginForm) (*AuthInfo, error) {
   var user_password string
   err := query["credentials_get"].QueryRow(form.Email).Scan(&user_password, &auth.Id, &auth.Name, &auth.Status)
   if err != nil {
-    log.Printf("[APP] LOGIN failure: %#v, %#v\n", err, form.Email)
+    log.Printf("[APP] LOGIN-FORM failure: %s, %s\n", err, form.Email)
     return nil, errors.New("Invalid password or email")
   }
   ok := comparePassword(user_password, form.Password)
@@ -50,6 +50,7 @@ func sendResetLink(form *ForgotForm) bool {
   token := generateToken(16)
   res, err := query["password_forgot"].Exec(token, form.Email)
   if err != nil {
+    log.Printf("[APP] RESET-FORM failure: %s, %s, %s\n", err, token, form.Email)
     return false
   }
   num, err := res.RowsAffected()
@@ -67,10 +68,8 @@ func loginUserByToken(token, email string) (*AuthInfo, error) {
   if err == nil {
     _, err = query["password_forgot"].Exec("", email)
   }
-  if err == nil {
-    // TODO: internal logging
-  } else {
-    log.Printf("[APP] RESETS error: %s, token=%s, email=%s\n", err, token, email)
+  if err != nil {
+    log.Printf("[APP] LOGIN-TOKEN error: %s, token=%s, email=%s\n", err, token, email)
   }
   return &auth, err
 }
@@ -79,7 +78,7 @@ func listUsers() []UserRecord {
   list := []UserRecord{}
   rows, err := query["user_list"].Query()
   if err != nil {
-    log.Printf("[APP] USER_LIST error: %s\n", err)
+    log.Printf("[APP] USER-LIST error: %s\n", err)
     return list
   }
   defer rows.Close()
@@ -87,13 +86,13 @@ func listUsers() []UserRecord {
     var item UserRecord
     err := rows.Scan(&item.Id, &item.Name, &item.Email)
     if err != nil {
-      log.Printf("[APP] USER_LIST error: %s\n", err)
+      log.Printf("[APP] USER-LIST error: %s\n", err)
     } else {
       list = append(list, item)
     }
   }
   if err := rows.Err(); err != nil {
-    log.Printf("[APP] USER_LIST error: %s\n", err)
+    log.Printf("[APP] USER-LIST error: %s\n", err)
   }
   return list
 }
@@ -106,6 +105,7 @@ func createUser(form *ProfileForm) error {
   form.Password = hashPassword(form.Password)
   _, err = query["user_insert"].Exec(form.Name, form.Email, form.Mobile, form.Password, form.Language)
   if err != nil {
+    log.Printf("[APP] USER-CREATE error: %s, %v\n", err, form)
     return errors.New("User could not be created. Perhaps email is already used.")
   }
   return nil
@@ -122,6 +122,7 @@ func updateUser(form *ProfileForm, user_id int) error {
   }
   _, err = query["user_update"].Exec(form.Name, form.Email, form.Mobile, form.Password, form.Language, user_id)
   if err != nil {
+    log.Printf("[APP] USER-UPDATE error: %s, %d\n", err, user_id)
     return errors.New("User could not be updated. Perhaps email is already used.")
   }
   return nil
@@ -155,6 +156,7 @@ func checkFormPassword(form *ProfileForm, user_id int) bool {
     var currentPassword string
     err := query["password_select"].QueryRow(user_id).Scan(&currentPassword)
     if err != nil {
+      log.Printf("[APP] PASSWORD-SELECT error: %s, %d\n", err, user_id)
       return false
     }
     form.Password = currentPassword
