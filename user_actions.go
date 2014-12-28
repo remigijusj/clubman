@@ -113,6 +113,7 @@ func getUserForm(c *gin.Context) {
   }
 }
 
+// NOTE: serves both signup and create by admin
 func handleUserCreate(c *gin.Context) {
   var form ProfileForm
   if ok := c.BindWith(&form, binding.Form); !ok || form.Password == "" {
