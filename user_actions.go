@@ -56,8 +56,8 @@ func handleReset(c *gin.Context) {
 func getProfile(c *gin.Context) {
   var form ProfileForm
   var err error
-  if user_id, ok := currentUserId(c); ok {
-    form, err = fetchUserProfile(user_id)
+  if self := currentUser(c); self != nil {
+    form, err = fetchUserProfile(self.Id)
   }
   if err != nil {
     forwardTo(c, "/", "Critical error happened. Please contact website admin.")
@@ -75,8 +75,9 @@ func handleProfile(c *gin.Context) {
     return
   }
   var err error
-  if user_id, ok := currentUserId(c); ok {
-    err = updateUser(&form, user_id)
+  if self := currentUser(c); self != nil {
+    form.Status = self.Status // security override
+    err = updateUser(self.Id, &form)
   }
   if err != nil {
     displayError(c, err.Error())
@@ -87,7 +88,8 @@ func handleProfile(c *gin.Context) {
 
 // TODO: filter, search
 func getUsersList(c *gin.Context) {
-  list := listUsers()
+  q := c.Request.URL.Query()
+  list := listUsers(q)
   c.Set("list", list)
 }
 
@@ -97,16 +99,13 @@ func newUserForm(c *gin.Context) {
 }
 
 func getUserForm(c *gin.Context) {
+  var form ProfileForm
   user_id, err := anotherUserId(c)
+  if err == nil {
+    form, err = fetchUserProfile(user_id)
+  }
   if err != nil {
     forwardWarning(c, "/users", err.Error())
-    c.Abort(0)
-    return
-  }
-
-  form, err := fetchUserProfile(user_id)
-  if err != nil {
-    forwardWarning(c, "/users", "ERROR: user profile not found.")
     c.Abort(0)
   } else {
     c.Set("user", user_id)
@@ -125,7 +124,7 @@ func handleUserCreate(c *gin.Context) {
     displayError(c, err.Error())
   } else {
     if isAuthenticated(c) {
-      forwardTo(c, "/users", "User has been created.")
+      forwardTo(c, "/users", "User profile has been created.")
     } else {
       forwardTo(c, "/login", "Please login with the entered credentials")
     }
@@ -139,10 +138,9 @@ func handleUserUpdate(c *gin.Context) {
     displayError(c, "Please provide all details")
     return
   }
-  var err error
-  user := c.Params.ByName("id")
-  if user_id, err := strconv.Atoi(user); err == nil {
-    err = updateUser(&form, user_id)
+  user_id, err := anotherUserId(c)
+  if err == nil {
+    err = updateUser(user_id, &form)
   }
   if err != nil {
     displayError(c, err.Error())
@@ -153,28 +151,26 @@ func handleUserUpdate(c *gin.Context) {
 
 func handleUserDelete(c *gin.Context) {
   user_id, err := anotherUserId(c)
-  if err != nil {
-    displayError(c, err.Error())
+  if err == nil {
+    err = deleteUser(user_id)
   }
-
-  err = deleteUser(user_id)
   if err != nil {
     displayError(c, err.Error())
   } else {
-    forwardTo(c, "/users", "User has been deleted.")
+    forwardTo(c, "/users", "User profile has been deleted.")
   }
 }
 
 func anotherUserId(c *gin.Context) (int, error) {
   user := c.Params.ByName("id")
   user_id, err := strconv.Atoi(user)
-  self_id, ok := currentUserId(c)
+  self := currentUser(c)
 
-  if err != nil || !ok {
+  if err != nil || self == nil {
     return 0, errors.New("Critical error happened. Please contact website admin.")
   }
-  if user_id == self_id {
-    return 0, errors.New("No access to own profile.")
+  if user_id == self.Id {
+    return 0, errors.New("No access to your own profile.")
   }
   return user_id, nil
 }

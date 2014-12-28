@@ -13,7 +13,11 @@ func defineRoutes(r *gin.Engine) {
     s.Static("/img", "./img")
     s.Static("/js", "./js")
   }
+  defineRoutesExternal(r)
+  defineRoutesInternal(r)
+}
 
+func defineRoutesExternal(r *gin.Engine) {
   r.GET("/login",  displayPage)
   r.GET("/forgot", displayPage)
   r.GET("/signup", displayPage)
@@ -21,7 +25,9 @@ func defineRoutes(r *gin.Engine) {
   r.POST("/login",  handleLogin)
   r.POST("/forgot", handleForgot)
   r.POST("/signup", handleUserCreate)
+}
 
+func defineRoutesInternal(r *gin.Engine) {
   a := r.Group("/", authRequired())
   {
     // TODO: redirect to welcome?
@@ -30,18 +36,22 @@ func defineRoutes(r *gin.Engine) {
     a.GET("/profile", getProfile, displayPage)
     a.POST("/profile", handleProfile)
 
-    ad := a.Group("/", adminRequired())
-    {
-      ad.GET("/users", getUsersList, displayPage)
-      ad.GET("/users/create", newUserForm, displayPage)
-      ad.POST("/users/create", handleUserCreate)
-      ad.GET("/users/update/:id", getUserForm, displayPage)
-      ad.POST("/users/update/:id", handleUserUpdate)
-      ad.POST("/users/delete/:id", handleUserDelete)
-    }
-
     // TODO: implement
     a.GET("/list", displayPage)
     a.GET("/calendar", displayPage)
+
+    defineRoutesAdmin(a)
+  }
+}
+
+func defineRoutesAdmin(a *gin.RouterGroup) {
+  ad := a.Group("/", adminRequired())
+  {
+    ad.GET("/users", getUsersList, displayPage)
+    ad.GET("/users/create", newUserForm, displayPage)
+    ad.POST("/users/create", handleUserCreate)
+    ad.GET("/users/update/:id", getUserForm, displayPage)
+    ad.POST("/users/update/:id", handleUserUpdate)
+    ad.POST("/users/delete/:id", handleUserDelete)
   }
 }

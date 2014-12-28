@@ -104,14 +104,14 @@ func deleteSession(c *gin.Context) {
 
 // --- authorization helpers ---
 
-func currentUserId(c *gin.Context) (int, bool) {
+func currentUser(c *gin.Context) *AuthInfo {
   self, _ := c.Get("self")
   auth, ok := self.(AuthInfo)
   if ok {
-    return auth.Id, true
+    return &auth
   } else {
     log.Printf("[APP] CUR_USER error: self=%#v\n", self)
-    return -1, false
+    return nil
   }
 }
 
@@ -123,7 +123,6 @@ func isAuthenticated(c *gin.Context) bool {
 func isAdmin(c *gin.Context) bool {
   self, _ := c.Get("self")
   auth, ok := self.(AuthInfo)
-  log.Printf("=> ISADMIN: %#v, %v\n", auth, ok)
   if ok {
     return auth.Status == StatusAdmin
   } else {

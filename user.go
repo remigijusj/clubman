@@ -1,8 +1,10 @@
 package main
 
 import (
+  "database/sql"
   "errors"
   "log"
+  "net/url"
 )
 
 const (
@@ -35,6 +37,7 @@ type UserRecord struct {
   Id       int
   Name     string
   Email    string
+  Status   int
 }
 
 func loginUserByForm(form *LoginForm) (*AuthInfo, error) {
@@ -54,23 +57,23 @@ func loginUserByForm(form *LoginForm) (*AuthInfo, error) {
 }
 
 // NOTE: we don't reveal if email is missing or another problem occured
-// TODO: add extensive logging
 func sendResetLink(form *ForgotForm) bool {
   token := generateToken(16)
   res, err := query["password_forgot"].Exec(token, form.Email)
   if err != nil {
-    log.Printf("[APP] RESET-FORM failure: %s, %s, %s\n", err, token, form.Email)
+    log.Printf("[APP] RESET-FORM failure 1: %s, %s, %s\n", err, token, form.Email)
     return false
   }
   num, err := res.RowsAffected()
   if num == 0 || err != nil {
+    log.Printf("[APP] RESET-FORM failure 2: %s, %s, %s\n", err, token, form.Email)
     return false
   }
   go sendResetEmail(form.Email, token)
   return true
 }
 
-// TODO: maybe reset old password?
+// TODO: for security - reset old password?
 func loginUserByToken(token, email string) (*AuthInfo, error) {
   var auth AuthInfo
   err := query["password_resets"].QueryRow(token, email).Scan(&auth.Id, &auth.Name, &auth.Status)
@@ -83,9 +86,9 @@ func loginUserByToken(token, email string) (*AuthInfo, error) {
   return &auth, err
 }
 
-func listUsers() []UserRecord {
+func listUsers(q url.Values) []UserRecord {
   list := []UserRecord{}
-  rows, err := query["user_list"].Query()
+  rows, err := listUsersQuery(q)
   if err != nil {
     log.Printf("[APP] USER-LIST error: %s\n", err)
     return list
@@ -93,7 +96,7 @@ func listUsers() []UserRecord {
   defer rows.Close()
   for rows.Next() {
     var item UserRecord
-    err := rows.Scan(&item.Id, &item.Name, &item.Email)
+    err := rows.Scan(&item.Id, &item.Name, &item.Email, &item.Status)
     if err != nil {
       log.Printf("[APP] USER-LIST error: %s\n", err)
     } else {
@@ -106,13 +109,32 @@ func listUsers() []UserRecord {
   return list
 }
 
+func listUsersQuery(q url.Values) (*sql.Rows, error) {
+  status := q.Get("status")
+  if status == "" {
+    return query["users_active"].Query()
+  } else {
+    return query["users_by_status"].Query(status)
+  }
+}
+
+func fetchUserProfile(user_id int) (ProfileForm, error) {
+  var form ProfileForm
+  err := query["user_select"].QueryRow(user_id).Scan(&form.Name, &form.Email, &form.Mobile, &form.Language, &form.Status)
+  if err != nil {
+    log.Printf("[APP] PROFILE error: %s, %#v\n", err, form)
+    err = errors.New("ERROR: user profile not found.")
+  }
+  return form, err
+}
+
 func createUser(form *ProfileForm) error {
   err := validateUser(form.Name, form.Email, form.Mobile, form.Password, false, form.Status)
   if err != nil {
     return err
   }
   form.Password = hashPassword(form.Password)
-  _, err = query["user_insert"].Exec(form.Name, form.Email, form.Mobile, form.Password, form.Language)
+  _, err = query["user_insert"].Exec(form.Name, form.Email, form.Mobile, form.Password, form.Language, form.Status)
   if err != nil {
     log.Printf("[APP] USER-CREATE error: %s, %v\n", err, form)
     return errors.New("User could not be created. Perhaps email is already used.")
@@ -120,7 +142,7 @@ func createUser(form *ProfileForm) error {
   return nil
 }
 
-func updateUser(form *ProfileForm, user_id int) error {
+func updateUser(user_id int, form *ProfileForm) error {
   err := validateUser(form.Name, form.Email, form.Mobile, form.Password, true, form.Status)
   if err != nil {
     return err
@@ -129,7 +151,7 @@ func updateUser(form *ProfileForm, user_id int) error {
   if !ok {
     return errors.New("User could not be updated. Password is invalid.")
   }
-  _, err = query["user_update"].Exec(form.Name, form.Email, form.Mobile, form.Password, form.Language, user_id)
+  _, err = query["user_update"].Exec(form.Name, form.Email, form.Mobile, form.Password, form.Language, form.Status, user_id)
   if err != nil {
     log.Printf("[APP] USER-UPDATE error: %s, %d\n", err, user_id)
     return errors.New("User could not be updated. Perhaps email is already used.")
@@ -144,15 +166,6 @@ func deleteUser(user_id int) error {
     return errors.New("User could not be deleted.")
   }
   return nil
-}
-
-func fetchUserProfile(user_id int) (ProfileForm, error) {
-  var form ProfileForm
-  err := query["user_select"].QueryRow(user_id).Scan(&form.Name, &form.Email, &form.Mobile, &form.Language)
-  if err != nil {
-    log.Printf("[APP] PROFILE error: %s, %#v\n", err, form)
-  }
-  return form, err
 }
 
 func checkFormPassword(form *ProfileForm, user_id int) bool {
