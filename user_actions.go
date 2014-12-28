@@ -1,6 +1,7 @@
 package main
 
 import (
+  "errors"
   "strconv"
 
   "github.com/gin-gonic/gin"
@@ -96,12 +97,14 @@ func newUserForm(c *gin.Context) {
 }
 
 func getUserForm(c *gin.Context) {
-  var form ProfileForm
-  user := c.Params.ByName("id")
-  user_id, err := strconv.Atoi(user)
-  if err == nil {
-    form, err = fetchUserProfile(user_id)
+  user_id, err := anotherUserId(c)
+  if err != nil {
+    forwardWarning(c, "/users", err.Error())
+    c.Abort(0)
+    return
   }
+
+  form, err := fetchUserProfile(user_id)
   if err != nil {
     forwardWarning(c, "/users", "ERROR: user profile not found.")
     c.Abort(0)
@@ -149,21 +152,29 @@ func handleUserUpdate(c *gin.Context) {
 }
 
 func handleUserDelete(c *gin.Context) {
-  user := c.Params.ByName("id")
-  user_id, err := strconv.Atoi(user)
-  self_id, ok := currentUserId(c)
-  if err != nil || !ok {
-    displayError(c, "Critical error happened. Please contact website admin.")
-    return
+  user_id, err := anotherUserId(c)
+  if err != nil {
+    displayError(c, err.Error())
   }
-  if user_id == self_id {
-    displayError(c, "You can't delete own profile.")
-    return
-  }
+
   err = deleteUser(user_id)
   if err != nil {
     displayError(c, err.Error())
   } else {
     forwardTo(c, "/users", "User has been deleted.")
   }
+}
+
+func anotherUserId(c *gin.Context) (int, error) {
+  user := c.Params.ByName("id")
+  user_id, err := strconv.Atoi(user)
+  self_id, ok := currentUserId(c)
+
+  if err != nil || !ok {
+    return 0, errors.New("Critical error happened. Please contact website admin.")
+  }
+  if user_id == self_id {
+    return 0, errors.New("No access to own profile.")
+  }
+  return user_id, nil
 }

@@ -3,9 +3,12 @@ package main
 const (
   serverHost = "nk-fitness.dk"
   serverRoot = "http://nk-fitness.dk"
+  serverPort = ":8001"
+
   cookieHost = ""
   cookieAuth = "nk-fitness#nk-fitness#nk-fitness" // 32 bytes
   cookieEncr = "nk-fitness$nk-fitness$nk-fitness" // 32 bytes
+  cookieAge  = 3600 * 8 // 8 hours
 )
 
 var queries = map[string]string{

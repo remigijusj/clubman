@@ -102,6 +102,8 @@ func deleteSession(c *gin.Context) {
   session.Options.MaxAge = -1
 }
 
+// --- authorization helpers ---
+
 func currentUserId(c *gin.Context) (int, bool) {
   self, _ := c.Get("self")
   auth, ok := self.(AuthInfo)
@@ -116,6 +118,17 @@ func currentUserId(c *gin.Context) (int, bool) {
 func isAuthenticated(c *gin.Context) bool {
   _, err := c.Get("self")
   return err == nil
+}
+
+func isAdmin(c *gin.Context) bool {
+  self, _ := c.Get("self")
+  auth, ok := self.(AuthInfo)
+  log.Printf("=> ISADMIN: %#v, %v\n", auth, ok)
+  if ok {
+    return auth.Status == StatusAdmin
+  } else {
+    return false
+  }
 }
 
 // --- password-related ---
