@@ -5,6 +5,7 @@ import (
   "errors"
   "log"
   "net/url"
+  "strings"
 )
 
 const (
@@ -73,7 +74,6 @@ func sendResetLink(form *ForgotForm) bool {
   return true
 }
 
-// TODO: for security - reset old password?
 func loginUserByToken(token, email string) (*AuthInfo, error) {
   var auth AuthInfo
   err := query["password_resets"].QueryRow(token, email).Scan(&auth.Id, &auth.Name, &auth.Status)
@@ -187,7 +187,20 @@ func checkFormPassword(form *ProfileForm, user_id int) bool {
 }
 
 func validateUser(name, email, mobile, password string, allowEmpty bool, status int) error {
-  log.Printf("=> VALIDATE\n   %#v, %#v, %#v, %#v\n", name, email, mobile, password) // <<< DEBUG
-  // TODO: implement
+  if !regex["name_validate"].MatchString(name) {
+    return errors.New("Name is invalid. First name and second name must be entered.")
+  }
+  if !regex["email_validate"].MatchString(email) {
+    return errors.New("Email has invalid format")
+  }
+  if !regex["mobile_validate"].MatchString(strings.Replace(mobile, " ", "", -1)) {
+    return errors.New("Phone number has invalid format")
+  }
+  if len(password) < minPassLen && !(allowEmpty && password == "") {
+    return errors.New("Password is too short. Minimum %{cnt} characters") // TODO: minPassLen, interpolate
+  }
+  if status < -2 || status > 2 {
+    return errors.New("Status is invalid")
+  }
   return nil
 }

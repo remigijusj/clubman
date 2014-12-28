@@ -9,6 +9,8 @@ const (
   cookieAuth = "nk-fitness#nk-fitness#nk-fitness" // 32 bytes
   cookieEncr = "nk-fitness$nk-fitness$nk-fitness" // 32 bytes
   cookieAge  = 3600 * 1 // 1 hours
+
+  minPassLen = 6
 )
 
 var queries = map[string]string{
@@ -22,4 +24,10 @@ var queries = map[string]string{
   "user_insert":      "INSERT INTO users(name, email, mobile, password, language, status) values (?, ?, ?, ?, ?, ?)",
   "user_update":      "UPDATE users SET name=?, email=?, mobile=?, password=?, language=?, status=? WHERE id=?",
   "user_delete":      "DELETE FROM users WHERE id=?",
+}
+
+var regexes = map[string]string{
+  "name_validate":   `\w\s+\w`,
+  "email_validate":  `^\w[-._\w]*\w@\w[-._\w]*\w\.\w{2,3}$`,
+  "mobile_validate": `^\+?\d{8,10}$`,
 }

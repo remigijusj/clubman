@@ -4,6 +4,7 @@ import (
   "database/sql"
   "encoding/gob"
   "log"
+  "regexp"
   //"html/template"
   //"os"
 
@@ -13,6 +14,7 @@ import (
 )
 
 var query map[string]*sql.Stmt
+var regex map[string]*regexp.Regexp
 var cookie *sessions.CookieStore
 
 func init() {
@@ -23,6 +25,7 @@ func init() {
 
 func main() {
   prepareQueries()
+  prepareRegexes()
   prepareCookies()
 
   r := gin.Default()
@@ -37,6 +40,13 @@ func prepareQueries() {
   query = make(map[string]*sql.Stmt, len(queries))
   for name, sql := range queries {
     query[name], _ = db.Prepare(sql)
+  }
+}
+
+func prepareRegexes() {
+  regex = make(map[string]*regexp.Regexp, len(regexes))
+  for name, rx := range regexes {
+    regex[name] = regexp.MustCompile(rx)
   }
 }
 

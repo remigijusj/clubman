@@ -86,7 +86,6 @@ func handleProfile(c *gin.Context) {
   }
 }
 
-// TODO: filter, search
 func getUsersList(c *gin.Context) {
   q := c.Request.URL.Query()
   list := listUsers(q)
@@ -161,6 +160,8 @@ func handleUserDelete(c *gin.Context) {
     forwardTo(c, "/users", "User profile has been deleted.")
   }
 }
+
+// --- local helpers ---
 
 func anotherUserId(c *gin.Context) (int, error) {
   user := c.Params.ByName("id")
