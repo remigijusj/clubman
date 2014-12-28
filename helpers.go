@@ -40,7 +40,9 @@ func setPage(c *gin.Context) {
   }
 }
 
-func displayError(c *gin.Context, message string) {
+// TODO: use up args
+func showError(c *gin.Context, err error, args ...interface{}) {
+  message := err.Error()
   if len(message) > 0 {
     setSessionAlert(c, &Alert{"warning", message})
   }

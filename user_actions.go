@@ -11,12 +11,12 @@ import (
 func handleLogin(c *gin.Context) {
   var form LoginForm
   if ok := c.BindWith(&form, binding.Form); !ok {
-    displayError(c, "Please enter email and password")
+    showError(c, errors.New("Please enter email and password"))
     return
   }
   auth, err := loginUserByForm(&form)
   if err != nil {
-    displayError(c, err.Error())
+    showError(c, err)
   } else {
     setSessionAuthInfo(c, auth)
     forwardTo(c, "/", "")
@@ -31,12 +31,12 @@ func handleLogout(c *gin.Context) {
 func handleForgot(c *gin.Context) {
   var form ForgotForm
   if ok := c.BindWith(&form, binding.Form); !ok {
-    displayError(c, "Please enter your email")
+    showError(c, errors.New("Please enter your email"))
     return
   }
   ok := sendResetLink(&form)
   if !ok {
-    displayError(c, "Reminder email could not be sent")
+    showError(c, errors.New("Reminder email could not be sent"))
   } else {
     forwardTo(c, "/login", "Email with instructions was sent to "+form.Email)
   }
@@ -71,7 +71,7 @@ func getProfile(c *gin.Context) {
 func handleProfile(c *gin.Context) {
   var form ProfileForm
   if ok := c.BindWith(&form, binding.Form); !ok {
-    displayError(c, "Please provide all details")
+    showError(c, errors.New("Please provide all details"), &form)
     return
   }
   var err error
@@ -80,7 +80,7 @@ func handleProfile(c *gin.Context) {
     err = updateUser(self.Id, &form)
   }
   if err != nil {
-    displayError(c, err.Error())
+    showError(c, err, &form)
   } else {
     forwardTo(c, "/", "User profile has been updated.")
   }
@@ -116,17 +116,17 @@ func getUserForm(c *gin.Context) {
 func handleUserCreate(c *gin.Context) {
   var form ProfileForm
   if ok := c.BindWith(&form, binding.Form); !ok || form.Password == "" {
-    displayError(c, "Please provide all details")
+    showError(c, errors.New("Please provide all details"), &form)
     return
   }
   err := createUser(&form)
   if err != nil {
-    displayError(c, err.Error())
+    showError(c, err, &form)
   } else {
     if isAuthenticated(c) {
       forwardTo(c, "/users", "User profile has been created.")
     } else {
-      forwardTo(c, "/login", "Please login with the entered credentials")
+      forwardTo(c, "/login", "User profile has been created. Please wait for administrator confirmation.")
     }
   }
 }
@@ -135,7 +135,7 @@ func handleUserCreate(c *gin.Context) {
 func handleUserUpdate(c *gin.Context) {
   var form ProfileForm
   if ok := c.BindWith(&form, binding.Form); !ok {
-    displayError(c, "Please provide all details")
+    showError(c, errors.New("Please provide all details"), &form)
     return
   }
   user_id, err := anotherUserId(c)
@@ -143,7 +143,7 @@ func handleUserUpdate(c *gin.Context) {
     err = updateUser(user_id, &form)
   }
   if err != nil {
-    displayError(c, err.Error())
+    showError(c, err, &form)
   } else {
     forwardTo(c, "/users", "User profile has been updated.")
   }
@@ -155,7 +155,7 @@ func handleUserDelete(c *gin.Context) {
     err = deleteUser(user_id)
   }
   if err != nil {
-    displayError(c, err.Error())
+    showError(c, err)
   } else {
     forwardTo(c, "/users", "User profile has been deleted.")
   }

@@ -66,6 +66,7 @@ func displayPage(c *gin.Context) {
 
   obj := gin.H(c.Keys)
   obj["alert"] = getSessionAlert(c)
+  // TODO: override form from session
   log.Printf("=> BINDING\n   %#v\n", obj) // <<< DEBUG
 
   c.HTML(200, "main.tmpl", obj)
