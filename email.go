@@ -1,6 +1,7 @@
 package main
 
 import (
+  "bytes"
   "html/template"
   "log"
   "net/url"
@@ -25,14 +26,16 @@ func sendEmail(to, subject, body string) error {
   return mailer.Send(msg)
 }
 
-// TODO: use external template
 func sendResetEmail(email, token string) {
-  url := serverRoot+"/resets?email="+url.QueryEscape(email)+"&token="+token
+  obj := map[string]string{
+    "host": serverHost,
+    "url":  serverRoot+"/resets?email="+url.QueryEscape(email)+"&token="+token,
+  }
+  var buf bytes.Buffer
+  mails.Lookup("password_reset").Execute(&buf, obj)
+  message := buf.String()
 
-  subject := "Password reset for "+serverHost
-  message := "<p><b>You have requested password reset for "+serverHost+"</b></p>"
-  message += "<p>Please click the link and change your password:</p>"
-  message += `<p><a href="`+url+`">`+url+`</a></p>`
+  subject := "Password reset for "+serverHost // TODO: use interpolation
 
   err := sendEmail(email, subject, message)
   if err != nil {
