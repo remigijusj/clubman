@@ -1,0 +1,51 @@
+  <div class="row">
+    <div class="large-8 columns">
+      <h4>Users</h4>
+
+      <p>
+        <a href="/users">Active</a> |
+        <a href="/users?status=-1">Waiting</a> |
+        <a href="/users?status=-2">Inactive</a>
+      </p>
+
+      <table class="list">
+        <thead>
+          <tr>
+            <td>Name</td>
+            <td>Email</td>
+            <td>Status</td>
+            <td>Actions</td>
+          </tr>
+        </thead>
+        <tbody>
+          {{ $selfId := .self.Id }}
+          {{range .list}}
+          <tr>
+            <td>
+              <a href="/users/{{.Id}}/show">{{.Name}}</a>
+            </td>
+            <td>
+              {{.Email}}
+            </td>
+            <td>
+              {{if eq .Status -2}}Deactivated  {{end}}
+              {{if eq .Status -1}}Waiting      {{end}}
+              {{if eq .Status  0}}User         {{end}}
+              {{if eq .Status  1}}Instructor   {{end}}
+              {{if eq .Status  2}}Administrator{{end}}
+            </td>
+            <td>
+              {{if ne .Id $selfId }}
+              <a href="/users/update/{{.Id}}">Edit</a>
+              {{end}}
+            </td>
+          </tr>
+          {{end}}
+        </tbody>
+      </table>
+
+      <p>
+        <a href="/users/create" class="button tiny radius">Create user</a>
+      </p>
+    </div>
+  </div>

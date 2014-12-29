@@ -1,0 +1,114 @@
+{{define "topnav"}}
+  <nav class="top-bar" data-topbar role="navigation">
+    <ul class="title-area">
+      <li class="name">
+        <h1><a href="/"><img src="/img/logo.gif" /></a></h1>
+      </li>
+      <li class="toggle-topbar menu-icon"><a href="#"><span></span></a></li>
+    </ul>
+    <section class="top-bar-section">
+      <ul class="right">
+      {{ with .self }}
+        <li><a href="/calendar">Calendar</a></li>
+        <li><a href="/list">Classes</a></li>
+        <li><a href="#">My assignments</a></li>
+        {{if eq .Status 2}}
+        <li class="has-dropdown">
+          <a href="#">Administrator</a>
+          <ul class="dropdown">
+            <li><a href="#">Activity logs</a></li>
+            <li><a href="/users">Users list</a></li>
+          </ul>
+        </li>
+        {{end}}
+        <li class="has-dropdown">
+          <a href="#">{{.Name}}</a>
+          <ul class="dropdown">
+            <li><a href="/profile">Edit profile</a></li>
+            <li><a href="/logout">Log out</a></li>
+          </ul>
+        </li>
+      {{ else }}
+        <li><a href="/signup">Sign up</a></li>
+        <li><a href="/forgot">Forgot password</a></li>
+        <li><a href="/login">Log in</a></li>
+      {{ end }}
+      </ul>
+    </section>
+  </nav>
+{{end}}
+{{define "alert"}}
+  <div class="row">
+    <div class="large-6 medium-8 columns">
+      <div data-alert class="alert-box radius {{.Kind}}">
+        {{.Message}}
+        <a href="#" class="close">&times;</a>
+      </div>
+    </div>
+  </div>
+{{end}}
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nykredit Fitness</title>
+    <link rel="stylesheet" href="/css/app.css">
+    <script src="/js/modernizr.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.6.2/html5shiv.js"></script>
+      <script src="//s3.amazonaws.com/nwapi/nwmatcher/nwmatcher-1.2.5-min.js"></script>
+      <script src="//html5base.googlecode.com/svn-history/r38/trunk/js/selectivizr-1.0.3b.js"></script>
+      <script src="//cdnjs.cloudflare.com/ajax/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="row page-wrap">
+      <div class="large-12 columns">
+
+        {{ template "topnav" . }}
+        <div class="top-corner"></div>
+
+        {{ with .alert }}
+          {{ template "alert" . }}
+        {{ end }}
+
+        {{ if eq .page "login" }}
+          {{ template "login.tmpl" . }}
+        {{ else if eq .page "forgot" }}
+          {{ template "forgot.tmpl" . }}
+        {{ else if eq .page "signup" }}
+          {{ template "signup.tmpl" . }}
+        {{ else if eq .page "profile" }}
+          {{ template "profile.tmpl" . }}
+
+        {{ else if eq .page "users" }}
+          {{ template "users.tmpl" . }}
+        {{ else if eq .page "users_create" }}
+          {{ template "users_create.tmpl" . }}
+        {{ else if eq .page "users_update" }}
+          {{ template "users_update.tmpl" . }}
+
+        {{ else if eq .page "list" }}
+          {{ template "list.tmpl" . }}
+        {{ else if eq .page "calendar" }}
+          {{ template "calendar.tmpl" . }}
+        {{ else }}
+          {{ template "welcome.tmpl" . }}
+        {{ end }}
+
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="large-12 columns text-center footer">
+        <a href="#">Nykredit Fitness</a>
+      </div>
+    </div>
+
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/foundation.min.js"></script>
+    <script src="/js/app.js"></script>
+    <script>$(document).foundation()</script>
+  </body>
+</html>

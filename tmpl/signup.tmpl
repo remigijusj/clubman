@@ -1,0 +1,60 @@
+  <div class="row">
+    <div class="large-6 medium-8 columns">
+      <h4>Create new user</h4>
+
+      <div class="panel">
+        <form action="/signup" method="POST">
+          <div class="row">
+            <div class="small-4 columns">
+              <label for="name">Name</label>
+            </div>
+            <div class="small-8 columns">
+              <input id="name" name="name" type="text" placeholder="Anders Andersen" />
+            </div>
+            <div class="small-12 columns description">
+              "Your real name which will be used to represent you various placed on the site, lists, emails etc.
+            </div>
+          </div>
+          <div class="row">
+            <div class="small-4 columns">
+              <label for="email">Email</label>
+            </div>
+            <div class="small-8 columns">
+              <input id="email" name="email" type="text" placeholder="my@email.com" />
+            </div>
+            <div class="small-12 columns description">
+              Your email which will be used to contact you regarding classes and more.
+            </div>
+          </div>
+          <div class="row">
+            <div class="small-4 columns">
+              <label for="mobile">Mobile phone</label>
+            </div>
+            <div class="small-8 columns">
+              <input id="mobile" name="mobile" type="text" placeholder="+45 11223344" />
+            </div>
+            <div class="small-12 columns description">
+              Your mobile phone number which will be used to contact you and notify you about various classes and more.
+            </div>
+          </div>
+          <div class="row">
+            <div class="small-4 columns">
+              <label for="password">Password</label>
+            </div>
+            <div class="small-8 columns">
+              <input type="password" style="display:none" />
+              <input id="password" name="password" type="password" placeholder="WT36yUX8STxP" />
+            </div>
+            <div class="small-12 columns description">
+              The password which you will use to log in to system.
+            </div>
+          </div>
+          <div class="row end">
+            <div class="columns">
+              <input type="submit" class="button tiny radius" value="Create" />
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>

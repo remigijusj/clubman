@@ -30,7 +30,7 @@ func main() {
   prepareCookies()
 
   r := gin.Default()
-  r.LoadHTMLFiles("main.tmpl")
+  loadTemplates(r, "tmpl/*")
 
   defineRoutes(r)
   r.Run(serverPort)
@@ -72,7 +72,7 @@ func displayPage(c *gin.Context) {
   }
   log.Printf("=> BINDING\n   %#v\n", obj) // <<< DEBUG
 
-  c.HTML(200, "main.tmpl", obj)
+  c.HTML(200, "page.tmpl", obj)
 }
 
 func authRequired() gin.HandlerFunc {

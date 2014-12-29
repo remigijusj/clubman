@@ -1,0 +1,39 @@
+  <div class="row">
+    <div class="large-6 medium-8 columns">
+      <h4>Sign in</h4>
+
+      <p class="form-description">
+        Welcome to Nykredit Fitness Tilmeldingssystem. Here members of Nykredit Fitness can sign up for fitness classes at Glaskuben.
+        If you are a new user, then you can create yourself in the system by clicking 'Create user'.
+        If you already have a user, then you can log in with your username and password.
+      </p>
+      <div class="panel">
+        <form action="/login" method="POST">
+          <div class="row">
+            <div class="small-4 columns">
+              <label for="email">Email</label>
+            </div>
+            <div class="small-8 columns">
+              <input id="email" name="email" type="text" placeholder="" />
+            </div>
+          </div>
+          <div class="row">
+            <div class="small-4 columns">
+              <label for="password">Password</label>
+            </div>
+            <div class="small-8 columns">
+              <input id="password" name="password" type="password" placeholder="" />
+            </div>
+          </div>
+          <div class="row end">
+            <div class="small-4 columns">
+              <input type="submit" class="button tiny radius" value="Sign in" />
+            </div>
+            <div class="small-8 columns">
+              <a href="/forgot"><small>Forgot password</small></a>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
