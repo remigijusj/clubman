@@ -78,6 +78,11 @@ func handleProfile(c *gin.Context) {
   if self := currentUser(c); self != nil {
     form.Status = self.Status // security override
     err = updateUser(self.Id, &form)
+    // NICE: update name immediately
+    if err == nil && self.Name != form.Name {
+      self.Name = form.Name
+      setSessionAuthInfo(c, self)
+    }
   }
   if err != nil {
     showError(c, err, &form)

@@ -272,6 +272,7 @@
           <div class="row end">
             <div class="columns">
               <input type="submit" class="button tiny radius" value="Save" />
+              <a href="/" class="info button tiny radius right">Cancel</a>
             </div>
           </div>
         </form>
@@ -293,7 +294,7 @@
               {{if ne .user .self.Id}}
                 <input type="button" class="button tiny radius delete" value="Delete" data-action="/users/delete/{{.user}}" data-confirm="Are you sure?" />
               {{end}}
-              <a href="/users" class="right">Cancel</a>
+              <a href="/users" class="info button tiny radius right">Cancel</a>
             </div>
           </div>
         </form>
@@ -312,7 +313,7 @@
           <div class="row end">
             <div class="columns">
               <input type="submit" class="button tiny radius" value="Create" />
-              <a href="/users" class="right">Cancel</a>
+              <a href="/users" class="info button tiny radius right">Cancel</a>
             </div>
           </div>
         </form>

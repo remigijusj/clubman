@@ -21,6 +21,7 @@ func init() {
   log.SetFlags(0)
   gob.Register(&Alert{})
   gob.Register(&AuthInfo{})
+  gob.Register(&ProfileForm{})
 }
 
 func main() {
@@ -66,7 +67,9 @@ func displayPage(c *gin.Context) {
 
   obj := gin.H(c.Keys)
   obj["alert"] = getSessionAlert(c)
-  // TODO: override form from session
+  if form := getFlashedForm(c); form != nil {
+    obj["form"] = form
+  }
   log.Printf("=> BINDING\n   %#v\n", obj) // <<< DEBUG
 
   c.HTML(200, "main.tmpl", obj)

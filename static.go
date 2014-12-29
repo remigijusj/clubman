@@ -27,7 +27,7 @@ var queries = map[string]string{
 }
 
 var regexes = map[string]string{
-  "name_validate":   `\w\s+\w`,
+  "name_validate":   `\pL\s+\pL`,
   "email_validate":  `^\w[-._\w]*\w@\w[-._\w]*\w\.\w{2,3}$`,
-  "mobile_validate": `^\+?\d{8,10}$`,
+  "mobile_validate": `^\+?\d{8,11}$`,
 }

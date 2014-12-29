@@ -40,11 +40,13 @@ func setPage(c *gin.Context) {
   }
 }
 
-// TODO: use up args
 func showError(c *gin.Context, err error, args ...interface{}) {
   message := err.Error()
   if len(message) > 0 {
     setSessionAlert(c, &Alert{"warning", message})
+  }
+  if len(args) > 0 {
+    setFlashedForm(c, args[0])
   }
   c.Redirect(302, c.Request.URL.Path)
 }
@@ -102,6 +104,19 @@ func deleteSession(c *gin.Context) {
   session, _ := cookie.Get(c.Request, sessionKey)
   defer session.Save(c.Request, c.Writer)
   session.Options.MaxAge = -1
+}
+
+func setFlashedForm(c *gin.Context, form interface{}) {
+  session, _ := cookie.Get(c.Request, "flash-form")
+  defer session.Save(c.Request, c.Writer)
+  session.Values["form"] = form
+}
+
+func getFlashedForm(c *gin.Context) interface{} {
+  session, _ := cookie.Get(c.Request, "flash-form")
+  defer session.Save(c.Request, c.Writer)
+  session.Options.MaxAge = -1
+  return session.Values["form"]
 }
 
 // --- authorization helpers ---
