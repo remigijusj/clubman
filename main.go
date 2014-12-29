@@ -30,6 +30,7 @@ func main() {
   r := gin.Default()
   loadHtmlTemplates("templates/*", r)
   loadMailTemplates("mails/*")
+  loadTranslations()
 
   defineRoutes(r)
   r.Run(serverPort)
@@ -81,7 +82,7 @@ func authRequired() gin.HandlerFunc {
       return
     }
     if c.Request.URL.Path != "/" {
-      setSessionAlert(c, &Alert{"warning", "You are not authorized to view this page."})
+      setSessionAlert(c, &Alert{"warning", T("You are not authorized to view this page")})
     }
     c.Redirect(302, "/login")
     c.Abort(0)
@@ -94,7 +95,7 @@ func adminRequired() gin.HandlerFunc {
       return
     }
     if c.Request.URL.Path != "/" {
-      setSessionAlert(c, &Alert{"warning", "You are not authorized to view this page."})
+      setSessionAlert(c, &Alert{"warning", T("You are not authorized to view this page")})
     }
     c.Redirect(302, "/")
     c.Abort(0)

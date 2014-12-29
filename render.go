@@ -7,15 +7,13 @@ import (
   "github.com/gin-gonic/gin"
 )
 
-type (
-  DevRender struct {
-    Glob string
-  }
+type DevRender struct {
+  Glob string
+}
 
-  ProRender struct {
-    Template *template.Template
-  }
-)
+type ProRender struct {
+  Template *template.Template
+}
 
 var helpers = template.FuncMap{
   "statusTitle": statusTitle,

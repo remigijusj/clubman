@@ -28,6 +28,8 @@ var regexes = map[string]string{
 }
 
 var queries = map[string]string{
+  "translations":     "SELECT locale, key, value FROM translations ORDER BY locale, key",
+
   "credentials_get":  "SELECT password, id, name, status FROM users WHERE email=? AND status>=0",
   "password_select":  "SELECT password FROM users WHERE id=?",
   "password_forgot":  "UPDATE users SET reset_token=? WHERE email=? AND status>=0",
