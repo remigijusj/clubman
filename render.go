@@ -19,19 +19,21 @@ type (
 
 var helpers = template.FuncMap{
   "statusTitle": statusTitle,
-  "statusList": statusList,
+  "statusList":  statusList,
 }
 
-// TODO: kill dev mode, or use gin.IsDebugging() later
-func loadTemplates(engine *gin.Engine, pattern string) {
-  if true {
+// TODO: kill debug mode, or use gin.IsDebugging() later
+const isDebugging = false
+
+func loadHtmlTemplates(pattern string, engine *gin.Engine) {
+  if isDebugging {
+    engine.HTMLRender = DevRender{
+      Glob: pattern,
+    }
+  } else {
     tmpl, _ := template.New("").Funcs(helpers).ParseGlob(pattern)
     engine.HTMLRender = ProRender{
       Template: tmpl,
-    }
-  } else {
-    engine.HTMLRender = DevRender{
-      Glob: pattern,
     }
   }
 }

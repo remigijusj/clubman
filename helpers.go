@@ -10,11 +10,6 @@ import (
   "github.com/gin-gonic/gin"
 )
 
-const (
-  sessionKey  = "session"
-  bcryptCost  = 10
-)
-
 type Alert struct {
   Kind, Message string
 }

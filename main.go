@@ -5,8 +5,6 @@ import (
   "encoding/gob"
   "log"
   "regexp"
-  //"html/template"
-  //"os"
 
   "github.com/gin-gonic/gin"
   "github.com/gorilla/sessions"
@@ -30,7 +28,8 @@ func main() {
   prepareCookies()
 
   r := gin.Default()
-  loadTemplates(r, "tmpl/*")
+  loadHtmlTemplates("templates/*", r)
+  loadMailTemplates("mails/*")
 
   defineRoutes(r)
   r.Run(serverPort)
@@ -56,7 +55,7 @@ func prepareCookies() {
   cookie.Options = &sessions.Options{
     Domain:   cookieHost,
     Path:     "/",
-    MaxAge:   cookieAge,
+    MaxAge:   cookieLife,
     HttpOnly: false,
     Secure:   false,
   }

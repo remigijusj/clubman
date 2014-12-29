@@ -1,30 +1,27 @@
 package main
 
 import (
+  "html/template"
   "log"
   "net/url"
 
   "gopkg.in/gomail.v1"
 )
 
-type MailConfig struct {
-  Host string
-  User string
-  Pass string
-  Port int
-  From string
-}
+var mails *template.Template
 
-var mail = MailConfig{"smtp.gmail.com", "", "...", 587, ""}
+func loadMailTemplates(pattern string) {
+  mails = template.Must(template.New("").Funcs(helpers).ParseGlob("mails/*"))
+}
 
 func sendEmail(to, subject, body string) error {
   msg := gomail.NewMessage()
-  msg.SetHeader("From", mail.From)
+  msg.SetHeader("From", emailsFrom)
   msg.SetHeader("To", to)
   msg.SetHeader("Subject", subject)
   msg.SetBody("text/html", body)
 
-  mailer := gomail.NewMailer(mail.Host, mail.User, mail.Pass, mail.Port)
+  mailer := gomail.NewMailer(emailsHost, emailsUser, emailsPass, emailsPort)
   return mailer.Send(msg)
 }
 
