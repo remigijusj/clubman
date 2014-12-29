@@ -11,8 +11,8 @@ import (
 )
 
 const (
-  sessionKey = "session"
-  bcryptCost = 10
+  sessionKey  = "session"
+  bcryptCost  = 10
 )
 
 type Alert struct {
@@ -64,7 +64,6 @@ func forwardWarning(c *gin.Context, route string, message string) {
   }
   c.Redirect(302, route)
 }
-
 
 // --- session methods ---
 
@@ -141,10 +140,14 @@ func isAdmin(c *gin.Context) bool {
   self, _ := c.Get("self")
   auth, ok := self.(AuthInfo)
   if ok {
-    return auth.Status == StatusAdmin
+    return auth.Status == userStatusAdmin
   } else {
     return false
   }
+}
+
+func (self AuthInfo) IsAdmin() bool {
+  return self.Status == userStatusAdmin
 }
 
 // --- password-related ---

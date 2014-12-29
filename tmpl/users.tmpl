@@ -28,11 +28,7 @@
               {{.Email}}
             </td>
             <td>
-              {{if eq .Status -2}}Deactivated  {{end}}
-              {{if eq .Status -1}}Waiting      {{end}}
-              {{if eq .Status  0}}User         {{end}}
-              {{if eq .Status  1}}Instructor   {{end}}
-              {{if eq .Status  2}}Administrator{{end}}
+              {{statusTitle .Status}}
             </td>
             <td>
               {{if ne .Id $selfId }}

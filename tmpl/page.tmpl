@@ -12,7 +12,7 @@
         <li><a href="/calendar">Calendar</a></li>
         <li><a href="/list">Classes</a></li>
         <li><a href="#">My assignments</a></li>
-        {{if eq .Status 2}}
+        {{if .IsAdmin}}
         <li class="has-dropdown">
           <a href="#">Administrator</a>
           <ul class="dropdown">

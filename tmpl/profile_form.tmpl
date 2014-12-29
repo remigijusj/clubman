@@ -57,18 +57,17 @@
       The language you would prefer to view the site in.
     </div>
   </div>
-  {{if and (eq .self.Status 2) (ne .page "profile")}}
+  {{if and (.self.IsAdmin) (ne .page "profile")}}
   <div class="row">
     <div class="small-4 columns">
       <label for="status">Status</label>
     </div>
     <div class="small-8 columns">
       <select id="status" name="status">
-        <option value="-2" {{if eq .form.Status -2}}selected{{end}}>Deactivated</option>
-        <option value="-1" {{if eq .form.Status -1}}selected{{end}}>Waiting</option>
-        <option value="0" {{if eq .form.Status 0}}selected{{end}}>User</option>
-        <option value="1" {{if eq .form.Status 1}}selected{{end}}>Instructor</option>
-        <option value="2" {{if eq .form.Status 2}}selected{{end}}>Administrator</option>
+        {{$status := .form.Status}}
+        {{range statusList}}
+        <option value="{{.Status}}" {{if eq $status .Status}}selected{{end}}>{{.Title}}</option>
+        {{end}}
       </select>
     </div>
     <div class="small-12 columns description">
