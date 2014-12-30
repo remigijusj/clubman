@@ -34,10 +34,10 @@ func loadTranslations() {
 func T(lang, key string, args ...interface{}) string {
   if trans, ok := translations[lang]; ok {
     if val, ok := trans[key]; ok {
-      return fmt.Sprintf(val, args)
+      return fmt.Sprintf(val, args...)
     }
   }
-  return fmt.Sprintf(key, args)
+  return fmt.Sprintf(key, args...)
 }
 
 func TC(c *gin.Context, key string, args ...interface{}) string {

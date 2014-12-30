@@ -9,7 +9,7 @@
               <label for="name">Name</label>
             </div>
             <div class="small-8 columns">
-              <input id="name" name="name" type="text" placeholder="Anders Andersen" />
+              <input id="name" name="name" type="text" value="{{.form.Name}}" placeholder="Anders Andersen" />
             </div>
             <div class="small-12 columns description">
               "Your real name which will be used to represent you various placed on the site, lists, emails etc.
@@ -20,7 +20,7 @@
               <label for="email">Email</label>
             </div>
             <div class="small-8 columns">
-              <input id="email" name="email" type="text" placeholder="my@email.com" />
+              <input id="email" name="email" type="text" value="{{.form.Email}}" placeholder="my@email.com" />
             </div>
             <div class="small-12 columns description">
               Your email which will be used to contact you regarding classes and more.
@@ -31,7 +31,7 @@
               <label for="mobile">Mobile phone</label>
             </div>
             <div class="small-8 columns">
-              <input id="mobile" name="mobile" type="text" placeholder="+45 11223344" />
+              <input id="mobile" name="mobile" type="text" value="{{.form.Mobile}}" placeholder="+45 11223344" />
             </div>
             <div class="small-12 columns description">
               Your mobile phone number which will be used to contact you and notify you about various classes and more.
