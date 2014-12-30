@@ -217,7 +217,7 @@ func validateUser(name, email, mobile, password string, allowEmpty bool, status 
     return errors.New("Phone number has invalid format")
   }
   if len(password) < minPassLen && !(allowEmpty && password == "") {
-    return errorWithA("Password must have at least %{cnt} characters", minPassLen)
+    return errorWithA("Password must have at least %d characters", minPassLen)
   }
   if status < -2 || status > 2 {
     return errors.New("Status is invalid")

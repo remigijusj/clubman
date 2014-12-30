@@ -31,17 +31,13 @@ func loadTranslations() {
   if err := rows.Err(); err != nil { panic(err) }
 }
 
-// TODO: interpolation
 func T(lang, key string, args ...interface{}) string {
-  if trans, ok := translations["da"]; ok {
+  if trans, ok := translations[lang]; ok {
     if val, ok := trans[key]; ok {
-      return val
+      return fmt.Sprintf(val, args)
     }
   }
-  if len(args) > 0 {
-    key += fmt.Sprintf(" %v", args)// <<< DEBUG
-  }
-  return key
+  return fmt.Sprintf(key, args)
 }
 
 func TC(c *gin.Context, key string, args ...interface{}) string {

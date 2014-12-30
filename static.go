@@ -1,8 +1,10 @@
 package main
 
 const (
-  serverHost = "nk-fitness.dk"
-  serverRoot = "http://nk-fitness.dk"
+  serverName = "Nykredit Fitness"
+
+  serverHost = "demo.nk-fitness.dk"
+  serverRoot = "http://demo.nk-fitness.dk"
   serverPort = ":8001"
 
   cookieHost = ""

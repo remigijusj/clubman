@@ -18,6 +18,7 @@ type ProRender struct {
 var helpers = template.FuncMap{
   "statusTitle": statusTitle,
   "statusList":  statusList,
+  "serverName": func() string { return serverName },
 }
 
 // TODO: kill debug mode, or use gin.IsDebugging() later

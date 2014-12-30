@@ -36,7 +36,7 @@ func sendResetEmail(lang, email, token string) {
   mails.Lookup("password_reset").Execute(&buf, obj)
   message := buf.String()
 
-  subject := T(lang, "Password reset for %{host}", serverHost)
+  subject := T(lang, "Password reset for %s", serverHost)
 
   err := sendEmail(email, subject, message)
   if err != nil {

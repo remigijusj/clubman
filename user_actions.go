@@ -38,7 +38,7 @@ func handleForgot(c *gin.Context) {
   if !ok {
     showError(c, errors.New("Reminder email could not be sent"))
   } else {
-    forwardTo(c, "/login", "Email with instructions was sent to %{email}", form.Email)
+    forwardTo(c, "/login", "Email with instructions was sent to %s", form.Email)
   }
 }
 
