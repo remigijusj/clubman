@@ -19,6 +19,7 @@ const (
   sessionKey = "session"
   bcryptCost = 10
   minPassLen = 6
+  defaultLang = "da"
 )
 
 var regexes = map[string]string{
@@ -30,7 +31,7 @@ var regexes = map[string]string{
 var queries = map[string]string{
   "translations":     "SELECT locale, key, value FROM translations ORDER BY locale, key",
 
-  "credentials_get":  "SELECT password, id, name, status FROM users WHERE email=? AND status>=0",
+  "credentials_get":  "SELECT password, id, name, status, language FROM users WHERE email=? AND status>=0",
   "password_select":  "SELECT password FROM users WHERE id=?",
   "password_forgot":  "UPDATE users SET reset_token=? WHERE email=? AND status>=0",
   "password_resets":  "SELECT id, name, status FROM users WHERE reset_token=? AND email=? AND status>=0",

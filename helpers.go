@@ -15,9 +15,15 @@ type Alert struct {
 }
 
 type AuthInfo struct {
-  Id     int
-  Name   string
-  Status int
+  Id       int
+  Name     string
+  Status   int
+  Language string
+}
+
+type ErrorWithArgs struct {
+  Message string
+  Args    []interface{}
 }
 
 // --- controller helpers ---
@@ -35,32 +41,37 @@ func setPage(c *gin.Context) {
   }
 }
 
-func showError(c *gin.Context, err error, args ...interface{}) {
+// NOTE: extra is used for optional form reference
+func showError(c *gin.Context, err error, extra ...interface{}) {
   message := err.Error()
   if len(message) > 0 {
-    setSessionAlert(c, &Alert{"warning", message})
+    var args []interface{}
+    if erra, ok := err.(*ErrorWithArgs); ok {
+      args = erra.Args
+    }
+    setSessionAlert(c, &Alert{"warning", TC(c, message, args...)})
   }
-  if len(args) > 0 {
-    setFlashedForm(c, args[0])
+  if len(extra) > 0 {
+    setFlashedForm(c, extra[0])
   }
   c.Redirect(302, c.Request.URL.Path)
 }
 
-func forwardTo(c *gin.Context, route string, message string) {
+func forwardTo(c *gin.Context, route string, message string, args ...interface{}) {
   if len(message) > 0 {
-    setSessionAlert(c, &Alert{"success", message})
+    setSessionAlert(c, &Alert{"success", TC(c, message, args...)})
   }
   c.Redirect(302, route)
 }
 
-func forwardWarning(c *gin.Context, route string, message string) {
+func forwardWarning(c *gin.Context, route string, message string, args ...interface{}) {
   if len(message) > 0 {
-    setSessionAlert(c, &Alert{"warning", message})
+    setSessionAlert(c, &Alert{"warning", TC(c, message, args...)})
   }
   c.Redirect(302, route)
 }
 
-// --- session methods ---
+// --- session helpers ---
 
 func setSessionAuthInfo(c *gin.Context, auth *AuthInfo) {
   session, _ := cookie.Get(c.Request, sessionKey)
@@ -94,12 +105,6 @@ func getSessionAlert(c *gin.Context) *Alert {
   return nil
 }
 
-func deleteSession(c *gin.Context) {
-  session, _ := cookie.Get(c.Request, sessionKey)
-  defer session.Save(c.Request, c.Writer)
-  session.Options.MaxAge = -1
-}
-
 func setFlashedForm(c *gin.Context, form interface{}) {
   session, _ := cookie.Get(c.Request, "flash-form")
   defer session.Save(c.Request, c.Writer)
@@ -111,6 +116,12 @@ func getFlashedForm(c *gin.Context) interface{} {
   defer session.Save(c.Request, c.Writer)
   session.Options.MaxAge = -1
   return session.Values["form"]
+}
+
+func deleteSession(c *gin.Context) {
+  session, _ := cookie.Get(c.Request, sessionKey)
+  defer session.Save(c.Request, c.Writer)
+  session.Options.MaxAge = -1
 }
 
 // --- authorization helpers ---
@@ -167,4 +178,15 @@ func generateToken(size int) string {
   b := make([]byte, size)
   rand.Read(b)
   return fmt.Sprintf("%x", b)
+}
+
+// --- error helpers ---
+
+// NOTE: fmt.Sprintf no fit because we use reuslt for i18n
+func (err *ErrorWithArgs) Error() string {
+  return err.Message
+}
+
+func errorWithA(message string, args ...interface{}) *ErrorWithArgs {
+  return &ErrorWithArgs{message, args}
 }

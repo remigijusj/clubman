@@ -79,10 +79,11 @@ func authRequired() gin.HandlerFunc {
   return func(c *gin.Context) {
     if auth := getSessionAuthInfo(c); auth != nil {
       c.Set("self", *auth)
+      c.Set("lang", auth.Language)
       return
     }
     if c.Request.URL.Path != "/" {
-      setSessionAlert(c, &Alert{"warning", T("You are not authorized to view this page")})
+      setSessionAlert(c, &Alert{"warning", TC(c, "You are not authorized to view this page")})
     }
     c.Redirect(302, "/login")
     c.Abort(0)
@@ -95,9 +96,20 @@ func adminRequired() gin.HandlerFunc {
       return
     }
     if c.Request.URL.Path != "/" {
-      setSessionAlert(c, &Alert{"warning", T("You are not authorized to view this page")})
+      setSessionAlert(c, &Alert{"warning", TC(c, "You are not authorized to view this page")})
     }
     c.Redirect(302, "/")
     c.Abort(0)
   }
+}
+
+func getLang(c *gin.Context) string {
+  lang_i, _ := c.Get("lang")
+  if lang, ok := lang_i.(string); ok {
+    return lang
+  }
+  if lang := c.Request.URL.Query().Get("lang"); lang != "" {
+    return lang
+  }
+  return defaultLang
 }

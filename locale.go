@@ -1,6 +1,9 @@
 package main
 
 import (
+  "fmt"
+
+  "github.com/gin-gonic/gin"
 )
 
 type TransMap map[string]string
@@ -28,12 +31,19 @@ func loadTranslations() {
   if err := rows.Err(); err != nil { panic(err) }
 }
 
-// TODO: pass user language; interpolation
-func T(key string, args ...interface{}) string {
+// TODO: interpolation
+func T(lang, key string, args ...interface{}) string {
   if trans, ok := translations["da"]; ok {
     if val, ok := trans[key]; ok {
       return val
     }
   }
+  if len(args) > 0 {
+    key += fmt.Sprintf(" %v", args)// <<< DEBUG
+  }
   return key
+}
+
+func TC(c *gin.Context, key string, args ...interface{}) string {
+  return T(getLang(c), key, args...)
 }

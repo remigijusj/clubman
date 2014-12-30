@@ -64,7 +64,7 @@ func statusList() []UserStatus {
 func loginUserByForm(form *LoginForm) (*AuthInfo, error) {
   var auth AuthInfo
   var user_password string
-  err := query["credentials_get"].QueryRow(form.Email).Scan(&user_password, &auth.Id, &auth.Name, &auth.Status)
+  err := query["credentials_get"].QueryRow(form.Email).Scan(&user_password, &auth.Id, &auth.Name, &auth.Status, &auth.Language)
   if err != nil {
     log.Printf("[APP] LOGIN-FORM failure: %s, %s\n", err, form.Email)
     return nil, errors.New("Invalid password or email")
@@ -78,7 +78,7 @@ func loginUserByForm(form *LoginForm) (*AuthInfo, error) {
 }
 
 // NOTE: we don't reveal if email is missing or another problem occured
-func sendResetLink(form *ForgotForm) bool {
+func sendResetLink(form *ForgotForm, lang string) bool {
   token := generateToken(16)
   res, err := query["password_forgot"].Exec(token, form.Email)
   if err != nil {
@@ -90,7 +90,7 @@ func sendResetLink(form *ForgotForm) bool {
     log.Printf("[APP] RESET-FORM failure 2: %s, %s, %s\n", err, token, form.Email)
     return false
   }
-  go sendResetEmail(form.Email, token)
+  go sendResetEmail(lang, form.Email, token)
   return true
 }
 
@@ -143,7 +143,7 @@ func fetchUserProfile(user_id int) (ProfileForm, error) {
   err := query["user_select"].QueryRow(user_id).Scan(&form.Name, &form.Email, &form.Mobile, &form.Language, &form.Status)
   if err != nil {
     log.Printf("[APP] PROFILE error: %s, %#v\n", err, form)
-    err = errors.New("ERROR: user profile not found.")
+    err = errors.New("User profile was not found")
   }
   return form, err
 }
@@ -157,7 +157,7 @@ func createUser(form *ProfileForm) error {
   _, err = query["user_insert"].Exec(form.Name, form.Email, form.Mobile, form.Password, form.Language, form.Status)
   if err != nil {
     log.Printf("[APP] USER-CREATE error: %s, %v\n", err, form)
-    return errors.New("User could not be created. Perhaps email is already used.")
+    return errors.New("User could not be created. Perhaps email is already used")
   }
   return nil
 }
@@ -169,12 +169,12 @@ func updateUser(user_id int, form *ProfileForm) error {
   }
   ok := checkFormPassword(form, user_id)
   if !ok {
-    return errors.New("User could not be updated. Password is invalid.")
+    return errors.New("User could not be updated")
   }
   _, err = query["user_update"].Exec(form.Name, form.Email, form.Mobile, form.Password, form.Language, form.Status, user_id)
   if err != nil {
     log.Printf("[APP] USER-UPDATE error: %s, %d\n", err, user_id)
-    return errors.New("User could not be updated. Perhaps email is already used.")
+    return errors.New("User could not be updated. Perhaps email is already used")
   }
   return nil
 }
@@ -183,7 +183,7 @@ func deleteUser(user_id int) error {
   _, err := query["user_delete"].Exec(user_id)
   if err != nil {
     log.Printf("[APP] USER-DELETE error: %s, %d\n", err, user_id)
-    return errors.New("User could not be deleted.")
+    return errors.New("User could not be deleted")
   }
   return nil
 }
@@ -208,7 +208,7 @@ func checkFormPassword(form *ProfileForm, user_id int) bool {
 
 func validateUser(name, email, mobile, password string, allowEmpty bool, status int) error {
   if !regex["name_validate"].MatchString(name) {
-    return errors.New("Name is invalid. First name and second name must be entered.")
+    return errors.New("First name and second name must be entered")
   }
   if !regex["email_validate"].MatchString(email) {
     return errors.New("Email has invalid format")
@@ -217,7 +217,7 @@ func validateUser(name, email, mobile, password string, allowEmpty bool, status 
     return errors.New("Phone number has invalid format")
   }
   if len(password) < minPassLen && !(allowEmpty && password == "") {
-    return errors.New("Password is too short. Minimum %{cnt} characters") // TODO: minPassLen, interpolate
+    return errorWithA("Password must have at least %{cnt} characters", minPassLen)
   }
   if status < -2 || status > 2 {
     return errors.New("Status is invalid")

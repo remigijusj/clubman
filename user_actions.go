@@ -34,11 +34,11 @@ func handleForgot(c *gin.Context) {
     showError(c, errors.New("Please enter your email"))
     return
   }
-  ok := sendResetLink(&form)
+  ok := sendResetLink(&form, getLang(c))
   if !ok {
     showError(c, errors.New("Reminder email could not be sent"))
   } else {
-    forwardTo(c, "/login", "Email with instructions was sent to "+form.Email)
+    forwardTo(c, "/login", "Email with instructions was sent to %{email}", form.Email)
   }
 }
 
@@ -60,7 +60,7 @@ func getProfile(c *gin.Context) {
     form, err = fetchUserProfile(self.Id)
   }
   if err != nil {
-    forwardTo(c, "/", "Critical error happened. Please contact website admin.")
+    forwardTo(c, "/", "Critical error happened, please contact website admin")
     c.Abort(0)
   } else {
     c.Set("form", form)
@@ -87,7 +87,7 @@ func handleProfile(c *gin.Context) {
   if err != nil {
     showError(c, err, &form)
   } else {
-    forwardTo(c, "/", "User profile has been updated.")
+    forwardTo(c, "/", "User profile has been updated")
   }
 }
 
@@ -129,9 +129,9 @@ func handleUserCreate(c *gin.Context) {
     showError(c, err, &form)
   } else {
     if isAuthenticated(c) {
-      forwardTo(c, "/users", "User profile has been created.")
+      forwardTo(c, "/users", "User profile has been created")
     } else {
-      forwardTo(c, "/login", "User profile has been created. Please wait for administrator confirmation.")
+      forwardTo(c, "/login", "User profile has been created. Please wait for administrator confirmation")
     }
   }
 }
@@ -150,7 +150,7 @@ func handleUserUpdate(c *gin.Context) {
   if err != nil {
     showError(c, err, &form)
   } else {
-    forwardTo(c, "/users", "User profile has been updated.")
+    forwardTo(c, "/users", "User profile has been updated")
   }
 }
 
@@ -162,7 +162,7 @@ func handleUserDelete(c *gin.Context) {
   if err != nil {
     showError(c, err)
   } else {
-    forwardTo(c, "/users", "User profile has been deleted.")
+    forwardTo(c, "/users", "User profile has been deleted")
   }
 }
 
@@ -174,10 +174,10 @@ func anotherUserId(c *gin.Context) (int, error) {
   self := currentUser(c)
 
   if err != nil || self == nil {
-    return 0, errors.New("Critical error happened. Please contact website admin.")
+    return 0, errors.New("Critical error happened, please contact website admin")
   }
   if user_id == self.Id {
-    return 0, errors.New("No access to your own profile.")
+    return 0, errors.New("No access to your own profile")
   }
   return user_id, nil
 }
