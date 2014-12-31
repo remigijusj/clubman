@@ -19,6 +19,7 @@ var helpers = template.FuncMap{
   "statusTitle": statusTitle,
   "statusList":  statusList,
   "serverName": func() string { return serverName },
+  "T": T,
 }
 
 // TODO: kill debug mode, or use gin.IsDebugging() later

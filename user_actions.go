@@ -78,10 +78,8 @@ func handleProfile(c *gin.Context) {
   if self := currentUser(c); self != nil {
     form.Status = self.Status // security override
     err = updateUser(self.Id, &form)
-    // NICE: update name immediately
-    if err == nil && self.Name != form.Name {
-      self.Name = form.Name
-      setSessionAuthInfo(c, self)
+    if err == nil {
+      updateSesssionNow(c, self, &form)
     }
   }
   if err != nil {
@@ -89,6 +87,13 @@ func handleProfile(c *gin.Context) {
   } else {
     forwardTo(c, defaultPage, "User profile has been updated")
   }
+}
+
+func updateSesssionNow(c *gin.Context, self *AuthInfo, form *ProfileForm) {
+  self.Name = form.Name
+  self.Language = form.Language
+  setSessionAuthInfo(c, self)
+  c.Set("self", *self)
 }
 
 func getUsersList(c *gin.Context) {

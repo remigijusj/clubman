@@ -67,9 +67,10 @@ func displayPage(c *gin.Context) {
 
   obj := gin.H(c.Keys)
   obj["alert"] = getSessionAlert(c)
-  if form := getFlashedForm(c); form != nil {
+  if form := getFlashedForm(c); form != nil { // <<< cond necessary?
     obj["form"] = form
   }
+  obj["lang"] = getLang(c)
   log.Printf("=> BINDING\n   %#v\n", obj) // <<< DEBUG
 
   c.HTML(200, "page.tmpl", obj)
@@ -79,7 +80,6 @@ func authRequired() gin.HandlerFunc {
   return func(c *gin.Context) {
     if auth := getSessionAuthInfo(c); auth != nil {
       c.Set("self", *auth)
-      c.Set("lang", auth.Language)
       return
     }
     if c.Request.URL.Path != "/" {
@@ -108,12 +108,11 @@ func redirectToDefault(c *gin.Context) {
 }
 
 func getLang(c *gin.Context) string {
-  lang_i, _ := c.Get("lang")
-  if lang, ok := lang_i.(string); ok {
-    return lang
-  }
   if lang := c.Request.URL.Query().Get("lang"); lang != "" {
     return lang
+  }
+  if auth := currentUser(c); auth != nil {
+    return auth.Language
   }
   return defaultLang
 }
