@@ -19,7 +19,7 @@ func handleLogin(c *gin.Context) {
     showError(c, err)
   } else {
     setSessionAuthInfo(c, auth)
-    forwardTo(c, "/", "")
+    forwardTo(c, defaultPage, "")
   }
 }
 
@@ -60,7 +60,7 @@ func getProfile(c *gin.Context) {
     form, err = fetchUserProfile(self.Id)
   }
   if err != nil {
-    forwardTo(c, "/", "Critical error happened, please contact website admin")
+    forwardTo(c, defaultPage, "Critical error happened, please contact website admin")
     c.Abort(0)
   } else {
     c.Set("form", form)
@@ -87,7 +87,7 @@ func handleProfile(c *gin.Context) {
   if err != nil {
     showError(c, err, &form)
   } else {
-    forwardTo(c, "/", "User profile has been updated")
+    forwardTo(c, defaultPage, "User profile has been updated")
   }
 }
 

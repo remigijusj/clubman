@@ -22,6 +22,7 @@ const (
   bcryptCost = 10
   minPassLen = 6
   defaultLang = "da"
+  defaultPage = "/calendar" // can't be "/"
 )
 
 var regexes = map[string]string{

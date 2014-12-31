@@ -98,9 +98,13 @@ func adminRequired() gin.HandlerFunc {
     if c.Request.URL.Path != "/" {
       setSessionAlert(c, &Alert{"warning", TC(c, "You are not authorized to view this page")})
     }
-    c.Redirect(302, "/")
+    c.Redirect(302, defaultPage)
     c.Abort(0)
   }
+}
+
+func redirectToDefault(c *gin.Context) {
+  c.Redirect(302, defaultPage)
 }
 
 func getLang(c *gin.Context) string {

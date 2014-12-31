@@ -8,31 +8,31 @@
     </ul>
     <section class="top-bar-section">
       <ul class="right">
-      {{ with .self }}
-        <li><a href="/calendar">Calendar</a></li>
-        <li><a href="/list">Classes</a></li>
-        <li><a href="#">My assignments</a></li>
+      {{with .self}}
+        <li><a href="/calendar">{{"Calendar"}}</a></li>
+        <li><a href="/list">{{"Classes"}}</a></li>
+        <li><a href="#">{{"My assignments"}}</a></li>
         {{if .IsAdmin}}
         <li class="has-dropdown">
-          <a href="#">Administrator</a>
+          <a href="#">{{"Administrator"}}</a>
           <ul class="dropdown">
-            <li><a href="#">Activity logs</a></li>
-            <li><a href="/users">Users list</a></li>
+            <li><a href="#">{{"Activity logs"}}</a></li>
+            <li><a href="/users">{{"Users list"}}</a></li>
           </ul>
         </li>
         {{end}}
         <li class="has-dropdown">
           <a href="#">{{.Name}}</a>
           <ul class="dropdown">
-            <li><a href="/profile">Edit profile</a></li>
-            <li><a href="/logout">Log out</a></li>
+            <li><a href="/profile">{{"Edit profile"}}</a></li>
+            <li><a href="/logout">{{"Log out"}}</a></li>
           </ul>
         </li>
-      {{ else }}
-        <li><a href="/signup">Sign up</a></li>
-        <li><a href="/forgot">Forgot password</a></li>
-        <li><a href="/login">Log in</a></li>
-      {{ end }}
+      {{else}}
+        <li><a href="/signup">{{"Sign up"}}</a></li>
+        <li><a href="/forgot">{{"Forgot password"}}</a></li>
+        <li><a href="/login">{{"Log in"}}</a></li>
+      {{end}}
       </ul>
     </section>
   </nav>
@@ -66,36 +66,34 @@
     <div class="row page-wrap">
       <div class="large-12 columns">
 
-        {{ template "topnav" . }}
+        {{template "topnav" . }}
         <div class="top-corner"></div>
 
-        {{ with .alert }}
-          {{ template "alert" . }}
-        {{ end }}
+        {{with .alert}}
+          {{template "alert" . }}
+        {{end}}
 
-        {{ if eq .page "login" }}
-          {{ template "login.tmpl" . }}
-        {{ else if eq .page "forgot" }}
-          {{ template "forgot.tmpl" . }}
-        {{ else if eq .page "signup" }}
-          {{ template "signup.tmpl" . }}
-        {{ else if eq .page "profile" }}
-          {{ template "profile.tmpl" . }}
+        {{if eq .page "login"}}
+          {{template "login.tmpl" . }}
+        {{else if eq .page "forgot"}}
+          {{template "forgot.tmpl" . }}
+        {{else if eq .page "signup"}}
+          {{template "signup.tmpl" . }}
+        {{else if eq .page "profile"}}
+          {{template "profile.tmpl" . }}
 
-        {{ else if eq .page "users" }}
-          {{ template "users.tmpl" . }}
-        {{ else if eq .page "users_create" }}
-          {{ template "users_create.tmpl" . }}
-        {{ else if eq .page "users_update" }}
-          {{ template "users_update.tmpl" . }}
+        {{else if eq .page "users"}}
+          {{template "users.tmpl" . }}
+        {{else if eq .page "users_create"}}
+          {{template "users_create.tmpl" . }}
+        {{else if eq .page "users_update"}}
+          {{template "users_update.tmpl" . }}
 
-        {{ else if eq .page "list" }}
-          {{ template "list.tmpl" . }}
-        {{ else if eq .page "calendar" }}
-          {{ template "calendar.tmpl" . }}
-        {{ else }}
-          {{ template "welcome.tmpl" . }}
-        {{ end }}
+        {{else if eq .page "list"}}
+          {{template "list.tmpl" . }}
+        {{else if eq .page "calendar"}}
+          {{template "calendar.tmpl" . }}
+        {{end}}
 
       </div>
     </div>

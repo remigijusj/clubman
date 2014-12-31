@@ -30,8 +30,7 @@ func defineRoutesExternal(r *gin.Engine) {
 func defineRoutesInternal(r *gin.Engine) {
   a := r.Group("/", authRequired())
   {
-    // TODO: redirect to welcome?
-    a.GET("/", displayPage)
+    a.GET("/", redirectToDefault)
     a.GET("/logout", handleLogout)
     a.GET("/profile", getProfile, displayPage)
     a.POST("/profile", handleProfile)
