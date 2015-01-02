@@ -31,6 +31,7 @@ func main() {
   loadHtmlTemplates("templates/*", r)
   loadMailTemplates("mails/*")
   loadTranslations()
+  makeTransHelpers()
 
   defineRoutes(r)
   r.Run(serverPort)

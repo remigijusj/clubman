@@ -19,7 +19,7 @@ var helpers = template.FuncMap{
   "statusTitle": statusTitle,
   "statusList":  statusList,
   "serverName": func() string { return serverName },
-  "T": T,
+  "T": func(key string) string { return key },
 }
 
 // TODO: kill debug mode, or use gin.IsDebugging() later
@@ -41,11 +41,18 @@ func loadHtmlTemplates(pattern string, engine *gin.Engine) {
 func (r ProRender) Render(w http.ResponseWriter, code int, data ...interface{}) error {
   writeHeader(w, code, "text/html")
   file := data[0].(string)
-  obj := data[1]
+  obj := data[1].(gin.H)
+
+  trans := transHelpers[defaultLang]
+  if lang, ok := obj["lang"].(string); ok {
+    trans = transHelpers[lang]
+  }
+  r.Template.Funcs(trans)
 
   return r.Template.ExecuteTemplate(w, file, obj)
 }
 
+// TODO: use Funcs
 func (r DevRender) Render(w http.ResponseWriter, code int, data ...interface{}) error {
   writeHeader(w, code, "text/html")
   file := data[0].(string)

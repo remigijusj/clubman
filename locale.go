@@ -2,39 +2,54 @@ package main
 
 import (
   "fmt"
+  "html/template"
 
   "github.com/gin-gonic/gin"
 )
 
-type TransMap map[string]string
+var translations = map[string]map[string]string{}
 
-var translations = map[string]TransMap{}
+var transHelpers = map[string]template.FuncMap{}
 
 func loadTranslations() {
+  for _, lang := range languages {
+    translations[lang] = make(map[string]string)
+  }
+
   rows, err := query["translations"].Query()
   if err != nil { panic(err) }
   defer rows.Close()
 
-  var locale string
+  var lang string
   for rows.Next() {
     var key, value string
-    err := rows.Scan(&locale, &key, &value)
+    err := rows.Scan(&lang, &key, &value)
     if err != nil { panic(err) }
 
-    trans, exist := translations[locale]
-    if !exist {
-      trans = make(TransMap, 10)
-      translations[locale] = trans
-    }
+    trans, exist := translations[lang]
+    if !exist { continue }
     trans[key] = value
   }
   if err := rows.Err(); err != nil { panic(err) }
 }
 
+func makeTransHelpers() {
+  for _, lang := range languages {
+    trans := translations[lang]
+    helper := func(key string, args ...interface{}) string {
+      if val, ok := trans[key]; ok { key = val }
+      return fmt.Sprintf(key, args...)
+    }
+    transHelpers[lang] = template.FuncMap{
+      "T": helper,
+    }
+  }
+}
+
 func T(lang, key string, args ...interface{}) string {
   if trans, ok := translations[lang]; ok {
     if val, ok := trans[key]; ok {
-      return fmt.Sprintf(val, args...)
+      key = val
     }
   }
   return fmt.Sprintf(key, args...)

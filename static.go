@@ -22,8 +22,10 @@ const (
   bcryptCost = 10
   minPassLen = 6
   defaultLang = "da"
-  defaultPage = "/calendar" // can't be "/"
+  defaultPage = "/calendar" // not "/"
 )
+
+var languages = []string{"da", "en"}
 
 var regexes = map[string]string{
   "name_validate":   `\pL\s+\pL`,

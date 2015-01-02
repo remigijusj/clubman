@@ -9,29 +9,29 @@
     <section class="top-bar-section">
       <ul class="right">
       {{if .self}}
-        <li><a href="/calendar">{{"Calendar" |T .lang}}</a></li>
-        <li><a href="/list">{{"Classes" |T .lang}}</a></li>
-        <li><a href="#">{{"My assignments" |T .lang}}</a></li>
+        <li><a href="/calendar">{{"Calendar"|T}}</a></li>
+        <li><a href="/list">{{"Classes"|T}}</a></li>
+        <li><a href="#">{{"My assignments"|T}}</a></li>
         {{if .self.IsAdmin}}
         <li class="has-dropdown">
-          <a href="#">{{"Administrator" |T .lang}}</a>
+          <a href="#">{{"Administrator"|T}}</a>
           <ul class="dropdown">
-            <li><a href="#">{{"Activity logs" |T .lang}}</a></li>
-            <li><a href="/users">{{"Users list" |T .lang}}</a></li>
+            <li><a href="#">{{"Activity logs"|T}}</a></li>
+            <li><a href="/users">{{"Users list"|T}}</a></li>
           </ul>
         </li>
         {{end}}
         <li class="has-dropdown">
           <a href="#">{{.self.Name}}</a>
           <ul class="dropdown">
-            <li><a href="/profile">{{"Edit profile" |T .lang}}</a></li>
-            <li><a href="/logout">{{"Log out" |T .lang}}</a></li>
+            <li><a href="/profile">{{"Edit profile"|T}}</a></li>
+            <li><a href="/logout">{{"Log out"|T}}</a></li>
           </ul>
         </li>
       {{else}}
-        <li><a href="/signup">{{"Sign up" |T .lang}}</a></li>
-        <li><a href="/forgot">{{"Forgot password" |T .lang}}</a></li>
-        <li><a href="/login">{{"Log in" |T .lang}}</a></li>
+        <li><a href="/signup">{{"Sign up"|T}}</a></li>
+        <li><a href="/forgot">{{"Forgot password"|T}}</a></li>
+        <li><a href="/login">{{"Log in"|T}}</a></li>
       {{end}}
       </ul>
     </section>

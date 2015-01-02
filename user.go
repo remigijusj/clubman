@@ -149,7 +149,7 @@ func fetchUserProfile(user_id int) (ProfileForm, error) {
 }
 
 func createUser(form *ProfileForm) error {
-  err := validateUser(form.Name, form.Email, form.Mobile, form.Password, false, form.Status)
+  err := validateUser(form.Name, form.Email, form.Mobile, form.Password, false, form.Language, form.Status)
   if err != nil {
     return err
   }
@@ -163,7 +163,7 @@ func createUser(form *ProfileForm) error {
 }
 
 func updateUser(user_id int, form *ProfileForm) error {
-  err := validateUser(form.Name, form.Email, form.Mobile, form.Password, true, form.Status)
+  err := validateUser(form.Name, form.Email, form.Mobile, form.Password, true, form.Language, form.Status)
   if err != nil {
     return err
   }
@@ -206,7 +206,7 @@ func checkFormPassword(form *ProfileForm, user_id int) bool {
   return true
 }
 
-func validateUser(name, email, mobile, password string, allowEmpty bool, status int) error {
+func validateUser(name, email, mobile, password string, allowEmpty bool, language string, status int) error {
   if !regex["name_validate"].MatchString(name) {
     return errors.New("First name and second name must be entered")
   }
@@ -218,6 +218,9 @@ func validateUser(name, email, mobile, password string, allowEmpty bool, status 
   }
   if len(password) < minPassLen && !(allowEmpty && password == "") {
     return errorWithA("Password must have at least %d characters", minPassLen)
+  }
+  if _, ok := translations[language]; !ok {
+    return errors.New("Language is invalid")
   }
   if status < -2 || status > 2 {
     return errors.New("Status is invalid")
