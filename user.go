@@ -41,7 +41,7 @@ type UserStatus struct {
 const userStatusAdmin = 2
 
 var statuses = []UserStatus{
-  UserStatus{-2, "Deactivated"  },
+  UserStatus{-2, "Inactive"     },
   UserStatus{-1, "Waiting"      },
   UserStatus{ 0, "User"         },
   UserStatus{ 1, "Instructor"   },

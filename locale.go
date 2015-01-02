@@ -27,7 +27,7 @@ func loadTranslations() {
     if err != nil { panic(err) }
 
     trans, exist := translations[lang]
-    if !exist { continue }
+    if !exist || value == "" { continue }
     trans[key] = value
   }
   if err := rows.Err(); err != nil { panic(err) }

@@ -1,15 +1,33 @@
+{{define "signup.tmpl"}}
+  <div class="row">
+    <div class="large-6 medium-8 columns">
+      <h4>{{"Create new user"|T}}</h4>
+
+      <div class="panel">
+        <form action="/signup" method="POST">
+          {{template "signup_form.tmpl" . }}
+          <div class="row end">
+            <div class="columns">
+              <input type="submit" class="button tiny radius" value="{{"Create"|T}}" />
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+{{end}}
 {{define "profile.tmpl"}}
   <div class="row">
     <div class="large-6 medium-8 columns">
-      <h4>Edit own profile</h4>
+      <h4>{{"Edit own profile"|T}}</h4>
 
       <div class="panel">
         <form action="/profile" method="POST">
           {{template "profile_form.tmpl" . }}
           <div class="row end">
             <div class="columns">
-              <input type="submit" class="button tiny radius" value="Save" />
-              <a href="/" class="info button tiny radius right">Cancel</a>
+              <input type="submit" class="button tiny radius" value="{{"Save"|T}}" />
+              <a href="/" class="info button tiny radius right">{{"Cancel"|T}}</a>
             </div>
           </div>
         </form>
@@ -20,18 +38,18 @@
 {{define "users_update.tmpl"}}
   <div class="row">
     <div class="large-6 medium-8 columns">
-      <h4>Edit user profile</h4>
+      <h4>{{"Edit user profile"|T}}</h4>
 
       <div class="panel">
         <form action="/users/update/{{.user}}" method="POST">
           {{template "profile_form.tmpl" . }}
           <div class="row end">
             <div class="columns">
-              <input type="submit" class="button tiny radius" value="Save" />
+              <input type="submit" class="button tiny radius" value="{{"Save"|T}}" />
               {{if ne .user .self.Id}}
-                <input type="button" class="button tiny radius delete" value="Delete" data-action="/users/delete/{{.user}}" data-confirm="Are you sure?" />
+                <input type="button" class="button tiny radius delete" value="{{"Delete"|T}}" data-action="/users/delete/{{.user}}" data-confirm="{{"Are you sure?"|T}}" />
               {{end}}
-              <a href="/users" class="info button tiny radius right">Cancel</a>
+              <a href="/users" class="info button tiny radius right">{{"Cancel"|T}}</a>
             </div>
           </div>
         </form>
@@ -42,15 +60,15 @@
 {{define "users_create.tmpl"}}
   <div class="row">
     <div class="large-6 medium-8 columns">
-      <h4>Create new user</h4>
+      <h4>{{"Create new user"|T}}</h4>
 
       <div class="panel">
         <form action="/users/create" method="POST">
           {{template "profile_form.tmpl" . }}
           <div class="row end">
             <div class="columns">
-              <input type="submit" class="button tiny radius" value="Create" />
-              <a href="/users" class="info button tiny radius right">Cancel</a>
+              <input type="submit" class="button tiny radius" value="{{"Create"|T}}" />
+              <a href="/users" class="info button tiny radius right">{{"Cancel"|T}}</a>
             </div>
           </div>
         </form>

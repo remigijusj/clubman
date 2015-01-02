@@ -68,7 +68,7 @@ func displayPage(c *gin.Context) {
 
   obj := gin.H(c.Keys)
   obj["alert"] = getSessionAlert(c)
-  if form := getFlashedForm(c); form != nil { // <<< cond necessary?
+  if form := getFlashedForm(c); form != nil {
     obj["form"] = form
   }
   obj["lang"] = getLang(c)

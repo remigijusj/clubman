@@ -26,14 +26,13 @@ func sendEmail(to, subject, body string) error {
   return mailer.Send(msg)
 }
 
-// TODO: localize body
 func sendResetEmail(lang, email, token string) {
   obj := map[string]string{
     "host": serverHost,
     "url":  serverRoot+"/resets?email="+url.QueryEscape(email)+"&token="+token,
   }
   var buf bytes.Buffer
-  mails.Lookup("password_reset").Execute(&buf, obj)
+  mails.Lookup("password_reset").Funcs(transHelpers[lang]).Execute(&buf, obj)
   message := buf.String()
 
   subject := T(lang, "Password reset for %s", serverHost)

@@ -1,0 +1,45 @@
+  <div class="row">
+    <div class="small-4 columns">
+      <label for="name">{{"Name"|T}}</label>
+    </div>
+    <div class="small-8 columns">
+      <input id="name" name="name" type="text" value="{{.form.Name}}" placeholder="{{"John Doe"|T}}" />
+    </div>
+    <div class="small-12 columns description">
+      {{"Your real name which will be shown in various places of the system"|T}}
+    </div>
+  </div>
+  <div class="row">
+    <div class="small-4 columns">
+      <label for="email">{{"Email"|T}}</label>
+    </div>
+    <div class="small-8 columns">
+      <input id="email" name="email" type="text" value="{{.form.Email}}" placeholder="{{"my@email.com"|T}}" />
+    </div>
+    <div class="small-12 columns description">
+      {{"Your email which will be used to log in, to contact you regarding classes, etc"|T}}
+    </div>
+  </div>
+  <div class="row">
+    <div class="small-4 columns">
+      <label for="mobile">{{"Mobile phone"|T}}</label>
+    </div>
+    <div class="small-8 columns">
+      <input id="mobile" name="mobile" type="text" value="{{.form.Mobile}}" placeholder="{{"12345678"|T}}" />
+    </div>
+    <div class="small-12 columns description">
+      {{"Your mobile phone number which will be used to send reminders about classes"|T}}
+    </div>
+  </div>
+  <div class="row">
+    <div class="small-4 columns">
+      <label for="password">{{"Password"|T}}</label>
+    </div>
+    <div class="small-8 columns">
+      <input type="password" style="display:none" />
+      <input id="password" name="password" type="password" placeholder="WT36yUX8STxP" />
+    </div>
+    <div class="small-12 columns description">
+      {{"The password which you will use to log in to the system"|T}}
+    </div>
+  </div>

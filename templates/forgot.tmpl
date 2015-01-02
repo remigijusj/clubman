@@ -1,26 +1,26 @@
   <div class="row">
     <div class="large-6 medium-8 columns">
-      <h4>Forgot password</h4>
+      <h4>{{"Forgot password"|T}}</h4>
 
       <p class="form-description">
-        Please enter your email and the system will send you login instructions.
+        {{"Please enter your email and the system will send you instructions"|T}}.
       </p>
       <div class="panel">
         <form action="/forgot" method="POST">
           <div class="row">
             <div class="small-4 columns">
-              <label for="email">Email</label>
+              <label for="email">{{"Email"|T}}</label>
             </div>
             <div class="small-8 columns">
               <input id="email" name="email" type="text" placeholder="" />
             </div>
             <div class="small-12 columns description">
-              The email you used when you created the user.
+              {{"The email you used when you created the user"|T}}
             </div>
           </div>
           <div class="row end">
             <div class="columns">
-              <input type="submit" class="button tiny radius" value="Send email" />
+              <input type="submit" class="button tiny radius" value="{{"Send email"|T}}" />
             </div>
           </div>
         </form>

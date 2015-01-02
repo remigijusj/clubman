@@ -1,8 +1,8 @@
 {{define "password_reset"}}
 <p>
-  <b>You have requested password reset for {{.host}}</b><br/>
-  Please click the link and change your password:
+  <b>{{T "You have requested password reset for %s" .host}}</b><br/>
+  {{"Please click the link and change your password"|T}}:
 </p>
 <p><a href="{{.url}}">{{.url}}</a></p>
-<p>This link is valid for one-time only.</p>
+<p>{{"This link is valid for one-time only"|T}}.</p>
 {{end}}

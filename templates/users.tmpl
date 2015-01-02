@@ -1,20 +1,20 @@
   <div class="row">
     <div class="large-8 columns">
-      <h4>Users</h4>
+      <h4>{{"Users list"|T}}</h4>
 
       <p>
-        <a href="/users">Active</a> |
-        <a href="/users?status=-1">Waiting</a> |
-        <a href="/users?status=-2">Inactive</a>
+        <a href="/users">{{"Active"|T}}</a> |
+        <a href="/users?status=-1">{{"Waiting"|T}}</a> |
+        <a href="/users?status=-2">{{"Inactive"|T}}</a>
       </p>
 
       <table class="list">
         <thead>
           <tr>
-            <td>Name</td>
-            <td>Email</td>
-            <td>Status</td>
-            <td>Actions</td>
+            <td>{{"Name"|T}}</td>
+            <td>{{"Email"|T}}</td>
+            <td>{{"Status"|T}}</td>
+            <td>{{"Actions"|T}}</td>
           </tr>
         </thead>
         <tbody>
@@ -28,11 +28,11 @@
               {{.Email}}
             </td>
             <td>
-              {{statusTitle .Status}}
+              {{T (statusTitle .Status)}}
             </td>
             <td>
               {{if ne .Id $selfId }}
-              <a href="/users/update/{{.Id}}">Edit</a>
+              <a href="/users/update/{{.Id}}">{{"Edit"|T}}</a>
               {{end}}
             </td>
           </tr>
@@ -41,7 +41,7 @@
       </table>
 
       <p>
-        <a href="/users/create" class="button tiny radius">Create user</a>
+        <a href="/users/create" class="button tiny radius">{{"Create user"|T}}</a>
       </p>
     </div>
   </div>

@@ -1,51 +1,51 @@
   <div class="row">
     <div class="small-4 columns">
-      <label for="name">Name</label>
+      <label for="name">{{"Name"|T}}</label>
     </div>
     <div class="small-8 columns">
-      <input id="name" name="name" type="text" value="{{.form.Name}}" placeholder="Anders Andersen" />
+      <input id="name" name="name" type="text" value="{{.form.Name}}" placeholder="{{"John Doe"|T}}" />
     </div>
     <div class="small-12 columns description">
-      The real name of the user.
+      {{"The real name of the user"|T}}
     </div>
   </div>
   <div class="row">
     <div class="small-4 columns">
-      <label for="email">Email</label>
+      <label for="email">{{"Email"|T}}</label>
     </div>
     <div class="small-8 columns">
-      <input id="email" name="email" type="text" value="{{.form.Email}}" placeholder="min@e-mail.dk" />
+      <input id="email" name="email" type="text" value="{{.form.Email}}" placeholder="{{"my@email.com"|T}}" />
     </div>
     <div class="small-12 columns description">
-      The email of the user which will be used for sending email and to log in.
+      {{"The email of the user which will be used to log in and for sending emails"|T}}
     </div>
   </div>
   <div class="row">
     <div class="small-4 columns">
-      <label for="password">Password</label>
+      <label for="password">{{"Password"|T}}</label>
     </div>
     <div class="small-8 columns">
       <input type="password" style="display:none" />
       <input id="password" name="password" type="password" placeholder="" />
     </div>
     <div class="small-12 columns description">
-      The password which the user will have to use to identify himself/herself.
+      {{"The password which the user will have to use to identify himself/herself"|T}}
     </div>
   </div>
   <div class="row">
     <div class="small-4 columns">
-      <label for="mobile">Mobile phone</label>
+      <label for="mobile">{{"Mobile phone"|T}}</label>
     </div>
     <div class="small-8 columns">
-      <input id="mobile" name="mobile" type="text" value="{{.form.Mobile}}" placeholder="+45 11223344" />
+      <input id="mobile" name="mobile" type="text" value="{{.form.Mobile}}" placeholder="{{"12345678"|T}}" />
     </div>
     <div class="small-12 columns description">
-      The mobile phonenumber of the user which will be used to send reminders and more.
+      {{"The mobile phone number of the user which will be used to send reminders, etc"|T}}
     </div>
   </div>
   <div class="row">
     <div class="small-4 columns">
-      <label for="language">Language</label>
+      <label for="language">{{"Language"|T}}</label>
     </div>
     <div class="small-8 columns">
       <select id="language" name="language">
@@ -54,24 +54,24 @@
       </select>
     </div>
     <div class="small-12 columns description">
-      The language you would prefer to view the site in.
+      {{"The language you prefer to view the site in"|T}}
     </div>
   </div>
   {{if and (.self.IsAdmin) (ne .page "profile")}}
   <div class="row">
     <div class="small-4 columns">
-      <label for="status">Status</label>
+      <label for="status">{{"Status"|T}}</label>
     </div>
     <div class="small-8 columns">
       <select id="status" name="status">
         {{$status := .form.Status}}
         {{range statusList}}
-        <option value="{{.Status}}" {{if eq $status .Status}}selected{{end}}>{{.Title}}</option>
+        <option value="{{.Status}}" {{if eq $status .Status}}selected{{end}}>{{T .Title}}</option>
         {{end}}
       </select>
     </div>
     <div class="small-12 columns description">
-      The type of the user controls which things in the system the user has access to.
+      {{"The type of the user controls which things in the system the user has access to"|T}}
     </div>
   </div>
   {{end}}
