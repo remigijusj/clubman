@@ -10,7 +10,7 @@
       <ul class="right">
       {{if .self}}
         <li><a href="/calendar">{{"Calendar"|T}}</a></li>
-        <li><a href="/list">{{"Classes"|T}}</a></li>
+        <li><a href="/classes">{{"Classes"|T}}</a></li>
         <li><a href="#">{{"My assignments"|T}}</a></li>
         {{if .self.IsAdmin}}
         <li class="has-dropdown">
@@ -88,6 +88,9 @@
           {{template "users_create.tmpl" . }}
         {{else if eq .page "users_update"}}
           {{template "users_update.tmpl" . }}
+
+        {{else if eq .page "classes"}}
+          {{template "classes.tmpl" . }}
 
         {{else if eq .page "list"}}
           {{template "list.tmpl" . }}

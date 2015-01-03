@@ -35,6 +35,8 @@ func defineRoutesInternal(r *gin.Engine) {
     a.GET("/profile", getProfile, displayPage)
     a.POST("/profile", handleProfile)
 
+    a.GET("/classes", getClassesList, displayPage)
+
     a.GET("/list", displayPage)
     a.GET("/calendar", displayPage)
 
