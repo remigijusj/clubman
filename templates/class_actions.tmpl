@@ -1,0 +1,39 @@
+{{define "classes_update.tmpl"}}
+  <div class="row">
+    <div class="large-6 medium-8 columns">
+      <h4>{{"Edit class"|T}}</h4>
+
+      <div class="panel">
+        <form action="/classes/update/{{.class}}" method="POST">
+          {{template "class_form.tmpl" . }}
+          <div class="row end">
+            <div class="columns">
+              <input type="submit" class="button tiny radius" value="{{"Save"|T}}" />
+              <input type="button" class="button tiny radius delete" value="{{"Delete"|T}}" data-action="/classes/delete/{{.class}}" data-confirm="{{"Are you sure?"|T}}" />
+              <a href="/classes" class="info button tiny radius right">{{"Cancel"|T}}</a>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+{{end}}
+{{define "classes_create.tmpl"}}
+  <div class="row">
+    <div class="large-6 medium-8 columns">
+      <h4>{{"Create class"|T}}</h4>
+
+      <div class="panel">
+        <form action="/classes/create" method="POST">
+          {{template "class_form.tmpl" . }}
+          <div class="row end">
+            <div class="columns">
+              <input type="submit" class="button tiny radius" value="{{"Create"|T}}" />
+              <a href="/classes" class="info button tiny radius right">{{"Cancel"|T}}</a>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+{{end}}

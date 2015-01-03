@@ -12,12 +12,13 @@
           </tr>
         </thead>
         <tbody>
+          {{ $self := .self }}
           {{range .list}}
           <tr>
             <td>
               <a href="/classes/show/{{.Id}}">{{.Name}}</a>
             </td>
-            {{if .self.IsAdmin}}
+            {{if $self.IsAdmin}}
             <td>
               <a href="/classes/update/{{.Id}}">{{"Edit"|T}}</a>
             </td>

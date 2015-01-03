@@ -174,8 +174,8 @@ func handleUserDelete(c *gin.Context) {
 // --- local helpers ---
 
 func anotherUserId(c *gin.Context) (int, error) {
-  user := c.Params.ByName("id")
-  user_id, err := strconv.Atoi(user)
+  id := c.Params.ByName("id")
+  user_id, err := strconv.Atoi(id)
   self := currentUser(c)
 
   if err != nil || self == nil {

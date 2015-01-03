@@ -49,9 +49,15 @@ func defineRoutesAdmin(a *gin.RouterGroup) {
   {
     ad.GET("/users", getUsersList, displayPage)
     ad.GET("/users/create", newUserForm, displayPage)
-    ad.POST("/users/create", handleUserCreate)
     ad.GET("/users/update/:id", getUserForm, displayPage)
+    ad.POST("/users/create", handleUserCreate)
     ad.POST("/users/update/:id", handleUserUpdate)
     ad.POST("/users/delete/:id", handleUserDelete)
+
+    ad.GET("/classes/create", newClassForm, displayPage)
+    ad.GET("/classes/update/:id", getClassForm, displayPage)
+    ad.POST("/classes/create", handleClassCreate)
+    ad.POST("/classes/update/:id", handleClassUpdate)
+    ad.POST("/classes/delete/:id", handleClassDelete)
   }
 }

@@ -1,0 +1,33 @@
+  <div class="row">
+    <div class="small-4 columns">
+      <label for="name">{{"Name"|T}}</label>
+    </div>
+    <div class="small-8 columns">
+      <input id="name" name="name" type="text" value="{{.form.Name}}" />
+    </div>
+    <div class="small-12 columns description">
+      {{"The name of the class"|T}}
+    </div>
+  </div>
+  <div class="row">
+    <div class="small-4 columns">
+      <label for="part_min">{{"Min participants"|T}}</label>
+    </div>
+    <div class="small-8 columns">
+      <input id="part_min" name="part_min" type="text" value="{{.form.PartMin}}" />
+    </div>
+    <div class="small-12 columns description">
+      {{"Minimum number of participants in this class"|T}}
+    </div>
+  </div>
+  <div class="row">
+    <div class="small-4 columns">
+      <label for="part_max">{{"Max participants"|T}}</label>
+    </div>
+    <div class="small-8 columns">
+      <input id="part_max" name="part_max" type="text" value="{{.form.PartMax}}" />
+    </div>
+    <div class="small-12 columns description">
+      {{"Maximum number of participants in this class, or zero if there is no limit"|T}}
+    </div>
+  </div>

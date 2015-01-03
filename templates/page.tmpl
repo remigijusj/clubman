@@ -91,6 +91,10 @@
 
         {{else if eq .page "classes"}}
           {{template "classes.tmpl" . }}
+        {{else if eq .page "classes_create"}}
+          {{template "classes_create.tmpl" . }}
+        {{else if eq .page "classes_update"}}
+          {{template "classes_update.tmpl" . }}
 
         {{else if eq .page "list"}}
           {{template "list.tmpl" . }}
