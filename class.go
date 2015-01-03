@@ -13,9 +13,10 @@ type ClassRecord struct {
 }
 
 type ClassForm struct {
-  Name     string `form:"name"     binding:"required"`
-  PartMin  int    `form:"part_min"`
-  PartMax  int    `form:"part_max"`
+  Name         string `form:"name"          binding:"required"`
+  PartMin      int    `form:"part_min"`
+  PartMax      int    `form:"part_max"`
+  InstructorId int    `form:"instructor_id" binding:"required"`
 }
 
 func listClasses(q url.Values) []ClassRecord {
@@ -47,7 +48,7 @@ func listClassesQuery(q url.Values) (*sql.Rows, error) {
 
 func fetchClass(class_id int) (ClassForm, error) {
   var form ClassForm
-  err := query["class_select"].QueryRow(class_id).Scan(&form.Name, &form.PartMin, &form.PartMax)
+  err := query["class_select"].QueryRow(class_id).Scan(&form.Name, &form.PartMin, &form.PartMax, &form.InstructorId)
   if err != nil {
     log.Printf("[APP] CLASS-SELECT error: %s, %#v\n", err, form)
     err = errors.New("Class was not found")
@@ -56,11 +57,11 @@ func fetchClass(class_id int) (ClassForm, error) {
 }
 
 func createClass(form *ClassForm) error {
-  err := validateClass(form.Name, form.PartMin, form.PartMax)
+  err := validateClass(form.Name, form.PartMin, form.PartMax, form.InstructorId)
   if err != nil {
     return err
   }
-  _, err = query["class_insert"].Exec(form.Name, form.PartMin, form.PartMax)
+  _, err = query["class_insert"].Exec(form.Name, form.PartMin, form.PartMax, form.InstructorId)
   if err != nil {
     log.Printf("[APP] CLASS-CREATE error: %s, %v\n", err, form)
     return errors.New("Class could not be created")
@@ -69,11 +70,11 @@ func createClass(form *ClassForm) error {
 }
 
 func updateClass(class_id int, form *ClassForm) error {
-  err := validateClass(form.Name, form.PartMin, form.PartMax)
+  err := validateClass(form.Name, form.PartMin, form.PartMax, form.InstructorId)
   if err != nil {
     return err
   }
-  _, err = query["class_update"].Exec(form.Name, form.PartMin, form.PartMax, class_id)
+  _, err = query["class_update"].Exec(form.Name, form.PartMin, form.PartMax, form.InstructorId, class_id)
   if err != nil {
     log.Printf("[APP] CLASS-UPDATE error: %s, %d\n", err, class_id)
     return errors.New("Class could not be updated")
@@ -90,7 +91,7 @@ func deleteClass(class_id int) error {
   return nil
 }
 
-func validateClass(name string, part_min, part_max int) error {
+func validateClass(name string, part_min, part_max, instructor_id int) error {
   if part_min < 0 || part_max < 0 || (part_max > 0 && part_max < part_min) {
     return errors.New("Participant numbers are invalid")
   }

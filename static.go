@@ -42,14 +42,15 @@ var queries = map[string]string{
   "password_resets":  "SELECT id, name, status FROM users WHERE reset_token=? AND email=? AND status>=0",
   "users_active":     "SELECT id, name, email, status FROM users WHERE status>=0 ORDER BY name",
   "users_by_status":  "SELECT id, name, email, status FROM users WHERE status=? ORDER BY name",
+  "users_on_status":  "SELECT id, name FROM users WHERE status=? ORDER BY name",
   "user_select":      "SELECT name, email, mobile, language, status FROM users WHERE id=?",
   "user_insert":      "INSERT INTO users(name, email, mobile, password, language, status) values (?, ?, ?, ?, ?, ?)",
   "user_update":      "UPDATE users SET name=?, email=?, mobile=?, password=?, language=?, status=? WHERE id=?",
   "user_delete":      "DELETE FROM users WHERE id=?",
 
   "classes_all":      "SELECT id, name FROM classes ORDER BY name",
-  "class_select":     "SELECT name, part_min, part_max FROM classes WHERE id=?",
-  "class_insert":     "INSERT INTO classes(name, part_min, part_max) VALUES (?, ?, ?)",
-  "class_update":     "UPDATE classes SET name=?, part_min=?, part_max=? WHERE id=?",
+  "class_select":     "SELECT name, part_min, part_max, instructor_id FROM classes WHERE id=?",
+  "class_insert":     "INSERT INTO classes(name, part_min, part_max, instructor_id) VALUES (?, ?, ?, ?)",
+  "class_update":     "UPDATE classes SET name=?, part_min=?, part_max=?, instructor_id=? WHERE id=?",
   "class_delete":     "DELETE FROM classes WHERE id=?",
 }

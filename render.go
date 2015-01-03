@@ -16,6 +16,7 @@ type ProRender struct {
 }
 
 var helpers = template.FuncMap{
+  "listRecords": listRecords,
   "statusTitle": statusTitle,
   "statusList":  statusList,
   "serverName": func() string { return serverName },

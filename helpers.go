@@ -22,8 +22,13 @@ type AuthInfo struct {
 }
 
 type ErrorWithArgs struct {
-  Message string
-  Args    []interface{}
+  Message  string
+  Args     []interface{}
+}
+
+type SimpleRecord struct {
+  Id       int
+  Text     string
 }
 
 // --- controller helpers ---
@@ -188,4 +193,29 @@ func (err *ErrorWithArgs) Error() string {
 
 func errorWithA(message string, args ...interface{}) *ErrorWithArgs {
   return &ErrorWithArgs{message, args}
+}
+
+// --- miscelaneous ---
+
+func listRecords(name string, args ...interface{}) []SimpleRecord {
+  list := []SimpleRecord{}
+  rows, err := query[name].Query(args...)
+  if err != nil {
+    log.Printf("[APP] USER-LIST-STATUS error: %s\n", err)
+    return list
+  }
+  defer rows.Close()
+  for rows.Next() {
+    var item SimpleRecord
+    err := rows.Scan(&item.Id, &item.Text)
+    if err != nil {
+      log.Printf("[APP] USER-LIST-STATUS error: %s\n", err)
+    } else {
+      list = append(list, item)
+    }
+  }
+  if err := rows.Err(); err != nil {
+    log.Printf("[APP] USER-LIST error: %s\n", err)
+  }
+  return list
 }

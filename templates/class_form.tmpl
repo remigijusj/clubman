@@ -31,3 +31,19 @@
       {{"Maximum number of participants in this class, or zero if there is no limit"|T}}
     </div>
   </div>
+  <div class="row">
+    <div class="small-4 columns">
+      <label for="instructor_id">{{"Instructor"|T}}</label>
+    </div>
+    <div class="small-8 columns">
+      <select id="instructor_id" name="instructor_id">
+        {{$instructor := .form.InstructorId}}
+        {{range (listRecords "users_on_status" 1)}}
+        <option value="{{.Id}}" {{if eq $instructor .Id }}selected{{end}}>{{.Text}}</option>
+        {{end}}
+      </select> 
+    </div>
+    <div class="small-12 columns description">
+      {{"The instructor for this class, who have special administrative rights"|T}}
+    </div>
+  </div>
