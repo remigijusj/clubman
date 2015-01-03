@@ -50,6 +50,6 @@ var queries = map[string]string{
   "classes_all":      "SELECT id, name FROM classes",
   "class_select":     "SELECT name, part_min, part_max FROM classes WHERE id=?",
   "class_insert":     "INSERT INTO classes(name, part_min, part_max) VALUES (?, ?, ?)",
-  "class_update":     "UPDATE classes SET name=?, part_min=?, part_max=?",
+  "class_update":     "UPDATE classes SET name=?, part_min=?, part_max=? WHERE id=?",
   "class_delete":     "DELETE FROM classes WHERE id=?",
 }

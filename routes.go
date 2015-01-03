@@ -37,7 +37,6 @@ func defineRoutesInternal(r *gin.Engine) {
 
     a.GET("/classes", getClassesList, displayPage)
 
-    a.GET("/list", displayPage)
     a.GET("/calendar", displayPage)
 
     defineRoutesAdmin(a)

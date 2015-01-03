@@ -20,6 +20,7 @@ func init() {
   gob.Register(&Alert{})
   gob.Register(&AuthInfo{})
   gob.Register(&ProfileForm{})
+  gob.Register(&ClassForm{})
 }
 
 func main() {

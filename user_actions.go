@@ -56,8 +56,11 @@ func handleReset(c *gin.Context) {
 func getProfile(c *gin.Context) {
   var form ProfileForm
   var err error
-  if self := currentUser(c); self != nil {
+  self := currentUser(c)
+  if self != nil {
     form, err = fetchUserProfile(self.Id)
+  } else {
+    err = errors.New("missing self")
   }
   if err != nil {
     forwardTo(c, defaultPage, "Critical error happened, please contact website admin")
@@ -75,12 +78,15 @@ func handleProfile(c *gin.Context) {
     return
   }
   var err error
-  if self := currentUser(c); self != nil {
+  self := currentUser(c)
+  if self != nil {
     form.Status = self.Status // security override
     err = updateUser(self.Id, &form)
     if err == nil {
       updateSesssionNow(c, self, &form)
     }
+  } else {
+    err = errors.New("Critical error happened, please contact website admin")
   }
   if err != nil {
     showError(c, err, &form)
@@ -117,7 +123,7 @@ func getUserForm(c *gin.Context) {
     forwardWarning(c, "/users", err.Error())
     c.Abort(0)
   } else {
-    c.Set("user", user_id)
+    c.Set("id", user_id)
     c.Set("form", form)
   }
 }

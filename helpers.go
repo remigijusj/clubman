@@ -132,7 +132,6 @@ func currentUser(c *gin.Context) *AuthInfo {
   if ok {
     return &auth
   } else {
-    log.Printf("[APP] CUR_USER error: self=%#v\n", self)
     return nil
   }
 }

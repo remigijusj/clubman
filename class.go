@@ -14,8 +14,8 @@ type ClassRecord struct {
 
 type ClassForm struct {
   Name     string `form:"name"     binding:"required"`
-  PartMin  int    `form:"part_min" binding:"required"`
-  PartMax  int    `form:"part_max" binding:"required"`
+  PartMin  int    `form:"part_min"`
+  PartMax  int    `form:"part_max"`
 }
 
 func listClasses(q url.Values) []ClassRecord {
@@ -91,7 +91,7 @@ func deleteClass(class_id int) error {
 }
 
 func validateClass(name string, part_min, part_max int) error {
-  if part_min < 0 || part_max < 0 || part_max < part_min {
+  if part_min < 0 || part_max < 0 || (part_max > 0 && part_max < part_min) {
     return errors.New("Participant numbers are invalid")
   }
   return nil

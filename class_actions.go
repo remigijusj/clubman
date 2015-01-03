@@ -29,7 +29,7 @@ func getClassForm(c *gin.Context) {
     forwardWarning(c, "/classes", err.Error())
     c.Abort(0)
   } else {
-    c.Set("class", class_id)
+    c.Set("id", class_id)
     c.Set("form", form)
   }
 }
