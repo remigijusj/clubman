@@ -47,7 +47,7 @@ var queries = map[string]string{
   "user_update":      "UPDATE users SET name=?, email=?, mobile=?, password=?, language=?, status=? WHERE id=?",
   "user_delete":      "DELETE FROM users WHERE id=?",
 
-  "classes_all":      "SELECT id, name FROM classes",
+  "classes_all":      "SELECT id, name FROM classes ORDER BY name",
   "class_select":     "SELECT name, part_min, part_max FROM classes WHERE id=?",
   "class_insert":     "INSERT INTO classes(name, part_min, part_max) VALUES (?, ?, ?)",
   "class_update":     "UPDATE classes SET name=?, part_min=?, part_max=? WHERE id=?",

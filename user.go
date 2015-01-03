@@ -38,7 +38,10 @@ type UserStatus struct {
   Title    string
 }
 
-const userStatusAdmin = 2
+const (
+  userStatusWaiting = -1
+  userStatusAdmin = 2
+)
 
 var statuses = []UserStatus{
   UserStatus{-2, "Inactive"     },

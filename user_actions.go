@@ -135,6 +135,10 @@ func handleUserCreate(c *gin.Context) {
     showError(c, errors.New("Please provide all details"), &form)
     return
   }
+  if c.Request.URL.Path == "/signup" {
+    form.Language = getLang(c)
+    form.Status = userStatusWaiting
+  }
   err := createUser(&form)
   if err != nil {
     showError(c, err, &form)
