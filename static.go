@@ -40,6 +40,7 @@ var queries = map[string]string{
   "password_select":  "SELECT password FROM users WHERE id=?",
   "password_forgot":  "UPDATE users SET reset_token=? WHERE email=? AND status>=0",
   "password_resets":  "SELECT id, name, status FROM users WHERE reset_token=? AND email=? AND status>=0",
+
   "users_active":     "SELECT id, name, email, status FROM users WHERE status>=0 ORDER BY name",
   "users_by_status":  "SELECT id, name, email, status FROM users WHERE status=? ORDER BY name",
   "users_on_status":  "SELECT id, name FROM users WHERE status=? ORDER BY name",
@@ -47,10 +48,12 @@ var queries = map[string]string{
   "user_insert":      "INSERT INTO users(name, email, mobile, password, language, status) values (?, ?, ?, ?, ?, ?)",
   "user_update":      "UPDATE users SET name=?, email=?, mobile=?, password=?, language=?, status=? WHERE id=?",
   "user_delete":      "DELETE FROM users WHERE id=?",
+  "user_name":        "SELECT name FROM users WHERE id=?",
 
   "teams_all":        "SELECT id, name FROM teams ORDER BY name",
   "team_select":      "SELECT name, part_min, part_max, instructor_id FROM teams WHERE id=?",
   "team_insert":      "INSERT INTO teams(name, part_min, part_max, instructor_id) VALUES (?, ?, ?, ?)",
   "team_update":      "UPDATE teams SET name=?, part_min=?, part_max=?, instructor_id=? WHERE id=?",
   "team_delete":      "DELETE FROM teams WHERE id=?",
+  "team_events":      "SELECT id, start_at, minutes, status FROM events WHERE team_id=? ORDER BY start_at",
 }

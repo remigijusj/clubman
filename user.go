@@ -199,3 +199,9 @@ func validateUser(name, email, mobile, password string, allowEmpty bool, languag
   }
   return nil
 }
+
+func userName(user_id int) (string, error) {
+  var name string
+  err := query["user_name"].QueryRow(user_id).Scan(&name)
+  return name, err
+}

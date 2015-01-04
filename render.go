@@ -19,6 +19,7 @@ var helpers = template.FuncMap{
   "listRecords": listRecords,
   "statusTitle": statusTitle,
   "statusList":  statusList,
+  "userName":    userName,
   "serverName": func() string { return serverName },
   "T": func(key string) string { return key },
 }

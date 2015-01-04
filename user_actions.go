@@ -102,7 +102,7 @@ func updateSesssionNow(c *gin.Context, self *AuthInfo, form *ProfileForm) {
   c.Set("self", *self)
 }
 
-func getUsersList(c *gin.Context) {
+func getUserList(c *gin.Context) {
   q := c.Request.URL.Query()
   list := listUsers(q)
   c.Set("list", list)

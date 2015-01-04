@@ -8,10 +8,21 @@ import (
   "github.com/gin-gonic/gin/binding"
 )
 
-func getTeamsList(c *gin.Context) {
+func getTeamList(c *gin.Context) {
   q := c.Request.URL.Query()
   list := listTeams(q)
   c.Set("list", list)
+}
+
+func getTeamData(c *gin.Context) {
+  team_id, err := teamId(c)
+  if err != nil {
+    forwardWarning(c, "/teams", err.Error())
+    c.Abort(0)
+  } else {
+    list := listTeamEvents(team_id)
+    c.Set("list", list)
+  }
 }
 
 func newTeamForm(c *gin.Context) {

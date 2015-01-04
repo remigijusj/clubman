@@ -1,0 +1,61 @@
+  <div class="row">
+    <div class="large-6 medium-8 columns">
+      <h4>{{.form.Name}}</h4>
+
+      <div class="panel">
+        <small>
+          {{if .self.IsAdmin}}
+          <a href="/teams/update/{{.id}}" class="button tiny radius right">{{"Edit"|T}}</a>
+          {{end}}
+          <b>{{"Instructor"|T}}</b>: {{userName .form.InstructorId}}
+          {{if gt .form.PartMin 0}}
+          <br/><b>{{"Min participants"|T}}</b>: {{.form.PartMin}}
+          {{end}}
+          {{if gt .form.PartMax 0}}
+          <br/><b>{{"Max participants"|T}}</b>: {{.form.PartMax}}
+          {{end}}
+        </small>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="large-12 columns">
+      <table class="list">
+        <thead>
+          <tr>
+            <td>{{"Lesson"|T}}</td>
+            <td>{{"Date"|T}}</td>
+            <td>{{"Weekday"|T}}</td>
+            <td>{{"Start time"|T}}</td>
+            <td>{{"Duration"|T}}</td>
+            <td>{{"Participants"|T}}</td>
+          </tr>
+        </thead>
+        <tbody>
+          {{range .list}}
+          <tr>
+            <td>
+              <a href="/events/view/{{.Id}}">{{"Lesson"|T}} {{.Id}}</a>
+            </td>
+            <td>
+              {{.StartAt.Format "02/01 2006"}}
+            </td>
+            <td>
+              {{.StartAt.Format "Monday"|T}}
+            </td>
+            <td>
+              {{.StartAt.Format "15:04"}}
+            </td>
+            <td>
+              {{.Minutes}} {{"min"|T}}
+            </td>
+            <td>
+              0
+            </td>
+          </tr>
+          {{end}}
+        </tbody>
+      </table>
+    </div>
+  </div>

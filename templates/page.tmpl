@@ -91,6 +91,8 @@
 
         {{else if eq .page "teams"}}
           {{template "teams.tmpl" . }}
+        {{else if eq .page "teams_view"}}
+          {{template "teams_view.tmpl" . }}
         {{else if eq .page "teams_create"}}
           {{template "teams_create.tmpl" . }}
         {{else if eq .page "teams_update"}}
