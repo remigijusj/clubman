@@ -35,7 +35,7 @@ func defineRoutesInternal(r *gin.Engine) {
     a.GET("/profile", getProfile, displayPage)
     a.POST("/profile", handleProfile)
 
-    a.GET("/classes", getClassesList, displayPage)
+    a.GET("/teams", getTeamsList, displayPage)
 
     a.GET("/calendar", displayPage)
 
@@ -46,17 +46,17 @@ func defineRoutesInternal(r *gin.Engine) {
 func defineRoutesAdmin(a *gin.RouterGroup) {
   ad := a.Group("/", adminRequired())
   {
-    ad.GET("/users", getUsersList, displayPage)
-    ad.GET("/users/create", newUserForm, displayPage)
-    ad.GET("/users/update/:id", getUserForm, displayPage)
-    ad.POST("/users/create", handleUserCreate)
+    ad.GET("/users",             getUsersList, displayPage)
+    ad.GET("/users/create",      newUserForm,  displayPage)
+    ad.GET("/users/update/:id",  getUserForm,  displayPage)
+    ad.POST("/users/create",     handleUserCreate)
     ad.POST("/users/update/:id", handleUserUpdate)
     ad.POST("/users/delete/:id", handleUserDelete)
 
-    ad.GET("/classes/create", newClassForm, displayPage)
-    ad.GET("/classes/update/:id", getClassForm, displayPage)
-    ad.POST("/classes/create", handleClassCreate)
-    ad.POST("/classes/update/:id", handleClassUpdate)
-    ad.POST("/classes/delete/:id", handleClassDelete)
+    ad.GET("/teams/create",      newTeamForm,  displayPage)
+    ad.GET("/teams/update/:id",  getTeamForm,  displayPage)
+    ad.POST("/teams/create",     handleTeamCreate)
+    ad.POST("/teams/update/:id", handleTeamUpdate)
+    ad.POST("/teams/delete/:id", handleTeamDelete)
   }
 }

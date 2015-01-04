@@ -34,7 +34,7 @@ var regexes = map[string]string{
 }
 
 var queries = map[string]string{
-  "translations":     "SELECT locale, key, value FROM translations ORDER BY locale, key",
+  "translations":     "SELECT lang, key, value FROM translations ORDER BY lang, key",
 
   "credentials_get":  "SELECT password, id, name, status, language FROM users WHERE email=? AND status>=0",
   "password_select":  "SELECT password FROM users WHERE id=?",
@@ -48,9 +48,9 @@ var queries = map[string]string{
   "user_update":      "UPDATE users SET name=?, email=?, mobile=?, password=?, language=?, status=? WHERE id=?",
   "user_delete":      "DELETE FROM users WHERE id=?",
 
-  "classes_all":      "SELECT id, name FROM classes ORDER BY name",
-  "class_select":     "SELECT name, part_min, part_max, instructor_id FROM classes WHERE id=?",
-  "class_insert":     "INSERT INTO classes(name, part_min, part_max, instructor_id) VALUES (?, ?, ?, ?)",
-  "class_update":     "UPDATE classes SET name=?, part_min=?, part_max=?, instructor_id=? WHERE id=?",
-  "class_delete":     "DELETE FROM classes WHERE id=?",
+  "teams_all":        "SELECT id, name FROM teams ORDER BY name",
+  "team_select":      "SELECT name, part_min, part_max, instructor_id FROM teams WHERE id=?",
+  "team_insert":      "INSERT INTO teams(name, part_min, part_max, instructor_id) VALUES (?, ?, ?, ?)",
+  "team_update":      "UPDATE teams SET name=?, part_min=?, part_max=?, instructor_id=? WHERE id=?",
+  "team_delete":      "DELETE FROM teams WHERE id=?",
 }

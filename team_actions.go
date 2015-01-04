@@ -8,83 +8,83 @@ import (
   "github.com/gin-gonic/gin/binding"
 )
 
-func getClassesList(c *gin.Context) {
+func getTeamsList(c *gin.Context) {
   q := c.Request.URL.Query()
-  list := listClasses(q)
+  list := listTeams(q)
   c.Set("list", list)
 }
 
-func newClassForm(c *gin.Context) {
-  form := ClassForm{}
+func newTeamForm(c *gin.Context) {
+  form := TeamForm{}
   c.Set("form", form)
 }
 
-func getClassForm(c *gin.Context) {
-  var form ClassForm
-  class_id, err := classId(c)
+func getTeamForm(c *gin.Context) {
+  var form TeamForm
+  team_id, err := teamId(c)
   if err == nil {
-    form, err = fetchClass(class_id)
+    form, err = fetchTeam(team_id)
   }
   if err != nil {
-    forwardWarning(c, "/classes", err.Error())
+    forwardWarning(c, "/teams", err.Error())
     c.Abort(0)
   } else {
-    c.Set("id", class_id)
+    c.Set("id", team_id)
     c.Set("form", form)
   }
 }
 
-func handleClassCreate(c *gin.Context) {
-  var form ClassForm
+func handleTeamCreate(c *gin.Context) {
+  var form TeamForm
   if ok := c.BindWith(&form, binding.Form); !ok {
     showError(c, errors.New("Please provide all details"), &form)
     return
   }
-  err := createClass(&form)
+  err := createTeam(&form)
   if err != nil {
     showError(c, err, &form)
   } else {
-    forwardTo(c, "/classes", "Class has been created")
+    forwardTo(c, "/teams", "Team has been created")
   }
 }
 
-func handleClassUpdate(c *gin.Context) {
-  var form ClassForm
+func handleTeamUpdate(c *gin.Context) {
+  var form TeamForm
   if ok := c.BindWith(&form, binding.Form); !ok {
     showError(c, errors.New("Please provide all details"), &form)
     return
   }
-  class_id, err := classId(c)
+  team_id, err := teamId(c)
   if err == nil {
-    err = updateClass(class_id, &form)
+    err = updateTeam(team_id, &form)
   }
   if err != nil {
     showError(c, err, &form)
   } else {
-    forwardTo(c, "/classes", "Class has been updated")
+    forwardTo(c, "/teams", "Team has been updated")
   }
 }
 
-func handleClassDelete(c *gin.Context) {
-  class_id, err := classId(c)
+func handleTeamDelete(c *gin.Context) {
+  team_id, err := teamId(c)
   if err == nil {
-    err = deleteClass(class_id)
+    err = deleteTeam(team_id)
   }
   if err != nil {
     showError(c, err)
   } else {
-    forwardTo(c, "/classes", "Class has been deleted")
+    forwardTo(c, "/teams", "Team has been deleted")
   }
 }
 
 // --- local helpers ---
 
-func classId(c *gin.Context) (int, error) {
+func teamId(c *gin.Context) (int, error) {
   id := c.Params.ByName("id")
-  class_id, err := strconv.Atoi(id)
+  team_id, err := strconv.Atoi(id)
 
   if err != nil {
     return 0, errors.New("Critical error happened, please contact website admin")
   }
-  return class_id, nil
+  return team_id, nil
 }
