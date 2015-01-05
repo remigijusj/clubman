@@ -24,7 +24,7 @@
       <table class="list">
         <thead>
           <tr>
-            <td>{{"Lesson"|T}}</td>
+            <td>{{"Event"|T}}</td>
             <td>{{"Date"|T}}</td>
             <td>{{"Weekday"|T}}</td>
             <td>{{"Start time"|T}}</td>
@@ -36,7 +36,7 @@
           {{range .list}}
           <tr>
             <td>
-              <a href="/events/view/{{.Id}}">{{"Lesson"|T}} {{.Id}}</a>
+              <a href="/events/view/{{.Id}}">{{"Event"|T}} {{.Id}}</a>
             </td>
             <td>
               {{.StartAt.Format "02/01 2006"}}

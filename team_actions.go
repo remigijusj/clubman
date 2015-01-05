@@ -2,6 +2,7 @@ package main
 
 import (
   "errors"
+  "fmt"
   "strconv"
 
   "github.com/gin-gonic/gin"
@@ -85,6 +86,25 @@ func handleTeamDelete(c *gin.Context) {
     showError(c, err)
   } else {
     forwardTo(c, "/teams", "Team has been deleted")
+  }
+}
+
+func newTeamEventsForm(c *gin.Context) {
+  team, _ := c.Get("form")
+  c.Set("team", team)
+  form := TeamEventsForm{}
+  c.Set("form", form)
+}
+
+func handleTeamEvents(c *gin.Context) {
+  team_id, err := teamId(c)
+  if err == nil {
+    // <<< err = 
+  }
+  if err != nil {
+    showError(c, err)
+  } else {
+    forwardTo(c, fmt.Sprintf("/teams/view/%d", team_id), "Events have been added")
   }
 }
 

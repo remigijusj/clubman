@@ -97,6 +97,8 @@
           {{template "teams_create.tmpl" . }}
         {{else if eq .page "teams_update"}}
           {{template "teams_update.tmpl" . }}
+        {{else if eq .page "teams_events"}}
+          {{template "teams_events.tmpl" . }}
 
         {{else if eq .page "calendar"}}
           {{template "calendar.tmpl" . }}

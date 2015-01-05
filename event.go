@@ -12,6 +12,14 @@ type EventRecord struct {
   Status   int
 }
 
+type TeamEventsForm struct {
+  DateFrom string `form:"date_from" binding:"required"`
+  DateTill string `form:"date_till" binding:"required"`
+  Weekdays string `form:"weekdays"`
+  StartAt  string `form:"start_at"`
+  Minutes  string `form:"minutes"`
+}
+
 func listTeamEvents(team_id int) []EventRecord {
   list := []EventRecord{}
   rows, err := query["team_events"].Query(team_id)

@@ -57,8 +57,10 @@ func defineRoutesAdmin(a *gin.RouterGroup) {
 
     ad.GET("/teams/create",      newTeamForm, displayPage)
     ad.GET("/teams/update/:id",  getTeamForm, displayPage)
+    ad.GET("/teams/events/:id",  getTeamForm, newTeamEventsForm, displayPage)
     ad.POST("/teams/create",     handleTeamCreate)
     ad.POST("/teams/update/:id", handleTeamUpdate)
     ad.POST("/teams/delete/:id", handleTeamDelete)
+    ad.POST("/teams/events/:id", handleTeamEvents)
   }
 }
