@@ -10,6 +10,7 @@ import (
 type TeamRecord struct {
   Id       int
   Name     string
+  UserName string
 }
 
 type TeamForm struct {
@@ -29,7 +30,7 @@ func listTeams(q url.Values) []TeamRecord {
   defer rows.Close()
   for rows.Next() {
     var item TeamRecord
-    err := rows.Scan(&item.Id, &item.Name)
+    err := rows.Scan(&item.Id, &item.Name, &item.UserName)
     if err != nil {
       log.Printf("[APP] TEAM-LIST error: %s\n", err)
     } else {

@@ -2,7 +2,6 @@ package main
 
 import (
   "errors"
-  "fmt"
   "strconv"
 
   "github.com/gin-gonic/gin"
@@ -94,18 +93,6 @@ func newTeamEventsForm(c *gin.Context) {
   c.Set("team", team)
   form := TeamEventsForm{}
   c.Set("form", form)
-}
-
-func handleTeamEvents(c *gin.Context) {
-  team_id, err := teamId(c)
-  if err == nil {
-    // <<< err = 
-  }
-  if err != nil {
-    showError(c, err)
-  } else {
-    forwardTo(c, fmt.Sprintf("/teams/view/%d", team_id), "Events have been added")
-  }
 }
 
 // --- local helpers ---

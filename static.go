@@ -51,7 +51,7 @@ var queries = map[string]string{
   "user_delete":      "DELETE FROM users WHERE id=?",
   "user_name":        "SELECT name FROM users WHERE id=?",
 
-  "teams_all":        "SELECT id, name FROM teams ORDER BY name",
+  "teams_all":        "SELECT teams.id, teams.name, users.name FROM teams LEFT JOIN users ON teams.instructor_id=users.id ORDER BY teams.name",
   "team_select":      "SELECT name, users_min, users_max, instructor_id FROM teams WHERE id=?",
   "team_insert":      "INSERT INTO teams(name, users_min, users_max, instructor_id) VALUES (?, ?, ?, ?)",
   "team_update":      "UPDATE teams SET name=?, users_min=?, users_max=?, instructor_id=? WHERE id=?",

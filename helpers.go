@@ -56,10 +56,16 @@ func showError(c *gin.Context, err error, extra ...interface{}) {
     }
     setSessionAlert(c, &Alert{"warning", TC(c, message, args...)})
   }
-  if len(extra) > 0 {
+  if len(extra) > 0 && extra[0] != nil {
     setFlashedForm(c, extra[0])
   }
-  c.Redirect(302, c.Request.URL.Path)
+  var route string
+  if len(extra) > 1 {
+    route = extra[1].(string)
+  } else {
+    route = c.Request.URL.Path
+  }
+  c.Redirect(302, route)
 }
 
 func forwardTo(c *gin.Context, route string, message string, args ...interface{}) {

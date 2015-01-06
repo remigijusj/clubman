@@ -1,6 +1,7 @@
 package main
 
 import (
+  "errors"
   "log"
   "time"
 )
@@ -41,4 +42,32 @@ func listTeamEvents(team_id int) []EventRecord {
     log.Printf("[APP] TEAM-EVENTS-LIST error: %s\n", err)
   }
   return list
+}
+
+func addEvents(team_id int, form *TeamEventsForm) (int, error) {
+  if err := validateEventsForm(); err != nil {
+    return 0, err
+  }
+  // <<< query
+  return 1, nil
+}
+
+func cancelEvents(team_id int, form *TeamEventsForm) (int, error) {
+  if err := validateEventsForm(); err != nil {
+    return 0, err
+  }
+  // <<< query
+  return 2, nil
+}
+
+func removeEvents(team_id int, form *TeamEventsForm) (int, error) {
+  if err := validateEventsForm(); err != nil {
+    return 0, err
+  }
+  // <<< query
+  return 0, errors.New("Not implemented")
+}
+
+func validateEventsForm() error {
+  return nil
 }

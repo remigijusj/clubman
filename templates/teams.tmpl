@@ -6,6 +6,7 @@
         <thead>
           <tr>
             <td>{{"Name"|T}}</td>
+            <td>{{"Instructor"|T}}</td>
             {{if .self.IsAdmin}}
             <td>{{"Actions"|T}}</td>
             {{end}}
@@ -18,9 +19,14 @@
             <td>
               <a href="/teams/view/{{.Id}}">{{.Name}}</a>
             </td>
+            <td>
+              {{.UserName}}
+            </td>
             {{if $self.IsAdmin}}
             <td>
               <a href="/teams/update/{{.Id}}">{{"Edit"|T}}</a>
+              &nbsp;
+              <a href="/teams/events/{{.Id}}">{{"Events"|T}}</a>
             </td>
             {{end}}
           </tr>
