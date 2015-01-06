@@ -54,7 +54,7 @@ func handleReset(c *gin.Context) {
 }
 
 func getProfile(c *gin.Context) {
-  var form ProfileForm
+  var form UserForm
   var err error
   self := currentUser(c)
   if self != nil {
@@ -72,7 +72,7 @@ func getProfile(c *gin.Context) {
 
 // NOTE: similar to handleUserUpdate
 func handleProfile(c *gin.Context) {
-  var form ProfileForm
+  var form UserForm
   if ok := c.BindWith(&form, binding.Form); !ok {
     showError(c, errors.New("Please provide all details"), &form)
     return
@@ -95,7 +95,7 @@ func handleProfile(c *gin.Context) {
   }
 }
 
-func updateSesssionNow(c *gin.Context, self *AuthInfo, form *ProfileForm) {
+func updateSesssionNow(c *gin.Context, self *AuthInfo, form *UserForm) {
   self.Name = form.Name
   self.Language = form.Language
   setSessionAuthInfo(c, self)
@@ -109,12 +109,12 @@ func getUserList(c *gin.Context) {
 }
 
 func newUserForm(c *gin.Context) {
-  form := ProfileForm{}
+  form := UserForm{}
   c.Set("form", form)
 }
 
 func getUserForm(c *gin.Context) {
-  var form ProfileForm
+  var form UserForm
   user_id, err := anotherUserId(c)
   if err == nil {
     form, err = fetchUserProfile(user_id)
@@ -130,7 +130,7 @@ func getUserForm(c *gin.Context) {
 
 // NOTE: serves both signup and create by admin
 func handleUserCreate(c *gin.Context) {
-  var form ProfileForm
+  var form UserForm
   if ok := c.BindWith(&form, binding.Form); !ok || form.Password == "" {
     showError(c, errors.New("Please provide all details"), &form)
     return
@@ -153,7 +153,7 @@ func handleUserCreate(c *gin.Context) {
 
 // NOTE: similar to handleProfile
 func handleUserUpdate(c *gin.Context) {
-  var form ProfileForm
+  var form UserForm
   if ok := c.BindWith(&form, binding.Form); !ok {
     showError(c, errors.New("Please provide all details"), &form)
     return

@@ -8,11 +8,11 @@
           <a href="/teams/update/{{.id}}" class="button tiny radius right">{{"Edit"|T}}</a>
           {{end}}
           <b>{{"Instructor"|T}}</b>: {{userName .form.InstructorId}}
-          {{if gt .form.PartMin 0}}
-          <br/><b>{{"Min participants"|T}}</b>: {{.form.PartMin}}
+          {{if gt .form.UsersMin 0}}
+          <br/><b>{{"Min participants"|T}}</b>: {{.form.UsersMin}}
           {{end}}
-          {{if gt .form.PartMax 0}}
-          <br/><b>{{"Max participants"|T}}</b>: {{.form.PartMax}}
+          {{if gt .form.UsersMax 0}}
+          <br/><b>{{"Max participants"|T}}</b>: {{.form.UsersMax}}
           {{end}}
         </small>
       </div>

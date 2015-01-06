@@ -51,9 +51,9 @@ var queries = map[string]string{
   "user_name":        "SELECT name FROM users WHERE id=?",
 
   "teams_all":        "SELECT id, name FROM teams ORDER BY name",
-  "team_select":      "SELECT name, part_min, part_max, instructor_id FROM teams WHERE id=?",
-  "team_insert":      "INSERT INTO teams(name, part_min, part_max, instructor_id) VALUES (?, ?, ?, ?)",
-  "team_update":      "UPDATE teams SET name=?, part_min=?, part_max=?, instructor_id=? WHERE id=?",
+  "team_select":      "SELECT name, users_min, users_max, instructor_id FROM teams WHERE id=?",
+  "team_insert":      "INSERT INTO teams(name, users_min, users_max, instructor_id) VALUES (?, ?, ?, ?)",
+  "team_update":      "UPDATE teams SET name=?, users_min=?, users_max=?, instructor_id=? WHERE id=?",
   "team_delete":      "DELETE FROM teams WHERE id=?",
   "team_events":      "SELECT id, start_at, minutes, status FROM events WHERE team_id=? ORDER BY start_at",
 }

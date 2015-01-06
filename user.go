@@ -17,7 +17,7 @@ type ForgotForm struct {
   Email    string `form:"email"    binding:"required"`
 }
 
-type ProfileForm struct {
+type UserForm struct {
   Name     string `form:"name"     binding:"required"`
   Email    string `form:"email"    binding:"required"`
   Mobile   string `form:"mobile"   binding:"required"`
@@ -110,8 +110,8 @@ func listUsersQuery(q url.Values) (*sql.Rows, error) {
   }
 }
 
-func fetchUserProfile(user_id int) (ProfileForm, error) {
-  var form ProfileForm
+func fetchUserProfile(user_id int) (UserForm, error) {
+  var form UserForm
   err := query["user_select"].QueryRow(user_id).Scan(&form.Name, &form.Email, &form.Mobile, &form.Language, &form.Status)
   if err != nil {
     log.Printf("[APP] PROFILE error: %s, %#v\n", err, form)
@@ -120,7 +120,7 @@ func fetchUserProfile(user_id int) (ProfileForm, error) {
   return form, err
 }
 
-func createUser(form *ProfileForm) error {
+func createUser(form *UserForm) error {
   err := validateUser(form.Name, form.Email, form.Mobile, form.Password, false, form.Language, form.Status)
   if err != nil {
     return err
@@ -134,7 +134,7 @@ func createUser(form *ProfileForm) error {
   return nil
 }
 
-func updateUser(user_id int, form *ProfileForm) error {
+func updateUser(user_id int, form *UserForm) error {
   err := validateUser(form.Name, form.Email, form.Mobile, form.Password, true, form.Language, form.Status)
   if err != nil {
     return err
@@ -160,7 +160,7 @@ func deleteUser(user_id int) error {
   return nil
 }
 
-func checkFormPassword(form *ProfileForm, user_id int) bool {
+func checkFormPassword(form *UserForm, user_id int) bool {
   if form.Password != "" {
     form.Password = hashPassword(form.Password)
     if form.Password == "" {

@@ -14,8 +14,8 @@ type TeamRecord struct {
 
 type TeamForm struct {
   Name         string `form:"name"          binding:"required"`
-  PartMin      int    `form:"part_min"`
-  PartMax      int    `form:"part_max"`
+  UsersMin     int    `form:"users_min"`
+  UsersMax     int    `form:"users_max"`
   InstructorId int    `form:"instructor_id" binding:"required"`
 }
 
@@ -48,7 +48,7 @@ func listTeamsQuery(q url.Values) (*sql.Rows, error) {
 
 func fetchTeam(team_id int) (TeamForm, error) {
   var form TeamForm
-  err := query["team_select"].QueryRow(team_id).Scan(&form.Name, &form.PartMin, &form.PartMax, &form.InstructorId)
+  err := query["team_select"].QueryRow(team_id).Scan(&form.Name, &form.UsersMin, &form.UsersMax, &form.InstructorId)
   if err != nil {
     log.Printf("[APP] TEAM-SELECT error: %s, %#v\n", err, form)
     err = errors.New("Team was not found")
@@ -57,11 +57,11 @@ func fetchTeam(team_id int) (TeamForm, error) {
 }
 
 func createTeam(form *TeamForm) error {
-  err := validateTeam(form.Name, form.PartMin, form.PartMax, form.InstructorId)
+  err := validateTeam(form.Name, form.UsersMin, form.UsersMax, form.InstructorId)
   if err != nil {
     return err
   }
-  _, err = query["team_insert"].Exec(form.Name, form.PartMin, form.PartMax, form.InstructorId)
+  _, err = query["team_insert"].Exec(form.Name, form.UsersMin, form.UsersMax, form.InstructorId)
   if err != nil {
     log.Printf("[APP] TEAM-CREATE error: %s, %v\n", err, form)
     return errors.New("Team could not be created")
@@ -70,11 +70,11 @@ func createTeam(form *TeamForm) error {
 }
 
 func updateTeam(team_id int, form *TeamForm) error {
-  err := validateTeam(form.Name, form.PartMin, form.PartMax, form.InstructorId)
+  err := validateTeam(form.Name, form.UsersMin, form.UsersMax, form.InstructorId)
   if err != nil {
     return err
   }
-  _, err = query["team_update"].Exec(form.Name, form.PartMin, form.PartMax, form.InstructorId, team_id)
+  _, err = query["team_update"].Exec(form.Name, form.UsersMin, form.UsersMax, form.InstructorId, team_id)
   if err != nil {
     log.Printf("[APP] TEAM-UPDATE error: %s, %d\n", err, team_id)
     return errors.New("Team could not be updated")
@@ -91,8 +91,8 @@ func deleteTeam(team_id int) error {
   return nil
 }
 
-func validateTeam(name string, part_min, part_max, instructor_id int) error {
-  if part_min < 0 || part_max < 0 || (part_max > 0 && part_max < part_min) {
+func validateTeam(name string, users_min, users_max, instructor_id int) error {
+  if users_min < 0 || users_max < 0 || (users_max > 0 && users_max < users_min) {
     return errors.New("Participant numbers are invalid")
   }
   return nil

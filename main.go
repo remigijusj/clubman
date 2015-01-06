@@ -19,7 +19,7 @@ func init() {
   log.SetFlags(0)
   gob.Register(&Alert{})
   gob.Register(&AuthInfo{})
-  gob.Register(&ProfileForm{})
+  gob.Register(&UserForm{})
   gob.Register(&TeamForm{})
 }
 
