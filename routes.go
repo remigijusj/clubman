@@ -5,7 +5,6 @@ import (
 )
 
 func defineRoutes(r *gin.Engine) {
-  // TODO: combine to 1 public dir
   s := r.Group("/")
   {
     s.Handlers = s.Handlers[:1] // removing Logger from Default

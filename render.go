@@ -24,11 +24,8 @@ var helpers = template.FuncMap{
   "T": func(key string) string { return key },
 }
 
-// TODO: kill debug mode, or use gin.IsDebugging() later
-const isDebugging = false
-
 func loadHtmlTemplates(pattern string, engine *gin.Engine) {
-  if isDebugging {
+  if reloadTmpl {
     engine.HTMLRender = DevRender{
       Glob: pattern,
     }
@@ -45,29 +42,34 @@ func (r ProRender) Render(w http.ResponseWriter, code int, data ...interface{}) 
   file := data[0].(string)
   obj := data[1].(gin.H)
 
-  trans := transHelpers[defaultLang]
-  if lang, ok := obj["lang"].(string); ok {
-    trans = transHelpers[lang]
-  }
-  r.Template.Funcs(trans)
+  addTranslations(r.Template, obj)
 
   return r.Template.ExecuteTemplate(w, file, obj)
 }
 
-// TODO: use Funcs
 func (r DevRender) Render(w http.ResponseWriter, code int, data ...interface{}) error {
   writeHeader(w, code, "text/html")
   file := data[0].(string)
-  obj := data[1]
+  obj := data[1].(gin.H)
 
-  t := template.New("")
+  t := template.New("").Funcs(helpers)
   if _, err := t.ParseGlob(r.Glob); err != nil {
     return err
   }
+  addTranslations(t, obj)
+
   return t.ExecuteTemplate(w, file, obj)
 }
 
 func writeHeader(w http.ResponseWriter, code int, contentType string) {
   w.Header().Set("Content-Type", contentType)
   w.WriteHeader(code)
+}
+
+func addTranslations(t *template.Template, obj gin.H) {
+  trans := transHelpers[defaultLang]
+  if lang, ok := obj["lang"].(string); ok {
+    trans = transHelpers[lang]
+  }
+  t.Funcs(trans)
 }

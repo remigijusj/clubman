@@ -2,7 +2,6 @@ package main
 
 const (
   serverName = "Nykredit Fitness"
-
   serverHost = "demo.nk-fitness.dk"
   serverRoot = "http://demo.nk-fitness.dk"
   serverPort = ":8001"
@@ -23,6 +22,8 @@ const (
   minPassLen = 6
   defaultLang = "da"
   defaultPage = "/calendar" // not "/"
+
+  reloadTmpl = true // DEBUG mode
 )
 
 var languages = []string{"da", "en"}
@@ -56,4 +57,6 @@ var queries = map[string]string{
   "team_update":      "UPDATE teams SET name=?, users_min=?, users_max=?, instructor_id=? WHERE id=?",
   "team_delete":      "DELETE FROM teams WHERE id=?",
   "team_events":      "SELECT id, start_at, minutes, status FROM events WHERE team_id=? ORDER BY start_at",
+
+  "events_delete":    "DELETE FROM events WHERE team_id=?",
 }
