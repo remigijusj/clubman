@@ -10,10 +10,10 @@
               <label for="date_from">{{"Date from"|T}}</label>
             </div>
             <div class="small-8 columns">
-              <input id="date_from" name="date_from" type="text" value="{{.form.DateFrom}}" placeholder="01/12 2015" />
+              <input id="date_from" name="date_from" type="text" value="{{.form.DateFrom}}" placeholder="01/12 2015" class="date" />
             </div>
             <div class="small-12 columns description">
-              ...
+              {{"From what date events are added or removed"|T}}
             </div>
           </div>
           <div class="row">
@@ -21,10 +21,10 @@
               <label for="date_till">{{"Date till"|T}}</label>
             </div>
             <div class="small-8 columns">
-              <input id="date_till" name="date_till" type="text" value="{{.form.DateTill}}" placeholder="31/12 2015" />
+              <input id="date_till" name="date_till" type="text" value="{{.form.DateTill}}" placeholder="31/12 2015" class="date" />
             </div>
             <div class="small-12 columns description">
-              ...
+              {{"Till what date events are added or removed"|T}}
             </div>
           </div>
           <div class="row">
@@ -43,7 +43,7 @@
               </select>
             </div>
             <div class="small-12 columns description">
-              ...
+              {{"Only add or remove events on the listed weekdays"|T}}
             </div>
           </div>
           <div class="row">
@@ -54,7 +54,7 @@
               <input id="start_at" name="start_at" type="text" value="{{.form.StartAt}}" size="5" placeholder="10:30" />
             </div>
             <div class="small-12 columns description">
-              ...
+              {{"At what time the events will start each specified day"|T}}
             </div>
           </div>
           <div class="row">
@@ -68,7 +68,7 @@
               min
             </div>
             <div class="small-12 columns description">
-              ...
+              {{"How many minutes will the event last"|T}}
             </div>
           </div>
 

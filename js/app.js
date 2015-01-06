@@ -9,4 +9,12 @@ $(function(){
       form.prop('action', action).submit();
     }
   });
+  // datepicker
+  $('.date').fdatepicker({
+    format: 'dd/mm yyyy',
+    weekStart: 1,
+    language: 'da'
+  });
+  // select
+  $('.select2').select2();
 });
