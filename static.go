@@ -22,6 +22,8 @@ const (
   minPassLen = 6
   defaultLang = "da"
   defaultPage = "/calendar" // not "/"
+  dateFormat = "02/01 2006"
+  timeFormat = "15:04"
 
   reloadTmpl = true // DEBUG mode
 )

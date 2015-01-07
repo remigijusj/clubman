@@ -36,7 +36,7 @@ func handleEventsFormAction(c *gin.Context, action (func(int, *TeamEventsForm) (
   }
   cnt, err = action(team_id, &form)
   if err != nil {
-    showError(c, err, &form, teamsViewPath(team_id))
+    showError(c, err, &form, teamsEventsPath(team_id))
   } else {
     forwardTo(c, teamsViewPath(team_id), message, cnt)
   }
