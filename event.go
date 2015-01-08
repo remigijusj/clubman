@@ -17,7 +17,7 @@ type EventRecord struct {
 type TeamEventsForm struct {
   DateFrom string `form:"date_from" binding:"required"`
   DateTill string `form:"date_till" binding:"required"`
-  Weekdays string `form:"weekdays"`
+  Weekdays []int  `form:"weekdays"`
   StartAt  string `form:"start_at"`
   Minutes  string `form:"minutes"`
 }
@@ -25,7 +25,7 @@ type TeamEventsForm struct {
 type TeamEventsData struct {
   DateFrom time.Time
   DateTill time.Time
-  Weekdays []int
+  Weekdays []bool
   StartAt  time.Time
   Minutes  int
 }
@@ -54,36 +54,36 @@ func listTeamEvents(team_id int) []EventRecord {
 }
 
 func addEvents(team_id int, form *TeamEventsForm) (int, error) {
-  data, err := parseEventsForm(form)
+  data, err := parseEventsForm(form, true)
   if err != nil {
     return 0, err
   }
-  _ = data
+  log.Printf("=> EVENTS-ADD: %#v\n", *data)
   // <<< query
-  return 1, nil
+  return 0, nil
 }
 
 func cancelEvents(team_id int, form *TeamEventsForm) (int, error) {
-  data, err := parseEventsForm(form)
+  data, err := parseEventsForm(form, false)
   if err != nil {
     return 0, err
   }
-  _ = data
+  log.Printf("=> EVENTS-CANCEL: %#v\n", *data)
   // <<< query
-  return 2, nil
+  return 0, nil
 }
 
 func removeEvents(team_id int, form *TeamEventsForm) (int, error) {
-  data, err := parseEventsForm(form)
+  data, err := parseEventsForm(form, false)
   if err != nil {
     return 0, err
   }
-  _ = data
+  log.Printf("=> EVENTS-REMOVE: %#v\n", *data)
   // <<< query
-  return 0, errors.New("Not implemented")
+  return 0, nil
 }
 
-func parseEventsForm(form *TeamEventsForm) (*TeamEventsData, error) {
+func parseEventsForm(form *TeamEventsForm, need_time bool) (*TeamEventsData, error) {
   var data TeamEventsData
 
   var err1, err2 error
@@ -93,15 +93,26 @@ func parseEventsForm(form *TeamEventsForm) (*TeamEventsData, error) {
     return nil, errors.New("Dates must be valid")
   }
 
-  // TODO: Weekdays
+  data.Weekdays = make([]bool, 7)
+  if len(form.Weekdays) > 0 {
+    for _, val := range form.Weekdays {
+      if val >= 0 && val < 7 {
+        data.Weekdays[val] = true
+      }
+    }
+  } else {
+    for i, _ := range data.Weekdays {
+      data.Weekdays[i] = true
+    }
+  }
 
   data.StartAt, err1 = time.Parse(timeFormat, form.StartAt)
-  if err1 != nil {
+  if need_time && err1 != nil {
     return nil, errors.New("Start time has invalid format")
   }
 
   data.Minutes, _ = strconv.Atoi(form.Minutes)
-  if data.Minutes <= 0 || data.Minutes >= 5 * 60 {
+  if need_time && data.Minutes <= 0 || data.Minutes >= 5 * 60 {
     return nil, errors.New("Duration must be a positive number, not too big")
   }
 

@@ -3,6 +3,7 @@ package main
 import (
   "errors"
   "fmt"
+  //"log"
 
   "github.com/gin-gonic/gin"
   "github.com/gin-gonic/gin/binding"

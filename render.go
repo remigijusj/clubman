@@ -16,6 +16,7 @@ type ProRender struct {
 }
 
 var helpers = template.FuncMap{
+  "containsInt": containsInt,
   "listRecords": listRecords,
   "statusTitle": statusTitle,
   "statusList":  statusList,

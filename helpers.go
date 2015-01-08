@@ -225,3 +225,12 @@ func listRecords(name string, args ...interface{}) []SimpleRecord {
   }
   return list
 }
+
+func containsInt(list []int, given int) bool {
+  for _, val := range list {
+    if val == given {
+      return true
+    }
+  }
+  return false
+}

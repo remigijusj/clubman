@@ -33,13 +33,13 @@
             </div>
             <div class="small-8 columns">
               <select id="weekdays" name="weekdays" multiple="multiple" class="select2">
-                <option value="1">{{"Monday"|T}}</option>
-                <option value="2">{{"Tuesday"|T}}</option>
-                <option value="3">{{"Wednesday"|T}}</option>
-                <option value="4">{{"Thursday"|T}}</option>
-                <option value="5">{{"Friday"|T}}</option>
-                <option value="6">{{"Saturday"|T}}</option>
-                <option value="0">{{"Sunday"|T}}</option>
+                <option value="1" {{if containsInt .form.Weekdays 1}}selected{{end}}>{{"Monday"|T}}</option>
+                <option value="2" {{if containsInt .form.Weekdays 2}}selected{{end}}>{{"Tuesday"|T}}</option>
+                <option value="3" {{if containsInt .form.Weekdays 3}}selected{{end}}>{{"Wednesday"|T}}</option>
+                <option value="4" {{if containsInt .form.Weekdays 4}}selected{{end}}>{{"Thursday"|T}}</option>
+                <option value="5" {{if containsInt .form.Weekdays 5}}selected{{end}}>{{"Friday"|T}}</option>
+                <option value="6" {{if containsInt .form.Weekdays 6}}selected{{end}}>{{"Saturday"|T}}</option>
+                <option value="0" {{if containsInt .form.Weekdays 0}}selected{{end}}>{{"Sunday"|T}}</option>
               </select>
             </div>
             <div class="small-12 columns description">
