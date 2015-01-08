@@ -58,9 +58,11 @@ func addEvents(team_id int, form *TeamEventsForm) (int, error) {
   if err != nil {
     return 0, err
   }
-  log.Printf("=> EVENTS-ADD: %#v\n", *data)
-  // <<< query
-  return 0, nil
+  cnt := data.iterate(func(date time.Time) {
+    log.Printf("+> %s\n", date.String())
+    // <<< query
+  })
+  return cnt, nil
 }
 
 func cancelEvents(team_id int, form *TeamEventsForm) (int, error) {
@@ -68,9 +70,11 @@ func cancelEvents(team_id int, form *TeamEventsForm) (int, error) {
   if err != nil {
     return 0, err
   }
-  log.Printf("=> EVENTS-CANCEL: %#v\n", *data)
-  // <<< query
-  return 0, nil
+  cnt := data.iterate(func(date time.Time) {
+    log.Printf("~> %s\n", date.String())
+    // <<< query
+  })
+  return cnt, nil
 }
 
 func removeEvents(team_id int, form *TeamEventsForm) (int, error) {
@@ -78,9 +82,11 @@ func removeEvents(team_id int, form *TeamEventsForm) (int, error) {
   if err != nil {
     return 0, err
   }
-  log.Printf("=> EVENTS-REMOVE: %#v\n", *data)
-  // <<< query
-  return 0, nil
+  cnt := data.iterate(func(date time.Time) {
+    log.Printf("-> %s\n", date.String())
+    // <<< query
+  })
+  return cnt, nil
 }
 
 func parseEventsForm(form *TeamEventsForm, need_time bool) (*TeamEventsData, error) {
@@ -112,9 +118,24 @@ func parseEventsForm(form *TeamEventsForm, need_time bool) (*TeamEventsData, err
   }
 
   data.Minutes, _ = strconv.Atoi(form.Minutes)
-  if need_time && data.Minutes <= 0 || data.Minutes >= 5 * 60 {
+  if need_time && data.Minutes <= 0 || data.Minutes >= 6 * 60 {
     return nil, errors.New("Duration must be a positive number, not too big")
   }
 
   return &data, nil
+}
+
+func (self TeamEventsData) iterate(callback func(time.Time)) int {
+  hour := self.StartAt.Sub(self.StartAt.Truncate(24 * time.Hour))
+  date := self.DateFrom.Add(hour)
+  ceil := self.DateTill.AddDate(0, 0, 1)
+  cnt := 0
+  for ; date.Before(ceil); date = date.AddDate(0, 0, 1) {
+    wday := int(date.Weekday())
+    if self.Weekdays[wday] {
+      cnt++
+      callback(date)
+    }
+  }
+  return cnt
 }
