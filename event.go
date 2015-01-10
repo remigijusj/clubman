@@ -58,9 +58,14 @@ func addEvents(team_id int, form *TeamEventsForm) (int, error) {
   if err != nil {
     return 0, err
   }
-  cnt := data.iterate(func(date time.Time) {
-    log.Printf("+> %s\n", date.String())
-    // <<< query
+  cnt := data.iterate(func(date time.Time) bool {
+    res, err := query["events_create"].Exec(team_id, date, data.Minutes, 0)
+    if err != nil {
+      log.Printf("[APP] EVENTS-ADD error: %s, %d, %s\n", err, team_id, date)
+      return false
+    }
+    num, err := res.RowsAffected()
+    return num > 0 && err == nil
   })
   return cnt, nil
 }
@@ -70,9 +75,14 @@ func cancelEvents(team_id int, form *TeamEventsForm) (int, error) {
   if err != nil {
     return 0, err
   }
-  cnt := data.iterate(func(date time.Time) {
-    log.Printf("~> %s\n", date.String())
-    // <<< query
+  cnt := data.iterate(func(date time.Time) bool {
+    res, err := query["events_status"].Exec(1, team_id, date)
+    if err != nil {
+      log.Printf("[APP] EVENTS-CANCEL error: %s, %d, %s\n", err, team_id, date)
+      return false
+    }
+    num, err := res.RowsAffected()
+    return num > 0 && err == nil
   })
   return cnt, nil
 }
@@ -82,9 +92,14 @@ func removeEvents(team_id int, form *TeamEventsForm) (int, error) {
   if err != nil {
     return 0, err
   }
-  cnt := data.iterate(func(date time.Time) {
-    log.Printf("-> %s\n", date.String())
-    // <<< query
+  cnt := data.iterate(func(date time.Time) bool {
+    res, err := query["events_delete"].Exec(team_id, date)
+    if err != nil {
+      log.Printf("[APP] EVENTS-DELETE error: %s, %d, %s\n", err, team_id, date)
+      return false
+    }
+    num, err := res.RowsAffected()
+    return num > 0 && err == nil
   })
   return cnt, nil
 }
@@ -125,7 +140,7 @@ func parseEventsForm(form *TeamEventsForm, need_time bool) (*TeamEventsData, err
   return &data, nil
 }
 
-func (self TeamEventsData) iterate(callback func(time.Time)) int {
+func (self TeamEventsData) iterate(callback func(time.Time) bool) int {
   hour := self.StartAt.Sub(self.StartAt.Truncate(24 * time.Hour))
   date := self.DateFrom.Add(hour)
   ceil := self.DateTill.AddDate(0, 0, 1)
@@ -133,8 +148,9 @@ func (self TeamEventsData) iterate(callback func(time.Time)) int {
   for ; date.Before(ceil); date = date.AddDate(0, 0, 1) {
     wday := int(date.Weekday())
     if self.Weekdays[wday] {
-      cnt++
-      callback(date)
+      if callback(date) {
+        cnt++
+      }
     }
   }
   return cnt

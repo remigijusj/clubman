@@ -60,5 +60,8 @@ var queries = map[string]string{
   "team_delete":      "DELETE FROM teams WHERE id=?",
   "team_events":      "SELECT id, start_at, minutes, status FROM events WHERE team_id=? ORDER BY start_at",
 
-  "events_delete":    "DELETE FROM events WHERE team_id=?",
+  "events_delete_all":"DELETE FROM events WHERE team_id=?",
+  "events_create":    "INSERT INTO events(team_id, start_at, minutes, status) VALUES (?, ?, ?, ?)",
+  "events_status":    "UPDATE events SET status=? WHERE team_id=? AND start_at=?",
+  "events_delete":    "DELETE FROM events WHERE team_id=? AND start_at=?",
 }

@@ -89,7 +89,7 @@ func deleteTeam(team_id int) error {
     log.Printf("[APP] TEAM-DELETE error: %s, %d\n", err, team_id)
     return errors.New("Team could not be deleted")
   }
-  _, err = query["events_delete"].Exec(team_id)
+  _, err = query["events_delete_all"].Exec(team_id)
   if err != nil {
     log.Printf("[APP] EVENTS-DELETE error: %s, %d\n", err, team_id)
     return nil
