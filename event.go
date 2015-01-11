@@ -44,6 +44,9 @@ func listTeamEvents(team_id int) []EventRecord {
     if err != nil {
       log.Printf("[APP] TEAM-EVENTS-LIST error: %s\n", err)
     } else {
+      // NOTE: we interpret datetimes in DB literally as entered, but all data being UTC
+      //   time.Parse gives UTC already, but rows.Scan gives us local times (why?), so convert!
+      item.StartAt = item.StartAt.UTC()
       list = append(list, item)
     }
   }
@@ -139,6 +142,9 @@ func parseEventsForm(form *TeamEventsForm, need_time bool) (*TeamEventsData, err
     }
   }
 
+  if need_time && form.StartAt == "" {
+    return nil, errors.New("Please enter start time")
+  }
   data.StartAt, err1 = time.Parse(timeFormat, form.StartAt)
   if need_time && err1 != nil {
     return nil, errors.New("Start time has invalid format")

@@ -59,7 +59,7 @@ var queries = map[string]string{
   "team_update":        "UPDATE teams SET name=?, users_min=?, users_max=?, instructor_id=? WHERE id=?",
   "team_delete":        "DELETE FROM teams WHERE id=?",
 
-  "events_team":        "SELECT id, start_at, minutes, status FROM events WHERE team_id=? ORDER BY start_at",
+  "events_team":        "SELECT id, start_at, minutes, status FROM events WHERE team_id=? AND start_at >= date('now') ORDER BY start_at",
   "events_create":      "INSERT INTO events(team_id, start_at, minutes, status) VALUES (?, ?, ?, ?)",
   "events_status_time": "UPDATE events SET status=? WHERE team_id=? AND start_at=?",
   "events_status_date": "UPDATE events SET status=? WHERE team_id=? AND datetime(start_at,'start of day')=?",

@@ -43,10 +43,6 @@ func handleEventsFormAction(c *gin.Context, action (func(int, *TeamEventsForm) (
   }
 }
 
-func teamsViewPath(team_id int) string {
-  return fmt.Sprintf("/teams/view/%d", team_id)
-}
-
 func teamsEventsPath(team_id int) string {
   return fmt.Sprintf("/teams/events/%d", team_id)
 }

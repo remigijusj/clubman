@@ -18,13 +18,13 @@
               <a href="/events/view/{{.Id}}">{{"Event"|T}} {{.Id}}</a>
             </td>
             <td>
-              {{.StartAt.Format "02/01 2006"}}
+              {{.StartAt.Format dateFormat}}
             </td>
             <td>
               {{.StartAt.Format "Monday"|T}}
             </td>
             <td>
-              {{.StartAt.Format "15:04"}}
+              {{.StartAt.Format timeFormat}}
             </td>
             <td>
               {{.Minutes}} {{"min"|T}}

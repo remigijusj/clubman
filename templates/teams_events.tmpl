@@ -10,7 +10,7 @@
               <label for="date_from">{{"Date from"|T}}</label>
             </div>
             <div class="small-8 columns">
-              <input id="date_from" name="date_from" type="text" value="{{.form.DateFrom}}" placeholder="01/12 2015" class="date" />
+              <input id="date_from" name="date_from" type="text" value="{{or .form.DateFrom .date_from}}" placeholder="{{.date_from}}" class="date" />
             </div>
             <div class="small-12 columns description">
               {{"From what date events are added or removed"|T}}
@@ -21,7 +21,7 @@
               <label for="date_till">{{"Date till"|T}}</label>
             </div>
             <div class="small-8 columns">
-              <input id="date_till" name="date_till" type="text" value="{{.form.DateTill}}" placeholder="31/12 2015" class="date" />
+              <input id="date_till" name="date_till" type="text" value="{{or .form.DateTill .date_till}}" placeholder="{{.date_till}}" class="date" />
             </div>
             <div class="small-12 columns description">
               {{"Till what date events are added or removed"|T}}
@@ -51,7 +51,7 @@
               <label for="start_at">{{"Start time"|T}}</label>
             </div>
             <div class="small-2 columns">
-              <input id="start_at" name="start_at" type="text" value="{{.form.StartAt}}" size="5" placeholder="10:30" />
+              <input id="start_at" name="start_at" type="text" value="{{.form.StartAt}}" size="5" placeholder="06:40" />
             </div>
             <div class="small-12 columns description">
               {{"At what time the events will start each specified day"|T}}
@@ -62,7 +62,7 @@
               <label for="minutes">{{"Duration"|T}}</label>
             </div>
             <div class="small-2 columns">
-              <input id="minutes" name="minutes" type="text" value="{{.form.Minutes}}" size="2" placeholder="30" />
+              <input id="minutes" name="minutes" type="text" value="{{or .form.Minutes "60"}}" size="2" placeholder="60" />
             </div>
             <div class="small-6 columns">
               min
