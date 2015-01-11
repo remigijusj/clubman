@@ -32,7 +32,7 @@ type TeamEventsData struct {
 
 func listTeamEvents(team_id int) []EventRecord {
   list := []EventRecord{}
-  rows, err := query["team_events"].Query(team_id)
+  rows, err := query["events_team"].Query(team_id)
   if err != nil {
     log.Printf("[APP] TEAM-EVENTS-LIST error: %s\n", err)
     return list
@@ -76,7 +76,13 @@ func cancelEvents(team_id int, form *TeamEventsForm) (int, error) {
     return 0, err
   }
   cnt := data.iterate(func(date time.Time) bool {
-    res, err := query["events_status"].Exec(1, team_id, date)
+    var kind string
+    if data.StartAt.IsZero() {
+      kind = "events_status_date"
+    } else{
+      kind = "events_status_time"
+    }
+    res, err := query[kind].Exec(1, team_id, date)
     if err != nil {
       log.Printf("[APP] EVENTS-CANCEL error: %s, %d, %s\n", err, team_id, date)
       return false
@@ -93,7 +99,13 @@ func removeEvents(team_id int, form *TeamEventsForm) (int, error) {
     return 0, err
   }
   cnt := data.iterate(func(date time.Time) bool {
-    res, err := query["events_delete"].Exec(team_id, date)
+    var kind string
+    if data.StartAt.IsZero() {
+      kind = "events_delete_date"
+    } else{
+      kind = "events_delete_time"
+    }
+    res, err := query[kind].Exec(team_id, date)
     if err != nil {
       log.Printf("[APP] EVENTS-DELETE error: %s, %d, %s\n", err, team_id, date)
       return false

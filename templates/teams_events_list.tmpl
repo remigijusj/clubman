@@ -1,25 +1,4 @@
   <div class="row">
-    <div class="large-6 medium-8 columns">
-      <h4>{{.form.Name}}</h4>
-
-      <div class="panel">
-        <small>
-          {{if .self.IsAdmin}}
-          <a href="/teams/update/{{.id}}" class="button tiny radius right">{{"Edit"|T}}</a>
-          {{end}}
-          <b>{{"Instructor"|T}}</b>: {{userName .form.InstructorId}}
-          {{if gt .form.UsersMin 0}}
-          <br/><b>{{"Min participants"|T}}</b>: {{.form.UsersMin}}
-          {{end}}
-          {{if gt .form.UsersMax 0}}
-          <br/><b>{{"Max participants"|T}}</b>: {{.form.UsersMax}}
-          {{end}}
-        </small>
-      </div>
-    </div>
-  </div>
-
-  <div class="row">
     <div class="large-12 columns">
       <table class="list">
         <thead>

@@ -36,7 +36,7 @@ func defineRoutesInternal(r *gin.Engine) {
 
     //a.GET("/users/view/:id", getUserData, displayPage)
     a.GET("/teams",          getTeamList, displayPage)
-    a.GET("/teams/view/:id", getTeamForm, getTeamData, displayPage)
+    a.GET("/teams/view/:id", getTeamForm, getTeamEventsData, displayPage)
 
     a.GET("/calendar", displayPage)
 
@@ -56,7 +56,7 @@ func defineRoutesAdmin(a *gin.RouterGroup) {
 
     ad.GET("/teams/create",       newTeamForm, displayPage)
     ad.GET("/teams/update/:id",   getTeamForm, displayPage)
-    ad.GET("/teams/events/:id",   getTeamForm, newTeamEventsForm, displayPage)
+    ad.GET("/teams/events/:id",   getTeamForm, getTeamEventsData, newTeamEventsForm, displayPage)
     ad.POST("/teams/create",      handleTeamCreate)
     ad.POST("/teams/update/:id",  handleTeamUpdate)
     ad.POST("/teams/delete/:id",  handleTeamDelete)

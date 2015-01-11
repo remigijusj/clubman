@@ -14,7 +14,7 @@ func getTeamList(c *gin.Context) {
   c.Set("list", list)
 }
 
-func getTeamData(c *gin.Context) {
+func getTeamEventsData(c *gin.Context) {
   team_id, err := teamId(c)
   if err != nil {
     forwardWarning(c, "/teams", err.Error())
