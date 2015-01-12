@@ -95,8 +95,9 @@ func newTeamEventsForm(c *gin.Context) {
   form := TeamEventsForm{}
   c.Set("form", form)
   // placeholders
-  c.Set("date_from", time.Now().UTC().Format(dateFormat))
-  c.Set("date_till", time.Date(time.Now().UTC().Year()+1, 1, 0, 0, 0, 0, 0, time.UTC).Format(dateFormat))
+  lang := getLang(c)
+  c.Set("date_from", time.Now().UTC().Format(dateFormats[lang]))
+  c.Set("date_till", time.Date(time.Now().UTC().Year()+1, 1, 0, 0, 0, 0, 0, time.UTC).Format(dateFormats[lang]))
 }
 
 // --- local helpers ---

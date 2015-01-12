@@ -12,13 +12,14 @@
           </tr>
         </thead>
         <tbody>
+          {{$lang := .lang}}
           {{range .list}}
           <tr>
             <td>
               <a href="/events/view/{{.Id}}">{{"Event"|T}} {{.Id}}</a>
             </td>
             <td>
-              {{.StartAt.Format dateFormat}}
+              {{.StartAt.Format (dateFormat $lang)}}
             </td>
             <td>
               {{.StartAt.Format "Monday"|T}}

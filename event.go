@@ -56,8 +56,8 @@ func listTeamEvents(team_id int) []EventRecord {
   return list
 }
 
-func addEvents(team_id int, form *TeamEventsForm) (int, error) {
-  data, err := parseEventsForm(form, true)
+func addEvents(team_id int, form *TeamEventsForm, lang string) (int, error) {
+  data, err := parseEventsForm(form, true, lang)
   if err != nil {
     return 0, err
   }
@@ -73,8 +73,8 @@ func addEvents(team_id int, form *TeamEventsForm) (int, error) {
   return cnt, nil
 }
 
-func cancelEvents(team_id int, form *TeamEventsForm) (int, error) {
-  data, err := parseEventsForm(form, false)
+func cancelEvents(team_id int, form *TeamEventsForm, lang string) (int, error) {
+  data, err := parseEventsForm(form, false, lang)
   if err != nil {
     return 0, err
   }
@@ -96,8 +96,8 @@ func cancelEvents(team_id int, form *TeamEventsForm) (int, error) {
   return cnt, nil
 }
 
-func removeEvents(team_id int, form *TeamEventsForm) (int, error) {
-  data, err := parseEventsForm(form, false)
+func removeEvents(team_id int, form *TeamEventsForm, lang string) (int, error) {
+  data, err := parseEventsForm(form, false, lang)
   if err != nil {
     return 0, err
   }
@@ -119,12 +119,12 @@ func removeEvents(team_id int, form *TeamEventsForm) (int, error) {
   return cnt, nil
 }
 
-func parseEventsForm(form *TeamEventsForm, need_time bool) (*TeamEventsData, error) {
+func parseEventsForm(form *TeamEventsForm, need_time bool, lang string) (*TeamEventsData, error) {
   var data TeamEventsData
 
   var err1, err2 error
-  data.DateFrom, err1 = time.Parse(dateFormat, form.DateFrom)
-  data.DateTill, err2 = time.Parse(dateFormat, form.DateTill)
+  data.DateFrom, err1 = time.Parse(dateFormats[lang], form.DateFrom)
+  data.DateTill, err2 = time.Parse(dateFormats[lang], form.DateTill)
   if err1 != nil || err2 != nil || data.DateTill.Before(data.DateFrom) {
     return nil, errors.New("Dates must be valid")
   }

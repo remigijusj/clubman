@@ -1,5 +1,7 @@
 $(function(){
-  // support DELETE button in forms
+  // foundation
+  $(document).foundation();
+  // delete-button in forms
   $('input.delete').click(function(){
     var el = $(this);
     var form = el.closest('form');
@@ -11,10 +13,16 @@ $(function(){
   });
   // datepicker
   $('.date').fdatepicker({
-    format: 'dd/mm yyyy',
-    weekStart: 1,
-    language: 'da'
+    language: language,
+    format: dateFormat(),
+    weekStart: 1
   });
   // select
+  $.extend($.fn.select2.defaults, $.fn.select2.locales[language]);
   $('.select2').select2();
 });
+
+function dateFormat() {
+  if (language == 'da') return 'dd/mm yyyy';
+  return 'yyyy-mm-dd';
+}

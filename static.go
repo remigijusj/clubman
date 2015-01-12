@@ -22,13 +22,17 @@ const (
   minPassLen = 6
   defaultLang = "da"
   defaultPage = "/calendar" // not "/"
-  dateFormat = "02/01 2006"
   timeFormat = "15:04"
 
   reloadTmpl = true // DEBUG mode
 )
 
 var languages = []string{"da", "en"}
+
+var dateFormats = map[string]string{
+  "da": "02/01 2006",
+  "en": "2006-01-02",
+}
 
 var regexes = map[string]string{
   "name_validate":   `\pL\s+\pL`,

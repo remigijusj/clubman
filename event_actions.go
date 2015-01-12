@@ -23,7 +23,7 @@ func handleEventsRemove(c *gin.Context) {
 
 // --- local helpers ---
 
-func handleEventsFormAction(c *gin.Context, action (func(int, *TeamEventsForm) (int, error)), message string) {
+func handleEventsFormAction(c *gin.Context, action (func(int, *TeamEventsForm, string) (int, error)), message string) {
   var cnt int
   team_id, err := teamId(c)
   if err != nil {
@@ -35,7 +35,7 @@ func handleEventsFormAction(c *gin.Context, action (func(int, *TeamEventsForm) (
     showError(c, errors.New("Please provide all details"), &form, teamsEventsPath(team_id))
     return
   }
-  cnt, err = action(team_id, &form)
+  cnt, err = action(team_id, &form, getLang(c))
   if err != nil {
     showError(c, err, &form, teamsEventsPath(team_id))
   } else {
