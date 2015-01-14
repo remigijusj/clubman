@@ -3,7 +3,11 @@
       <h4>{{"Calendar"|T}}</h4>
 
       <ul class="calendar">
-        <li class="title">December</li>
+        <li class="title">
+          <div class="left"><a href="?date={{.prev.Format "2006-01-02"}}">&lt;&lt;&lt;</a></div>
+          {{.date.Format (dateFormat .lang)}}
+          <div class="right"><a href="?date={{.next.Format "2006-01-02"}}">&gt;&gt;&gt;</a></div>
+        </li>
         <li class="day-header">
           <div class="small-1 medium-1 large-1 day">
               <span class="show-for-medium-up">Mandag</span>

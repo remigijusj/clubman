@@ -1,0 +1,157 @@
+  <div class="row">
+    <div class="columns">
+      <h4>{{"Calendar"|T}}</h4>
+
+      <ul class="calendar">
+        <li class="title">
+          <div class="left"><a href="?date={{.prev.Format "2006-01-02"}}">&lt;&lt;&lt;</a></div>
+          {{.date.Format "January"|T}}
+          <div class="right"><a href="?date={{.next.Format "2006-01-02"}}">&gt;&gt;&gt;</a></div>
+        </li>
+        <li class="day-header">
+          <div class="small-1 medium-1 large-1 day">
+              <span class="show-for-medium-up">Mandag</span>
+              <span class="show-for-small">Man</span>
+          </div>
+          <div class="small-1 medium-1 large-1 day">
+              <span class="show-for-medium-up">Tirsdag</span>
+              <span class="show-for-small">Tir</span>
+          </div>
+          <div class="small-1 medium-1 large-1 day">
+              <span class="show-for-medium-up">Onsdag</span>
+              <span class="show-for-small">Ons</span>
+          </div>
+          <div class="small-1 medium-1 large-1 day">
+              <span class="show-for-large-up">Torsdag</span>
+              <span class="show-for-medium-down">Tor</span>
+          </div>
+          <div class="small-1 medium-1 large-1 day">
+              <span class="show-for-medium-up">Fredag</span>
+              <span class="show-for-small">Fre</span>
+          </div>
+          <div class="small-1 medium-1 large-1 day">
+              <span class="show-for-medium-up">Lørdag</span>
+              <span class="show-for-small">Lør</span>
+          </div>
+          <div class="small-1 medium-1 large-1 day">
+              <span class="show-for-medium-up">Søndag</span>
+              <span class="show-for-small">Søn</span>
+          </div>
+        </li>
+        <!--
+        <li class="week">
+          <div class="small-1 medium-1 large-1 day previous-month">27</div>
+        </li>
+        -->
+        <li class="week">
+          <div class="small-1 medium-1 large-1 day today">
+            <div class="num">1</div>
+          </div>
+          <div class="small-1 medium-1 large-1 day">
+            <div class="num">2</div>
+          </div>
+          <div class="small-1 medium-1 large-1 day active">
+            <div class="num">3</div>
+            <div class="inner">
+              Ryghold
+            </div>
+          </div>
+          <div class="small-1 medium-1 large-1 day">
+            <div class="num">4</div>
+            <div class="inner">
+              Spinning<br/>
+              Zumba
+            </div>
+          </div>
+          <div class="small-1 medium-1 large-1 day">
+            <div class="num">5</div>
+          </div>
+          <div class="small-1 medium-1 large-1 day">
+            <div class="num">6</div>
+          </div>
+          <div class="small-1 medium-1 large-1 day">
+            <div class="num">7</div>
+          </div>
+        </li>
+        <li class="week">
+          <div class="small-1 medium-1 large-1 day">
+            <div class="num">8</div>
+          </div>
+          <div class="small-1 medium-1 large-1 day">
+            <div class="num">9</div>
+          </div>
+          <div class="small-1 medium-1 large-1 day active">
+            <div class="num">10</div>
+            <div class="inner">
+              Ryghold<br/>
+              Stram op ...
+            </div>
+          </div>
+          <div class="small-1 medium-1 large-1 day">
+            <div class="num">11</div>
+            <div class="inner">
+              Spinning<br/>
+              Zumba
+            </div>
+          </div>
+          <div class="small-1 medium-1 large-1 day">
+            <div class="num">12</div>
+          </div>
+          <div class="small-1 medium-1 large-1 day">
+            <div class="num">13</div>
+          </div>
+          <div class="small-1 medium-1 large-1 day">
+            <div class="num">14</div>
+          </div>
+        </li>
+        <li class="week">
+          <div class="small-1 medium-1 large-1 day">15</div>
+          <div class="small-1 medium-1 large-1 day">16</div>
+          <div class="small-1 medium-1 large-1 day">17</div>
+          <div class="small-1 medium-1 large-1 day">18</div>
+          <div class="small-1 medium-1 large-1 day">19</div>
+          <div class="small-1 medium-1 large-1 day">20</div>
+          <div class="small-1 medium-1 large-1 day">21</div>
+        </li>
+        <li class="week">
+          <div class="small-1 medium-1 large-1 day">22</div>
+          <div class="small-1 medium-1 large-1 day">23</div>
+          <div class="small-1 medium-1 large-1 day">24</div>
+          <div class="small-1 medium-1 large-1 day">25</div>
+          <div class="small-1 medium-1 large-1 day">26</div>
+          <div class="small-1 medium-1 large-1 day">27</div>
+          <div class="small-1 medium-1 large-1 day">28</div>
+        </li>
+        <li class="week">
+          <div class="small-1 medium-1 large-1 day">
+            <div class="num">29</div>
+          </div>
+          <div class="small-1 medium-1 large-1 day">
+            <div class="num">30</div>
+          </div>
+          <div class="small-1 medium-1 large-1 day">
+            <div class="num">31</div>
+          </div>
+          <div class="small-1 medium-1 large-1 day next-month">
+            <div class="num">1</div>
+            <div class="inner">
+              Spinning<br/>
+              Zumba
+            </div>
+          </div>
+          <div class="small-1 medium-1 large-1 day next-month">
+            <div class="num">2</div>
+          </div>
+          <div class="small-1 medium-1 large-1 day next-month">
+            <div class="num">3</div>
+          </div>
+          <div class="small-1 medium-1 large-1 day next-month">
+            <div class="num">4</div>
+          </div>
+        </li>
+      </ul>
+      <div class="description">
+        For at få vist mere information om en dag - klik på den.
+      </div>
+    </div>
+  </div>

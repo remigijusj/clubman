@@ -9,7 +9,7 @@
     <section class="top-bar-section">
       <ul class="right">
       {{if .self}}
-        <li><a href="/calendar">{{"Calendar"|T}}</a></li>
+        <li><a href="/calendar/week">{{"Calendar"|T}}</a></li>
         <li><a href="/teams">{{"Teams"|T}}</a></li>
         <li><a href="#">{{"My assignments"|T}}</a></li>
         {{if .self.IsAdmin}}
@@ -101,8 +101,10 @@
         {{else if eq .page "teams_events"}}
           {{template "teams_events.tmpl" . }}
 
-        {{else if eq .page "calendar"}}
-          {{template "calendar.tmpl" . }}
+        {{else if eq .page "calendar_week"}}
+          {{template "calendar_week.tmpl" . }}
+        {{else if eq .page "calendar_month"}}
+          {{template "calendar_month.tmpl" . }}
         {{end}}
 
       </div>
