@@ -1,6 +1,7 @@
 package main
 
 import (
+  "database/sql"
   "errors"
   "log"
   "strconv"
@@ -9,6 +10,7 @@ import (
 
 type EventRecord struct {
   Id       int
+  TeamId   int
   StartAt  time.Time
   Minutes  int
   Status   int
@@ -30,9 +32,18 @@ type TeamEventsData struct {
   Minutes  int
 }
 
+func (self EventRecord) FinishAt() time.Time {
+  return self.StartAt.Add(time.Duration(self.Minutes) * time.Minute)
+}
+
 func listTeamEvents(team_id int) []EventRecord {
-  list := []EventRecord{}
   rows, err := query["events_team"].Query(team_id)
+  return listEvents(rows, err)
+}
+
+func listEvents(rows *sql.Rows, err error) []EventRecord {
+  list := []EventRecord{}
+  
   if err != nil {
     log.Printf("[APP] TEAM-EVENTS-LIST error: %s\n", err)
     return list
@@ -40,7 +51,7 @@ func listTeamEvents(team_id int) []EventRecord {
   defer rows.Close()
   for rows.Next() {
     var item EventRecord
-    err := rows.Scan(&item.Id, &item.StartAt, &item.Minutes, &item.Status)
+    err := rows.Scan(&item.Id, &item.TeamId, &item.StartAt, &item.Minutes, &item.Status)
     if err != nil {
       log.Printf("[APP] TEAM-EVENTS-LIST error: %s\n", err)
     } else {
@@ -62,7 +73,7 @@ func addEvents(team_id int, form *TeamEventsForm, lang string) (int, error) {
     return 0, err
   }
   cnt := data.iterate(func(date time.Time) bool {
-    res, err := query["events_create"].Exec(team_id, date, data.Minutes, 0)
+    res, err := query["event_create"].Exec(team_id, date, data.Minutes, 0)
     if err != nil {
       log.Printf("[APP] EVENTS-ADD error: %s, %d, %s\n", err, team_id, date)
       return false
@@ -172,4 +183,29 @@ func (self TeamEventsData) iterate(callback func(time.Time) bool) int {
     }
   }
   return cnt
+}
+
+func listWeekEventsGrouped(date time.Time) [][]EventRecord {
+  data := make([][]EventRecord, 7)
+  for i := 0; i < 7; i++ {
+    data[i] = []EventRecord{}
+  }
+
+  from := date.Format(dateFormat)
+  till := date.AddDate(0, 0, 7).Format(dateFormat)
+
+  rows, err := query["events_period"].Query(from, till)
+  list := listEvents(rows, err)
+  for _, event := range list {
+    i := int(event.StartAt.Weekday())
+    // zero-sunday adjustment
+    if i == 0 {
+      i = 6
+    } else {
+      i--
+    }
+    data[i] = append(data[i], event)
+  }
+
+  return data
 }

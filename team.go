@@ -20,9 +20,23 @@ type TeamForm struct {
   InstructorId int    `form:"instructor_id" binding:"required"`
 }
 
-func listTeams(q url.Values) []TeamRecord {
+func listTeamsByQuery(q url.Values) []TeamRecord {
+  rows, err := query["teams_all"].Query()
+  return listTeams(rows, err)
+}
+
+func indexTeams() map[int]TeamRecord {
+  rows, err := query["teams_all"].Query()
+  list := listTeams(rows, err)
+  data := make(map[int]TeamRecord, len(list))
+  for _, team := range list {
+    data[team.Id] = team
+  }
+  return data
+}
+
+func listTeams(rows *sql.Rows, err error) []TeamRecord {
   list := []TeamRecord{}
-  rows, err := listTeamsQuery(q)
   if err != nil {
     log.Printf("[APP] TEAM-LIST error: %s\n", err)
     return list
@@ -41,10 +55,6 @@ func listTeams(q url.Values) []TeamRecord {
     log.Printf("[APP] TEAM-LIST error: %s\n", err)
   }
   return list
-}
-
-func listTeamsQuery(q url.Values) (*sql.Rows, error) {
-  return query["teams_all"].Query()
 }
 
 func fetchTeam(team_id int) (TeamForm, error) {

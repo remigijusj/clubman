@@ -11,7 +11,7 @@ import (
 
 func getTeamList(c *gin.Context) {
   q := c.Request.URL.Query()
-  list := listTeams(q)
+  list := listTeamsByQuery(q)
   c.Set("list", list)
 }
 
