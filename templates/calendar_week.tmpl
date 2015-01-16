@@ -4,38 +4,42 @@
 
       <ul class="calendar">
         <li class="title">
-          <div class="left"><a href="?date={{.prev.Format "2006-01-02"}}">&lt;&lt;&lt;</a></div>
+          <div class="left">
+            <a href="?date={{.prev.Format "2006-01-02"}}"><i><small>{{"Prev"|T}}</small></i></a>
+          </div>
           {{.date.Format (dateFormat .lang)}}
-          <div class="right"><a href="?date={{.next.Format "2006-01-02"}}">&gt;&gt;&gt;</a></div>
+          <div class="right">
+            <a href="?date={{.next.Format "2006-01-02"}}"><i><small>{{"Next"|T}}</small></i></a>
+          </div>
         </li>
         <li class="day-header">
           <div class="small-1 medium-1 large-1 day">
-              <span class="show-for-medium-up">Mandag</span>
-              <span class="show-for-small">Man</span>
+            <span class="show-for-medium-up">{{"Monday"|T}}</span>
+            <span class="show-for-small">{{"Monday"|T|truncate 3}}</span>
           </div>
           <div class="small-1 medium-1 large-1 day">
-              <span class="show-for-medium-up">Tirsdag</span>
-              <span class="show-for-small">Tir</span>
+            <span class="show-for-medium-up">{{"Tuesday"|T}}</span>
+            <span class="show-for-small">{{"Tuesday"|T|truncate 3}}</span>
           </div>
           <div class="small-1 medium-1 large-1 day">
-              <span class="show-for-medium-up">Onsdag</span>
-              <span class="show-for-small">Ons</span>
+            <span class="show-for-medium-up">{{"Wednesday"|T}}</span>
+            <span class="show-for-small">{{"Wednesday"|T|truncate 3}}</span>
           </div>
           <div class="small-1 medium-1 large-1 day">
-              <span class="show-for-large-up">Torsdag</span>
-              <span class="show-for-medium-down">Tor</span>
+            <span class="show-for-medium-up">{{"Thursday"|T}}</span>
+            <span class="show-for-small">{{"Thursday"|T|truncate 3}}</span>
           </div>
           <div class="small-1 medium-1 large-1 day">
-              <span class="show-for-medium-up">Fredag</span>
-              <span class="show-for-small">Fre</span>
+            <span class="show-for-medium-up">{{"Friday"|T}}</span>
+            <span class="show-for-small">{{"Friday"|T|truncate 3}}</span>
           </div>
           <div class="small-1 medium-1 large-1 day">
-              <span class="show-for-medium-up">Lørdag</span>
-              <span class="show-for-small">Lør</span>
+            <span class="show-for-medium-up">{{"Saturday"|T}}</span>
+            <span class="show-for-small">{{"Saturday"|T|truncate 3}}</span>
           </div>
           <div class="small-1 medium-1 large-1 day">
-              <span class="show-for-medium-up">Søndag</span>
-              <span class="show-for-small">Søn</span>
+            <span class="show-for-medium-up">{{"Sunday"|T}}</span>
+            <span class="show-for-small">{{"Sunday"|T|truncate 3}}</span>
           </div>
         </li>
         <li class="week">
@@ -44,10 +48,12 @@
           <div class="small-1 medium-1 large-1 day {{if false}}today{{end}}">
             {{range $list}}
             <div class="inner">
-              {{$team := (index $teams .TeamId)}}
-              <b>{{$team.Name}}</b><br/>
-              {{$team.UserName}}<br/>
-              {{.StartAt.Format timeFormat}} &ndash; {{.FinishAt.Format timeFormat}}
+              <a href="/events/view/{{.Id}}">
+                {{$team := (index $teams .TeamId)}}
+                <b>{{$team.Name}}</b><br/>
+                {{$team.UserName}}<br/>
+                {{.StartAt.Format timeFormat}} &ndash; {{.FinishAt.Format timeFormat}}
+              </a>
             </div>
             {{end}}
           </div>
@@ -55,7 +61,7 @@
         </li>
       </ul>
       <div class="description">
-        For at få vist mere information om en dag - klik på den.
+        {{"To view more information about an event - click on it"|T}}
       </div>
     </div>
   </div>

@@ -31,6 +31,11 @@ func getMonthData(c *gin.Context) {
   c.Set("date", d)
   c.Set("prev", d.AddDate(0, -1, 0))
   c.Set("next", d.AddDate(0, 1, 0))
+
+  e := listMonthEventsGrouped(d)
+  c.Set("events", e)
+  t := indexTeams()
+  c.Set("teams", t)
 }
 
 // --- local helpers ---

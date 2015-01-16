@@ -209,3 +209,21 @@ func listWeekEventsGrouped(date time.Time) [][]EventRecord {
 
   return data
 }
+
+// TODO: implement
+func listMonthEventsGrouped(date time.Time) [][]EventRecord {
+  data := make([][]EventRecord, 31)
+
+/*
+  from := date.Format(dateFormat)
+  till := date.AddDate(0, 1, 7).Format(dateFormat)
+  rows, err := query["events_period"].Query(from, till)
+  list := listEvents(rows, err)
+  for _, event := range list {
+    i := int(event.StartAt.Weekday())
+    data[i] = append(data[i], event)
+  }
+*/
+
+  return data
+}
