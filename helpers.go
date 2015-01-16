@@ -5,6 +5,7 @@ import (
   "fmt"
   "log"
   "strings"
+  "time"
 
   "code.google.com/p/go.crypto/bcrypt"
   "github.com/gin-gonic/gin"
@@ -233,4 +234,33 @@ func containsInt(list []int, given int) bool {
     }
   }
   return false
+}
+
+// --- date helpers ---
+
+func weekFirst(d time.Time) time.Time {
+  return d.Truncate(7 * 24 * time.Hour)
+}
+
+func monthFirst(d time.Time) time.Time {
+  return d.AddDate(0, 0, -d.Day()+1)
+}
+
+func daysDiff(a, b time.Time) int {
+  return int(b.Sub(a).Hours() / 24)
+}
+
+// with zero-sunday adjustment
+func wdIndex(d time.Time) int {
+  i := int(d.Weekday())
+  if i > 0 {
+    return i-1
+  } else {
+    return 6
+  }
+}
+
+// used in month calendar
+func calcMonthDate(date time.Time, w, d int) time.Time {
+  return weekFirst(date).AddDate(0, 0, 7 * w + d)
 }

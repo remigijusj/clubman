@@ -16,11 +16,12 @@ type ProRender struct {
 }
 
 var helpers = template.FuncMap{
-  "containsInt": containsInt,
-  "listRecords": listRecords,
-  "statusTitle": statusTitle,
-  "statusList":  statusList,
-  "userName":    userName,
+  "calcMonthDate": calcMonthDate,
+  "containsInt":   containsInt,
+  "listRecords":   listRecords,
+  "statusTitle":   statusTitle,
+  "statusList":    statusList,
+  "userName":      userName,
   "serverName": func() string { return serverName },
   "timeFormat": func() string { return timeFormat },
   "dateFormat": func(lang string) string { return dateFormats[lang] },

@@ -186,44 +186,47 @@ func (self TeamEventsData) iterate(callback func(time.Time) bool) int {
 }
 
 func listWeekEventsGrouped(date time.Time) [][]EventRecord {
+  from := date
+  till := date.AddDate(0, 0, 7)
+
   data := make([][]EventRecord, 7)
-  for i := 0; i < 7; i++ {
-    data[i] = []EventRecord{}
+  for d := 0; d < 7; d++ {
+    data[d] = []EventRecord{}
   }
 
-  from := date.Format(dateFormat)
-  till := date.AddDate(0, 0, 7).Format(dateFormat)
-
-  rows, err := query["events_period"].Query(from, till)
+  rows, err := query["events_period"].Query(from.Format(dateFormat), till.Format(dateFormat))
   list := listEvents(rows, err)
+
   for _, event := range list {
-    i := int(event.StartAt.Weekday())
-    // zero-sunday adjustment
-    if i == 0 {
-      i = 6
-    } else {
-      i--
-    }
+    i := wdIndex(event.StartAt)
     data[i] = append(data[i], event)
   }
 
   return data
 }
 
-// TODO: implement
-func listMonthEventsGrouped(date time.Time) [][]EventRecord {
-  data := make([][]EventRecord, 31)
+func listMonthEventsGrouped(date time.Time) [][][]EventRecord {
+  from := weekFirst(date)
+  till := weekFirst(date.AddDate(0, 1, 0)).AddDate(0, 0, 7)
+  weeks := daysDiff(from, till) / 7
 
-/*
-  from := date.Format(dateFormat)
-  till := date.AddDate(0, 1, 7).Format(dateFormat)
-  rows, err := query["events_period"].Query(from, till)
-  list := listEvents(rows, err)
-  for _, event := range list {
-    i := int(event.StartAt.Weekday())
-    data[i] = append(data[i], event)
+  data := make([][][]EventRecord, weeks)
+  for w := 0; w < len(data); w++ {
+    data[w] = make([][]EventRecord, 7)
+    for d := 0; d < 7; d++ {
+      data[w][d] = []EventRecord{}
+    }
   }
-*/
+
+  rows, err := query["events_period"].Query(from.Format(dateFormat), till.Format(dateFormat))
+  list := listEvents(rows, err)
+
+  for _, event := range list {
+    ed := event.StartAt.Truncate(24 * time.Hour)
+    w := daysDiff(from, ed) / 7
+    i := wdIndex(ed)
+    data[w][i] = append(data[w][i], event)
+  }
 
   return data
 }

@@ -7,7 +7,7 @@
           <div class="left">
             <a href="?date={{.prev.Format "2006-01-02"}}"><i><small>{{"Prev"|T}}</small></i></a>
           </div>
-          {{.date.Format "January"|T}}
+          <span class="date changer">{{.date.Format "January"|T}}</span>
           <div class="right">
             <a href="?date={{.next.Format "2006-01-02"}}"><i><small>{{"Next"|T}}</small></i></a>
           </div>
@@ -42,117 +42,24 @@
             <span class="show-for-small">{{"Sunday"|T|truncate 3}}</span>
           </div>
         </li>
-        <!--
+        {{$date := .date}}
+        {{$teams := .teams}}
+        {{range $w, $week := .events}}
         <li class="week">
-          <div class="small-1 medium-1 large-1 day previous-month">27</div>
-        </li>
-        -->
-        <li class="week">
-          <div class="small-1 medium-1 large-1 day today">
-            <div class="num">1</div>
-          </div>
-          <div class="small-1 medium-1 large-1 day">
-            <div class="num">2</div>
-          </div>
-          <div class="small-1 medium-1 large-1 day active">
-            <div class="num">3</div>
+          {{range $d, $list := $week}}
+          {{$date := calcMonthDate $date $w $d}}
+          <div class="small-1 medium-1 large-1 day today previous-month next-month">
+            <div class="num">{{$date.Day}}</div>
             <div class="inner">
-              Ryghold
+              {{range $list}}
+              {{$team := (index $teams .TeamId)}}
+              <a href="/events/view/{{.Id}}">{{$team.Name}}</a><br/>
+              {{end}}
             </div>
           </div>
-          <div class="small-1 medium-1 large-1 day">
-            <div class="num">4</div>
-            <div class="inner">
-              Spinning<br/>
-              Zumba
-            </div>
-          </div>
-          <div class="small-1 medium-1 large-1 day">
-            <div class="num">5</div>
-          </div>
-          <div class="small-1 medium-1 large-1 day">
-            <div class="num">6</div>
-          </div>
-          <div class="small-1 medium-1 large-1 day">
-            <div class="num">7</div>
-          </div>
+          {{end}}
         </li>
-        <li class="week">
-          <div class="small-1 medium-1 large-1 day">
-            <div class="num">8</div>
-          </div>
-          <div class="small-1 medium-1 large-1 day">
-            <div class="num">9</div>
-          </div>
-          <div class="small-1 medium-1 large-1 day active">
-            <div class="num">10</div>
-            <div class="inner">
-              Ryghold<br/>
-              Stram op ...
-            </div>
-          </div>
-          <div class="small-1 medium-1 large-1 day">
-            <div class="num">11</div>
-            <div class="inner">
-              Spinning<br/>
-              Zumba
-            </div>
-          </div>
-          <div class="small-1 medium-1 large-1 day">
-            <div class="num">12</div>
-          </div>
-          <div class="small-1 medium-1 large-1 day">
-            <div class="num">13</div>
-          </div>
-          <div class="small-1 medium-1 large-1 day">
-            <div class="num">14</div>
-          </div>
-        </li>
-        <li class="week">
-          <div class="small-1 medium-1 large-1 day">15</div>
-          <div class="small-1 medium-1 large-1 day">16</div>
-          <div class="small-1 medium-1 large-1 day">17</div>
-          <div class="small-1 medium-1 large-1 day">18</div>
-          <div class="small-1 medium-1 large-1 day">19</div>
-          <div class="small-1 medium-1 large-1 day">20</div>
-          <div class="small-1 medium-1 large-1 day">21</div>
-        </li>
-        <li class="week">
-          <div class="small-1 medium-1 large-1 day">22</div>
-          <div class="small-1 medium-1 large-1 day">23</div>
-          <div class="small-1 medium-1 large-1 day">24</div>
-          <div class="small-1 medium-1 large-1 day">25</div>
-          <div class="small-1 medium-1 large-1 day">26</div>
-          <div class="small-1 medium-1 large-1 day">27</div>
-          <div class="small-1 medium-1 large-1 day">28</div>
-        </li>
-        <li class="week">
-          <div class="small-1 medium-1 large-1 day">
-            <div class="num">29</div>
-          </div>
-          <div class="small-1 medium-1 large-1 day">
-            <div class="num">30</div>
-          </div>
-          <div class="small-1 medium-1 large-1 day">
-            <div class="num">31</div>
-          </div>
-          <div class="small-1 medium-1 large-1 day next-month">
-            <div class="num">1</div>
-            <div class="inner">
-              Spinning<br/>
-              Zumba
-            </div>
-          </div>
-          <div class="small-1 medium-1 large-1 day next-month">
-            <div class="num">2</div>
-          </div>
-          <div class="small-1 medium-1 large-1 day next-month">
-            <div class="num">3</div>
-          </div>
-          <div class="small-1 medium-1 large-1 day next-month">
-            <div class="num">4</div>
-          </div>
-        </li>
+        {{end}}
       </ul>
       <div class="description">
         {{"To view more information about a day - click on it"|T}}

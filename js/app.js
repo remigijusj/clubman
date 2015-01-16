@@ -17,6 +17,10 @@ $(function(){
     format: dateFormat(),
     weekStart: 1
   });
+  $('.date.changer').on('changeDate', function(e){
+    var date = e.date.toISOString().substr(0,10);
+    location.href = location.href.replace(/\?date=.*|$/, '?date='+date)
+  });
   // select
   $.extend($.fn.select2.defaults, $.fn.select2.locales[language]);
   $('.select2').select2();

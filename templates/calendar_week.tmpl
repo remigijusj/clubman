@@ -7,7 +7,7 @@
           <div class="left">
             <a href="?date={{.prev.Format "2006-01-02"}}"><i><small>{{"Prev"|T}}</small></i></a>
           </div>
-          {{.date.Format (dateFormat .lang)}}
+          <span class="date changer">{{.date.Format (dateFormat .lang)}}</span>
           <div class="right">
             <a href="?date={{.next.Format "2006-01-02"}}"><i><small>{{"Next"|T}}</small></i></a>
           </div>
@@ -44,7 +44,7 @@
         </li>
         <li class="week">
           {{$teams := .teams}}
-          {{range $i, $list := .events}}
+          {{range $d, $list := .events}}
           <div class="small-1 medium-1 large-1 day {{if false}}today{{end}}">
             {{range $list}}
             <div class="inner">

@@ -12,7 +12,7 @@ func handleCalendar(c *gin.Context) {
 
 func getWeekData(c *gin.Context) {
   d := getDate(c)
-  d = d.Truncate(7 * 24 * time.Hour) // monday
+  d = weekFirst(d) // monday
 
   c.Set("date", d)
   c.Set("prev", d.AddDate(0, 0, -7))
@@ -26,7 +26,7 @@ func getWeekData(c *gin.Context) {
 
 func getMonthData(c *gin.Context) {
   d := getDate(c)
-  d = d.AddDate(0, 0, -d.Day()) // 1st of month
+  d = monthFirst(d)
 
   c.Set("date", d)
   c.Set("prev", d.AddDate(0, -1, 0))
@@ -43,7 +43,7 @@ func getMonthData(c *gin.Context) {
 func getDate(c *gin.Context) time.Time {
   date, err := time.Parse("2006-01-02", c.Request.URL.Query().Get("date"))
   if err != nil {
-    date = time.Now()
+    date = time.Now().Truncate(24 * time.Hour).UTC()
   }
   return date
 }
