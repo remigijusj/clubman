@@ -48,7 +48,7 @@
         <li class="week">
           {{range $d, $list := $week}}
           {{$date := calcMonthDate $date $w $d}}
-          <div class="small-1 medium-1 large-1 day today previous-month next-month">
+          <div class="small-1 medium-1 large-1 day {{if false}}today previous-month next-month{{end}}">
             <div class="num">{{$date.Day}}</div>
             <div class="inner">
               {{range $list}}

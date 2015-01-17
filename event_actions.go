@@ -44,6 +44,8 @@ func getEventAssignmentsList(c *gin.Context) {
   } else {
     list := listEventAssignments(event_id)
     c.Set("list", list)
+    user_names := mapUserNames(listAssignmentUserIds(list))
+    c.Set("user_names", user_names)
     signed_up := findAssignment(list, currentUser(c))
     c.Set("signed_up", signed_up)
   }
@@ -73,4 +75,12 @@ func handleEventsFormAction(c *gin.Context, action (func(int, *TeamEventsForm, s
 
 func teamsEventsPath(team_id int) string {
   return fmt.Sprintf("/teams/events/%d", team_id)
+}
+
+func listAssignmentUserIds(list []AssignmentRecord) []int {
+  ids := make([]int, len(list))
+  for i, item := range list {
+    ids[i] = item.UserId
+  }
+  return ids
 }

@@ -5,12 +5,14 @@ import (
   "encoding/gob"
   "log"
   "regexp"
+  "strings"
 
   "github.com/gin-gonic/gin"
   "github.com/gorilla/sessions"
   _ "github.com/mattn/go-sqlite3" // tdm-gcc
 )
 
+var db *sql.DB
 var query map[string]*sql.Stmt
 var regex map[string]*regexp.Regexp
 var cookie *sessions.CookieStore
@@ -40,7 +42,7 @@ func main() {
 }
 
 func prepareQueries() {
-  db, _ := sql.Open("sqlite3", "./main.db")
+  db, _ = sql.Open("sqlite3", "./main.db")
   query = make(map[string]*sql.Stmt, len(queries))
   for name, sql := range queries {
     query[name], _ = db.Prepare(sql)
@@ -118,4 +120,15 @@ func getLang(c *gin.Context) string {
     return auth.Language
   }
   return defaultLang
+}
+
+func queryMultiple(name string, list []int) (*sql.Rows, error) {
+  qry := strings.Replace(queries[name], "(?)", "(?"+strings.Repeat(",?", len(list)-1)+")", 1)
+
+  args := make([]interface{}, len(list))
+  for i, item := range list {
+    args[i] = item
+  }
+
+  return db.Query(qry, args...)
 }

@@ -12,11 +12,12 @@
         </thead>
         <tbody>
           {{$is_admin := .self.IsAdmin}}
+          {{$user_names := .user_names}}
           {{$id := .id}}
           {{range .list}}
           <tr>
             <td>
-              <a href="/users/view/{{.UserId}}">{{userName .UserId}}</a>
+              <a href="/users/view/{{.UserId}}">{{index $user_names .UserId}}</a>
             </td>
             <td>
               {{T (statusTitle "assignment" .Status)}}

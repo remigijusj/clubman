@@ -21,8 +21,7 @@ type TeamForm struct {
 }
 
 func listTeamsByQuery(q url.Values) []TeamRecord {
-  rows, err := query["teams_all"].Query()
-  return listTeams(rows, err)
+  return listTeams(query["teams_all"].Query())
 }
 
 func indexTeams() map[int]TeamRecord {

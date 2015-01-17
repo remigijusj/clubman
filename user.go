@@ -78,9 +78,17 @@ func loginUserByToken(token, email string) (*AuthInfo, error) {
   return &auth, err
 }
 
-func listUsers(q url.Values) []UserRecord {
+func listUsersByQuery(q url.Values) []UserRecord {
+  status := q.Get("status")
+  if status == "" {
+    return listUsers(query["users_active"].Query())
+  } else {
+    return listUsers(query["users_by_status"].Query(status))
+  }
+}
+
+func listUsers(rows *sql.Rows, err error) []UserRecord {
   list := []UserRecord{}
-  rows, err := listUsersQuery(q)
   if err != nil {
     log.Printf("[APP] USER-LIST error: %s\n", err)
     return list
@@ -99,15 +107,6 @@ func listUsers(q url.Values) []UserRecord {
     log.Printf("[APP] USER-LIST error: %s\n", err)
   }
   return list
-}
-
-func listUsersQuery(q url.Values) (*sql.Rows, error) {
-  status := q.Get("status")
-  if status == "" {
-    return query["users_active"].Query()
-  } else {
-    return query["users_by_status"].Query(status)
-  }
 }
 
 func fetchUserProfile(user_id int) (UserForm, error) {
@@ -204,4 +203,30 @@ func userName(user_id int) (string, error) {
   var name string
   err := query["user_name"].QueryRow(user_id).Scan(&name)
   return name, err
+}
+
+func mapUserNames(user_ids []int) map[int]string {
+  data := make(map[int]string, len(user_ids))
+
+  rows, err := queryMultiple("user_names", user_ids)
+  if err != nil {
+    log.Printf("[APP] USER-NAMES error: %s\n", err)
+    return data
+  }
+  defer rows.Close()
+
+  var user_id int
+  var name string
+  for rows.Next() {
+    err := rows.Scan(&user_id, &name)
+    if err != nil {
+      log.Printf("[APP] USER-NAMES error: %s\n", err)
+    } else {
+      data[user_id] = name
+    }
+  }
+  if err := rows.Err(); err != nil {
+    log.Printf("[APP] USER-NAMES error: %s\n", err)
+  }
+  return data
 }
