@@ -1,0 +1,30 @@
+  <div class="row">
+    <div class="large-12 columns">
+      <table class="list">
+        <thead>
+          <tr>
+            <td>{{"User"|T}}</td>
+            <td>{{"Status"|T}}</td>
+            <td>{{"Actions"|T}}</td>
+          </tr>
+        </thead>
+        <tbody>
+          {{$lang := .lang}}
+          {{range .list}}
+          <tr>
+            <td>
+              <a href="/users/view/{{.Id}}">{{userName .UserId}}</a>
+            </td>
+            <td>
+              {{.Status}}
+            </td>
+            <td>
+              <a href="/assignments/cancel/{{.Id}}">{{"Cancel"|T}}</a>
+              <a href="/assignments/delete/{{.Id}}">{{"Delete"|T}}</a>
+            </td>
+          </tr>
+          {{end}}
+        </tbody>
+      </table>
+    </div>
+  </div>

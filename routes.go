@@ -35,14 +35,14 @@ func defineRoutesInternal(r *gin.Engine) {
     a.POST("/profile", handleProfile)
 
     //a.GET("/users/view/:id", getUserData, displayPage)
-    a.GET("/teams",          getTeamList, displayPage)
-    a.GET("/teams/view/:id", getTeamForm, getTeamEventsData, displayPage)
+    a.GET("/teams",           getTeamList,  displayPage)
+    a.GET("/teams/view/:id",  getTeamForm,  getTeamEventsData, displayPage)
 
-    a.GET("/events/view/:id", displayPage)
+    a.GET("/events/view/:id", getEventForm, getEventAssignmentsList, displayPage)
 
-    a.GET("/calendar", handleCalendar)
-    a.GET("/calendar/week", getWeekData, displayPage)
-    a.GET("/calendar/month", getMonthData, displayPage)
+    a.GET("/calendar",        redirectCalendar)
+    a.GET("/calendar/week",   getWeekData,  displayPage)
+    a.GET("/calendar/month",  getMonthData, displayPage)
 
     defineRoutesAdmin(a)
   }

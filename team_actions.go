@@ -2,7 +2,6 @@ package main
 
 import (
   "errors"
-  "strconv"
   "time"
 
   "github.com/gin-gonic/gin"
@@ -16,7 +15,7 @@ func getTeamList(c *gin.Context) {
 }
 
 func getTeamEventsData(c *gin.Context) {
-  team_id, err := teamId(c)
+  team_id, err := getIntParam(c, "id")
   if err != nil {
     forwardWarning(c, "/teams", err.Error())
     c.Abort(0)
@@ -33,7 +32,7 @@ func newTeamForm(c *gin.Context) {
 
 func getTeamForm(c *gin.Context) {
   var form TeamForm
-  team_id, err := teamId(c)
+  team_id, err := getIntParam(c, "id")
   if err == nil {
     form, err = fetchTeam(team_id)
   }
@@ -66,7 +65,7 @@ func handleTeamUpdate(c *gin.Context) {
     showError(c, errors.New("Please provide all details"), &form)
     return
   }
-  team_id, err := teamId(c)
+  team_id, err := getIntParam(c, "id")
   if err == nil {
     err = updateTeam(team_id, &form)
   }
@@ -78,7 +77,7 @@ func handleTeamUpdate(c *gin.Context) {
 }
 
 func handleTeamDelete(c *gin.Context) {
-  team_id, err := teamId(c)
+  team_id, err := getIntParam(c, "id")
   if err == nil {
     err = deleteTeam(team_id)
   }
@@ -98,16 +97,4 @@ func newTeamEventsForm(c *gin.Context) {
   lang := getLang(c)
   c.Set("date_from", time.Now().UTC().Format(dateFormats[lang]))
   c.Set("date_till", time.Date(time.Now().UTC().Year()+1, 1, 0, 0, 0, 0, 0, time.UTC).Format(dateFormats[lang]))
-}
-
-// --- local helpers ---
-
-func teamId(c *gin.Context) (int, error) {
-  id := c.Params.ByName("id")
-  team_id, err := strconv.Atoi(id)
-
-  if err != nil {
-    return 0, errors.New("Critical error happened, please contact website admin")
-  }
-  return team_id, nil
 }

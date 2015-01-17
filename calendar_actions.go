@@ -6,7 +6,7 @@ import (
   "github.com/gin-gonic/gin"
 )
 
-func handleCalendar(c *gin.Context) {
+func redirectCalendar(c *gin.Context) {
   c.Redirect(302, "/calendar/week")
 }
 

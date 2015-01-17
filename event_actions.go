@@ -21,11 +21,37 @@ func handleEventsRemove(c *gin.Context) {
   handleEventsFormAction(c, removeEvents, "%d events have been removed")
 }
 
+func getEventForm(c *gin.Context) {
+  var form EventForm
+  event_id, err := getIntParam(c, "id")
+  if err == nil {
+    form, err = fetchEvent(event_id)
+  }
+  if err != nil {
+    forwardWarning(c, defaultPage, err.Error())
+    c.Abort(0)
+  } else {
+    c.Set("id", event_id)
+    c.Set("form", form)
+  }
+}
+
+func getEventAssignmentsList(c *gin.Context) {
+  event_id, err := getIntParam(c, "id")
+  if err != nil {
+    forwardWarning(c, defaultPage, err.Error())
+    c.Abort(0)
+  } else {
+    list := listEventAssignments(event_id)
+    c.Set("list", list)
+  }
+}
+
 // --- local helpers ---
 
 func handleEventsFormAction(c *gin.Context, action (func(int, *TeamEventsForm, string) (int, error)), message string) {
   var cnt int
-  team_id, err := teamId(c)
+  team_id, err := getIntParam(c, "id")
   if err != nil {
     showError(c, err, nil, teamsEventsPath(team_id))
     return

@@ -1,11 +1,14 @@
   <div class="row">
     <div class="large-6 medium-8 columns">
-      <h4>{{"Event"|T}}</h4>
+      <h4>{{"Event"|T}} {{.id}}{{if eq .form.Status 1}} &ndash; {{"Canceled"|T}}{{end}}</h4>
 
       <div class="panel">
         <small>
-          <p>TO BE IMPLEMENTED</p>
+          <b>{{"Team"|T}}</b>: {{teamName .form.TeamId}}<br/>
+          <b>{{"Date"|T}}</b>: {{.form.StartAt.Format (dateFormat .lang)}}<br/>
+          <b>{{"Time"|T}}</b>: {{.form.StartAt.Format timeFormat}} &ndash; {{.form.FinishAt.Format timeFormat}}<br/>
         </small>
       </div>
     </div>
   </div>
+  {{template "events_assignments_list.tmpl" .}}

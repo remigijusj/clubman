@@ -2,8 +2,10 @@ package main
 
 import (
   "crypto/rand"
+  "errors"
   "fmt"
   "log"
+  "strconv"
   "strings"
   "time"
 
@@ -81,6 +83,15 @@ func forwardWarning(c *gin.Context, route string, message string, args ...interf
     setSessionAlert(c, &Alert{"warning", TC(c, message, args...)})
   }
   c.Redirect(302, route)
+}
+
+func getIntParam(c *gin.Context, name string) (int, error) {
+  s := c.Params.ByName(name)
+  v, err := strconv.Atoi(s)
+  if err != nil {
+    return 0, errors.New("Critical error happened, please contact website admin")
+  }
+  return v, nil
 }
 
 // --- session helpers ---

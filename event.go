@@ -16,6 +16,13 @@ type EventRecord struct {
   Status   int
 }
 
+type EventForm struct {
+  TeamId   int       `form:"team_id"  binding:"required"`
+  StartAt  time.Time `form:"start_at" binding:"required"`
+  Minutes  int       `form:"minutes"  binding:"required"`
+  Status   int       `form:"status"   binding:"required"`
+}
+
 type TeamEventsForm struct {
   DateFrom string `form:"date_from" binding:"required"`
   DateTill string `form:"date_till" binding:"required"`
@@ -33,6 +40,10 @@ type TeamEventsData struct {
 }
 
 func (self EventRecord) FinishAt() time.Time {
+  return self.StartAt.Add(time.Duration(self.Minutes) * time.Minute)
+}
+
+func (self EventForm) FinishAt() time.Time {
   return self.StartAt.Add(time.Duration(self.Minutes) * time.Minute)
 }
 
@@ -73,7 +84,7 @@ func addEvents(team_id int, form *TeamEventsForm, lang string) (int, error) {
     return 0, err
   }
   cnt := data.iterate(func(date time.Time) bool {
-    res, err := query["event_create"].Exec(team_id, date, data.Minutes, 0)
+    res, err := query["event_insert"].Exec(team_id, date, data.Minutes, 0)
     if err != nil {
       log.Printf("[APP] EVENTS-ADD error: %s, %d, %s\n", err, team_id, date)
       return false
@@ -229,4 +240,14 @@ func listMonthEventsGrouped(date time.Time) [][][]EventRecord {
   }
 
   return data
+}
+
+func fetchEvent(event_id int) (EventForm, error) {
+  var form EventForm
+  err := query["event_select"].QueryRow(event_id).Scan(&form.TeamId, &form.StartAt, &form.Minutes, &form.Status)
+  if err != nil {
+    log.Printf("[APP] EVENT-SELECT error: %s, %#v\n", err, form)
+    err = errors.New("Event was not found")
+  }
+  return form, err
 }
