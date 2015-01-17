@@ -3,6 +3,7 @@ package main
 import (
   "database/sql"
   "encoding/gob"
+  "errors"
   "log"
   "regexp"
   "strings"
@@ -123,6 +124,9 @@ func getLang(c *gin.Context) string {
 }
 
 func queryMultiple(name string, list []int) (*sql.Rows, error) {
+  if len(list) == 0 {
+    return nil, errors.New("Can't query with empty args")
+  }
   qry := strings.Replace(queries[name], "(?)", "(?"+strings.Repeat(",?", len(list)-1)+")", 1)
 
   args := make([]interface{}, len(list))

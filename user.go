@@ -207,6 +207,9 @@ func userName(user_id int) (string, error) {
 
 func mapUserNames(user_ids []int) map[int]string {
   data := make(map[int]string, len(user_ids))
+  if len(user_ids) == 0 {
+    return data
+  }
 
   rows, err := queryMultiple("user_names", user_ids)
   if err != nil {
