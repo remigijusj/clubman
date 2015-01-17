@@ -19,7 +19,7 @@
               <a href="/users/view/{{.UserId}}">{{userName .UserId}}</a>
             </td>
             <td>
-              {{.Status}}
+              {{T (statusTitle "assignment" .Status)}}
             </td>
             {{if $is_admin}}
             <td>

@@ -80,7 +80,7 @@ var queries = map[string]string{
   "events_delete_time": "DELETE FROM events WHERE team_id=? AND start_at=?",
   "events_delete_date": "DELETE FROM events WHERE team_id=? AND datetime(start_at, 'start of day')=?",
 
-  "assignments_event":  "SELECT event_id, user_id, status FROM assignments WHERE event_id=? ORDER BY status, user_id",
+  "assignments_event":  "SELECT event_id, user_id, status FROM assignments WHERE event_id=? ORDER BY status DESC, user_id",
   //"assignments_user":   "SELECT event_id, status FROM assignments WHERE user_id=?",
   "assignment_insert":  "INSERT INTO assignments(event_id, user_id, status) VALUES (?, ?, ?)",
   "assignment_status":  "UPDATE assignments SET status=? WHERE event_id=? AND user_id=?",

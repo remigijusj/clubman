@@ -54,7 +54,7 @@ func createAssignment(event_id, user_id int) error {
 }
 
 func cancelAssignment(event_id, user_id int) error {
-  res, err := query["assignment_status"].Exec(1, event_id, user_id)
+  res, err := query["assignment_status"].Exec(-2, event_id, user_id)
   if err != nil {
     log.Printf("[APP] ASSIGNMENTS-STATUS error: %s, %d, %d\n", err, event_id, user_id)
     return errors.New("Assignment could not be updated")

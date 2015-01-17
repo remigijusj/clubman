@@ -65,7 +65,7 @@
     <div class="small-8 columns">
       <select id="status" name="status">
         {{$status := .form.Status}}
-        {{range statusList}}
+        {{range statusList "user"}}
         <option value="{{.Status}}" {{if eq $status .Status}}selected{{end}}>{{T .Title}}</option>
         {{end}}
       </select>
