@@ -5,23 +5,32 @@
           <tr>
             <td>{{"User"|T}}</td>
             <td>{{"Status"|T}}</td>
+            {{if .self.IsAdmin}}
             <td>{{"Actions"|T}}</td>
+            {{end}}
           </tr>
         </thead>
         <tbody>
-          {{$lang := .lang}}
+          {{$is_admin := .self.IsAdmin}}
+          {{$id := .id}}
           {{range .list}}
           <tr>
             <td>
-              <a href="/users/view/{{.Id}}">{{userName .UserId}}</a>
+              <a href="/users/view/{{.UserId}}">{{userName .UserId}}</a>
             </td>
             <td>
               {{.Status}}
             </td>
+            {{if $is_admin}}
             <td>
-              <a href="/assignments/cancel/{{.Id}}">{{"Cancel"|T}}</a>
-              <a href="/assignments/delete/{{.Id}}">{{"Delete"|T}}</a>
+              {{if eq .Status 1}}
+              <a href="#" data-action="/assignments/create/{{$id}}?user_id={{.UserId}}">{{"Signup"|T}}</a>
+              {{else}}
+              <a href="#" data-action="/assignments/cancel/{{$id}}?user_id={{.UserId}}">{{"Cancel"|T}}</a>
+              {{end}}
+              <a href="#" data-action="/assignments/delete/{{$id}}?user_id={{.UserId}}">{{"Delete"|T}}</a>
             </td>
+            {{end}}
           </tr>
           {{end}}
         </tbody>

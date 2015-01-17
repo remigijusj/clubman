@@ -44,6 +44,9 @@ func defineRoutesInternal(r *gin.Engine) {
     a.GET("/calendar/week",   getWeekData,  displayPage)
     a.GET("/calendar/month",  getMonthData, displayPage)
 
+    a.POST("/assignments/create/:event_id", handleAssignmentCreate)
+    a.POST("/assignments/cancel/:event_id", handleAssignmentCancel)
+
     defineRoutesAdmin(a)
   }
 }
@@ -65,8 +68,10 @@ func defineRoutesAdmin(a *gin.RouterGroup) {
     ad.POST("/teams/update/:id",  handleTeamUpdate)
     ad.POST("/teams/delete/:id",  handleTeamDelete)
 
-    ad.POST("/events/add/:id",    handleEventsAdd)
+    ad.POST("/events/create/:id", handleEventsCreate)
     ad.POST("/events/cancel/:id", handleEventsCancel)
-    ad.POST("/events/remove/:id", handleEventsRemove)
+    ad.POST("/events/delete/:id", handleEventsDelete)
+
+    a.POST("/assignments/delete/:event_id", handleAssignmentDelete)
   }
 }

@@ -1,8 +1,9 @@
 $(function(){
   // foundation
   $(document).foundation();
-  // delete-button in forms
-  $('input.delete').click(function(){
+  // buttons
+  $('input[data-action],a[data-action]').click(function(e){
+    e.preventDefault();
     var el = $(this);
     var form = el.closest('form');
     var action = el.data('action');

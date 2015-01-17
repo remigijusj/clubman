@@ -47,7 +47,7 @@
             <div class="columns">
               <input type="submit" class="button tiny radius" value="{{"Save"|T}}" />
               {{if ne .id .self.Id}}
-                <input type="button" class="button tiny radius delete" value="{{"Delete"|T}}" data-action="/users/delete/{{.id}}" data-confirm="{{"Are you sure?"|T}}" />
+                <input type="button" class="button tiny radius" value="{{"Delete"|T}}" data-action="/users/delete/{{.id}}" data-confirm="{{"Are you sure?"|T}}" />
               {{end}}
               <a href="/users" class="info button tiny radius right">{{"Cancel"|T}}</a>
             </div>

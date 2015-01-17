@@ -3,7 +3,7 @@
       <h4>{{.team.Name}}: {{"Events"|T}}</h4>
 
       <div class="panel">
-        <form action="/events/add/{{.id}}" method="POST">
+        <form action="/events/create/{{.id}}" method="POST">
 
           <div class="row">
             <div class="small-4 columns">
@@ -75,8 +75,8 @@
           <div class="row end">
             <div class="columns">
               <input type="submit" class="button tiny radius" value="{{"Add events"|T}}" />
-              <input type="button" class="button tiny radius delete" value="{{"Cancel events"|T}}" data-action="/events/cancel/{{.id}}" />
-              <input type="button" class="button tiny radius delete" value="{{"Remove events"|T}}" data-action="/events/remove/{{.id}}" />
+              <input type="button" class="button tiny radius" value="{{"Cancel events"|T}}" data-action="/events/cancel/{{.id}}" />
+              <input type="button" class="button tiny radius" value="{{"Remove events"|T}}" data-action="/events/delete/{{.id}}" />
               <a href="/teams" class="info button tiny radius right">{{"Cancel"|T}}</a>
             </div>
           </div>

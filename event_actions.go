@@ -9,16 +9,16 @@ import (
   "github.com/gin-gonic/gin/binding"
 )
 
-func handleEventsAdd(c *gin.Context) {
-  handleEventsFormAction(c, addEvents, "%d events have been added")
+func handleEventsCreate(c *gin.Context) {
+  handleEventsFormAction(c, createEvents, "%d events have been added")
 }
 
 func handleEventsCancel(c *gin.Context) {
   handleEventsFormAction(c, cancelEvents, "%d events have been canceled")
 }
 
-func handleEventsRemove(c *gin.Context) {
-  handleEventsFormAction(c, removeEvents, "%d events have been removed")
+func handleEventsDelete(c *gin.Context) {
+  handleEventsFormAction(c, deleteEvents, "%d events have been removed")
 }
 
 func getEventForm(c *gin.Context) {
@@ -44,6 +44,8 @@ func getEventAssignmentsList(c *gin.Context) {
   } else {
     list := listEventAssignments(event_id)
     c.Set("list", list)
+    signed_up := findAssignment(list, currentUser(c))
+    c.Set("signed_up", signed_up)
   }
 }
 

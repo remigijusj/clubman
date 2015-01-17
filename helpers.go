@@ -94,6 +94,16 @@ func getIntParam(c *gin.Context, name string) (int, error) {
   return v, nil
 }
 
+// NOTE: optional, therefore not error
+func getIntQuery(c *gin.Context, name string) (int, bool) {
+  s := c.Request.URL.Query().Get(name)
+  v, err := strconv.Atoi(s)
+  if err != nil {
+    return 0, false
+  }
+  return v, true
+}
+
 // --- session helpers ---
 
 func setSessionAuthInfo(c *gin.Context, auth *AuthInfo) {

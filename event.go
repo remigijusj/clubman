@@ -78,7 +78,7 @@ func listEvents(rows *sql.Rows, err error) []EventRecord {
   return list
 }
 
-func addEvents(team_id int, form *TeamEventsForm, lang string) (int, error) {
+func createEvents(team_id int, form *TeamEventsForm, lang string) (int, error) {
   data, err := parseEventsForm(form, true, lang)
   if err != nil {
     return 0, err
@@ -86,7 +86,7 @@ func addEvents(team_id int, form *TeamEventsForm, lang string) (int, error) {
   cnt := data.iterate(func(date time.Time) bool {
     res, err := query["event_insert"].Exec(team_id, date, data.Minutes, 0)
     if err != nil {
-      log.Printf("[APP] EVENTS-ADD error: %s, %d, %s\n", err, team_id, date)
+      log.Printf("[APP] EVENTS-CREATE error: %s, %d, %s\n", err, team_id, date)
       return false
     }
     num, err := res.RowsAffected()
@@ -118,7 +118,7 @@ func cancelEvents(team_id int, form *TeamEventsForm, lang string) (int, error) {
   return cnt, nil
 }
 
-func removeEvents(team_id int, form *TeamEventsForm, lang string) (int, error) {
+func deleteEvents(team_id int, form *TeamEventsForm, lang string) (int, error) {
   data, err := parseEventsForm(form, false, lang)
   if err != nil {
     return 0, err
