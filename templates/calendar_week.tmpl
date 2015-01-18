@@ -42,6 +42,16 @@
             <span class="show-for-small">{{"Sunday"|T|truncate 3}}</span>
           </div>
         </li>
+        <li class="day-header">
+          {{$date := .date}}
+          {{$lang := .lang}}
+          {{range $d, $list := .events}}
+          {{$date := calcMonthDate $date 0 $d}}
+          <div class="small-1 medium-1 large-1 day">
+            <small>{{$date.Day}}</small>
+          </div>
+          {{end}}
+        </li>
         <li class="week">
           {{$teams := .teams}}
           {{range $d, $list := .events}}

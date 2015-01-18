@@ -29,7 +29,7 @@
 
       <div class="panel">
         <form action="/teams/update/{{.id}}" method="POST">
-          {{template "team_form.tmpl" . }}
+          {{template "teams_form.tmpl" . }}
           <div class="row end">
             <div class="columns">
               <input type="submit" class="button tiny radius" value="{{"Save"|T}}" />
@@ -52,7 +52,7 @@
 
       <div class="panel">
         <form action="/teams/create" method="POST">
-          {{template "team_form.tmpl" . }}
+          {{template "teams_form.tmpl" . }}
           <div class="row end">
             <div class="columns">
               <input type="submit" class="button tiny radius" value="{{"Create"|T}}" />

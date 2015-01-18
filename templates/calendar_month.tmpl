@@ -43,12 +43,15 @@
           </div>
         </li>
         {{$date := .date}}
+        {{$prev := .prev}}
+        {{$next := .next}}
+        {{$today := .today}}
         {{$teams := .teams}}
         {{range $w, $week := .events}}
         <li class="week">
           {{range $d, $list := $week}}
           {{$date := calcMonthDate $date $w $d}}
-          <div class="small-1 medium-1 large-1 day {{if false}}today previous-month next-month{{end}}">
+          <div class="small-1 medium-1 large-1 day {{if eq $date.String $today.String}}today{{end}} {{if eq $date.Month $prev.Month}}previous-month{{end}} {{if eq $date.Month $next.Month}}next-month{{end}}">
             <div class="num">{{$date.Day}}</div>
             <div class="inner">
               {{range $list}}

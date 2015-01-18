@@ -31,6 +31,7 @@ func getMonthData(c *gin.Context) {
   c.Set("date", d)
   c.Set("prev", d.AddDate(0, -1, 0))
   c.Set("next", d.AddDate(0, 1, 0))
+  c.Set("today", today())
 
   e := listMonthEventsGrouped(d)
   c.Set("events", e)
@@ -43,7 +44,11 @@ func getMonthData(c *gin.Context) {
 func getDate(c *gin.Context) time.Time {
   date, err := time.Parse("2006-01-02", c.Request.URL.Query().Get("date"))
   if err != nil {
-    date = time.Now().Truncate(24 * time.Hour).UTC()
+    date = today()
   }
   return date
+}
+
+func today() time.Time {
+  return time.Now().Truncate(24 * time.Hour).UTC()
 }
