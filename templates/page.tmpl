@@ -109,6 +109,8 @@
 
         {{else if eq .page "events_view"}}
           {{template "events_view.tmpl" . }}
+        {{else if eq .page "events_update"}}
+          {{template "events_update.tmpl" . }}
 
         {{else if eq .page "calendar_week"}}
           {{template "calendar_week.tmpl" . }}

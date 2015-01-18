@@ -16,11 +16,14 @@ type EventRecord struct {
   Status   int
 }
 
+// NOTE: `date`, `time` just to pull data from event update
 type EventForm struct {
   TeamId   int       `form:"team_id"  binding:"required"`
-  StartAt  time.Time `form:"start_at" binding:"required"`
+  StartAt  time.Time `form:"start_at"`
+  Date     string    `form:"date"     binding:"required"`
+  Time     string    `form:"time"     binding:"required"`
   Minutes  int       `form:"minutes"  binding:"required"`
-  Status   int       `form:"status"   binding:"required"`
+  Status   int       `form:"status"`
 }
 
 type TeamEventsForm struct {
@@ -66,7 +69,7 @@ func listEvents(rows *sql.Rows, err error) []EventRecord {
     if err != nil {
       log.Printf("[APP] TEAM-EVENTS-LIST error: %s\n", err)
     } else {
-      // NOTE: we interpret datetimes in DB literally as entered, but all data being UTC
+      // WARNING: we interpret datetimes in DB literally as entered, but all data being UTC
       //   time.Parse gives UTC already, but rows.Scan gives us local times (why?), so convert!
       item.StartAt = item.StartAt.UTC()
       list = append(list, item)
@@ -107,7 +110,7 @@ func cancelEvents(team_id int, form *TeamEventsForm, lang string) (int, error) {
     } else{
       kind = "events_status_time"
     }
-    res, err := query[kind].Exec(1, team_id, date)
+    res, err := query[kind].Exec(-2, team_id, date)
     if err != nil {
       log.Printf("[APP] EVENTS-CANCEL error: %s, %d, %s\n", err, team_id, date)
       return false
@@ -118,7 +121,7 @@ func cancelEvents(team_id int, form *TeamEventsForm, lang string) (int, error) {
   return cnt, nil
 }
 
-func deleteEvents(team_id int, form *TeamEventsForm, lang string) (int, error) {
+func removeEvents(team_id int, form *TeamEventsForm, lang string) (int, error) {
   data, err := parseEventsForm(form, false, lang)
   if err != nil {
     return 0, err
@@ -132,7 +135,7 @@ func deleteEvents(team_id int, form *TeamEventsForm, lang string) (int, error) {
     }
     res, err := query[kind].Exec(team_id, date)
     if err != nil {
-      log.Printf("[APP] EVENTS-DELETE error: %s, %d, %s\n", err, team_id, date)
+      log.Printf("[APP] EVENTS-REMOVE error: %s, %d, %s\n", err, team_id, date)
       return false
     }
     num, err := res.RowsAffected()
@@ -173,7 +176,7 @@ func parseEventsForm(form *TeamEventsForm, need_time bool, lang string) (*TeamEv
   }
 
   data.Minutes, _ = strconv.Atoi(form.Minutes)
-  if need_time && data.Minutes <= 0 || data.Minutes >= 6 * 60 {
+  if need_time && !minutesValid(data.Minutes) {
     return nil, errors.New("Duration must be a positive number, not too big")
   }
 
@@ -181,7 +184,7 @@ func parseEventsForm(form *TeamEventsForm, need_time bool, lang string) (*TeamEv
 }
 
 func (self TeamEventsData) iterate(callback func(time.Time) bool) int {
-  hour := self.StartAt.Sub(self.StartAt.Truncate(24 * time.Hour))
+  hour := hourDuration(self.StartAt)
   date := self.DateFrom.Add(hour)
   ceil := self.DateTill.AddDate(0, 0, 1)
   cnt := 0
@@ -249,5 +252,59 @@ func fetchEvent(event_id int) (EventForm, error) {
     log.Printf("[APP] EVENT-SELECT error: %s, %#v\n", err, form)
     err = errors.New("Event was not found")
   }
+  // WARNING: see the comment in listEvents  
+  form.StartAt = form.StartAt.UTC()
   return form, err
+}
+
+func updateEvent(event_id int, form *EventForm, lang string) error {
+  err := parseEventForm(form, lang)
+  if err != nil {
+    return err
+  }
+  _, err = query["event_update"].Exec(form.TeamId, form.StartAt, form.Minutes, form.Status, event_id)
+  if err != nil {
+    log.Printf("[APP] EVENT-UPDATE error: %s, %d\n", err, event_id)
+    return errors.New("Event could not be updated")
+  }
+  return nil
+}
+
+func deleteEvent(event_id int) error {
+  _, err := query["event_delete"].Exec(event_id)
+  if err != nil {
+    log.Printf("[APP] EVENT-DELETE error: %s, %d\n", err, event_id)
+    return errors.New("Event could not be deleted")
+  }
+  _, err = query["assignments_delete_event"].Exec(event_id)
+  if err != nil {
+    log.Printf("[APP] EVENT-DELETE-ASSIGNMENTS error: %s, %d\n", err, event_id)
+    return nil
+  }
+  return nil
+}
+
+func parseEventForm(form *EventForm, lang string) error {
+  date, err := time.Parse(dateFormats[lang], form.Date)
+  if err != nil {
+    return errors.New("Date must be valid")
+  }
+  when, err := time.Parse(timeFormat, form.Time)
+  if err != nil {
+    return errors.New("Start time has invalid format")
+  }
+  hour := hourDuration(when)
+  form.StartAt = date.Add(hour)
+
+  if !minutesValid(form.Minutes) {
+    return errors.New("Duration must be a positive number, not too big")
+  }
+  if !(form.Status == -2 || form.Status == 0) {
+    return errors.New("Status is invalid")
+  }
+  return nil
+}
+
+func minutesValid(minutes int) bool {
+  return minutes > 0 && minutes < 6 * 60
 }

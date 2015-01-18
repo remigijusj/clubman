@@ -285,3 +285,7 @@ func wdIndex(d time.Time) int {
 func calcMonthDate(date time.Time, w, d int) time.Time {
   return weekFirst(date).AddDate(0, 0, 7 * w + d)
 }
+
+func hourDuration(when time.Time) time.Duration {
+  return when.Sub(when.Truncate(24 * time.Hour))
+}

@@ -1,0 +1,66 @@
+  <div class="row">
+    <div class="small-4 columns">
+      <label for="date_from">{{"Date from"|T}}</label>
+    </div>
+    <div class="small-8 columns">
+      <input id="date_from" name="date_from" type="text" value="{{or .form.DateFrom .date_from}}" placeholder="{{.date_from}}" class="date" />
+    </div>
+    <div class="small-12 columns description">
+      {{"From what date events are added or removed"|T}}
+    </div>
+  </div>
+  <div class="row">
+    <div class="small-4 columns">
+      <label for="date_till">{{"Date till"|T}}</label>
+    </div>
+    <div class="small-8 columns">
+      <input id="date_till" name="date_till" type="text" value="{{or .form.DateTill .date_till}}" placeholder="{{.date_till}}" class="date" />
+    </div>
+    <div class="small-12 columns description">
+      {{"Till what date events are added or removed"|T}}
+    </div>
+  </div>
+  <div class="row">
+    <div class="small-4 columns">
+      <label for="weekdays">{{"Weekday"|T}}</label>
+    </div>
+    <div class="small-8 columns">
+      <select id="weekdays" name="weekdays" multiple="multiple" class="select2">
+        <option value="1" {{if containsInt .form.Weekdays 1}}selected{{end}}>{{"Monday"|T}}</option>
+        <option value="2" {{if containsInt .form.Weekdays 2}}selected{{end}}>{{"Tuesday"|T}}</option>
+        <option value="3" {{if containsInt .form.Weekdays 3}}selected{{end}}>{{"Wednesday"|T}}</option>
+        <option value="4" {{if containsInt .form.Weekdays 4}}selected{{end}}>{{"Thursday"|T}}</option>
+        <option value="5" {{if containsInt .form.Weekdays 5}}selected{{end}}>{{"Friday"|T}}</option>
+        <option value="6" {{if containsInt .form.Weekdays 6}}selected{{end}}>{{"Saturday"|T}}</option>
+        <option value="0" {{if containsInt .form.Weekdays 0}}selected{{end}}>{{"Sunday"|T}}</option>
+      </select>
+    </div>
+    <div class="small-12 columns description">
+      {{"Only add or remove events on the listed weekdays"|T}}
+    </div>
+  </div>
+  <div class="row">
+    <div class="small-4 columns">
+      <label for="start_at">{{"Start time"|T}}</label>
+    </div>
+    <div class="small-2 columns">
+      <input id="start_at" name="start_at" type="text" value="{{.form.StartAt}}" size="5" placeholder="06:40" />
+    </div>
+    <div class="small-12 columns description">
+      {{"At what time the events will start each specified day"|T}}
+    </div>
+  </div>
+  <div class="row">
+    <div class="small-4 columns">
+      <label for="minutes">{{"Duration"|T}}</label>
+    </div>
+    <div class="small-2 columns">
+      <input id="minutes" name="minutes" type="text" value="{{or .form.Minutes "60"}}" size="2" placeholder="60" />
+    </div>
+    <div class="small-6 columns">
+      min
+    </div>
+    <div class="small-12 columns description">
+      {{"How many minutes will the event last"|T}}
+    </div>
+  </div>

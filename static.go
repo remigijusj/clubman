@@ -70,11 +70,14 @@ var queries = map[string]string{
   "team_update":        "UPDATE teams SET name=?, users_min=?, users_max=?, instructor_id=? WHERE id=?",
   "team_delete":        "DELETE FROM teams WHERE id=?",
   "team_name":          "SELECT name FROM teams WHERE id=?",
+  "team_names_all":     "SELECT id, name FROM teams ORDEr BY name",
 
   "events_team":        "SELECT id, team_id, start_at, minutes, status FROM events WHERE team_id=? AND start_at >= date('now') ORDER BY start_at",
   "events_period":      "SELECT id, team_id, start_at, minutes, status FROM events WHERE start_at >= ? AND start_at < ? ORDER BY start_at",
   "event_select":       "SELECT team_id, start_at, minutes, status FROM events WHERE id=?",
   "event_insert":       "INSERT INTO events(team_id, start_at, minutes, status) VALUES (?, ?, ?, ?)",
+  "event_update":       "UPDATE events SET team_id=?, start_at=?, minutes=?, status=? WHERE id=?",
+  "event_delete":       "DELETE FROM events WHERE id=?",
   "events_status_time": "UPDATE events SET status=? WHERE team_id=? AND start_at=?",
   "events_status_date": "UPDATE events SET status=? WHERE team_id=? AND datetime(start_at,'start of day')=?",
   "events_delete_team": "DELETE FROM events WHERE team_id=?",
@@ -86,4 +89,5 @@ var queries = map[string]string{
   "assignment_insert":  "INSERT INTO assignments(event_id, user_id, status) VALUES (?, ?, ?)",
   "assignment_status":  "UPDATE assignments SET status=? WHERE event_id=? AND user_id=?",
   "assignment_delete":  "DELETE FROM assignments WHERE event_id=? AND user_id=?",
+  "assignments_delete_event": "DELETE FROM assignments WHERE event_id=?",
 }

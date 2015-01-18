@@ -15,6 +15,9 @@
               <input type="button" data-action="/assignments/create/{{.id}}" class="button tiny radius right" value="{{"Signup"|T}}" />
               {{end}}
             {{end}}
+            {{if .self.IsAdmin}}
+              <a href="/events/update/{{.id}}" class="button tiny radius right right-1">{{"Edit"|T}}</a>
+            {{end}}
             <b>{{"Team"|T}}</b>: <a href="/teams/view/{{.form.TeamId}}">{{teamName .form.TeamId}}</a><br/>
             <b>{{"Date"|T}}</b>: {{.form.StartAt.Format (dateFormat .lang)}}<br/>
             <b>{{"Time"|T}}</b>: {{.form.StartAt.Format timeFormat}} &ndash; {{.form.FinishAt.Format timeFormat}}<br/>
@@ -25,4 +28,25 @@
     </div>
     {{template "events_assignments_list.tmpl" .}}
   </form>
+{{end}}
+{{define "events_update.tmpl"}}
+  <div class="row">
+    <div class="large-6 medium-8 columns">
+      <h4>{{"Edit event"|T}}</h4>
+
+      <div class="panel">
+        <form action="/events/update/{{.id}}" method="POST">
+          {{template "events_form.tmpl" . }}
+          <div class="row end">
+            <div class="columns">
+              <input type="submit" class="button tiny radius" value="{{"Save"|T}}" />
+              <input type="button" class="button tiny radius" value="{{"Delete"|T}}" data-action="/events/delete/{{.id}}" data-confirm="{{"Are you sure?"|T}}" />
+              &nbsp;&nbsp;
+              <a href="/events/view/{{.id}}" class="info button tiny radius right">{{"Cancel"|T}}</a>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
 {{end}}

@@ -64,3 +64,25 @@
     </div>
   </div>
 {{end}}
+{{define "teams_events.tmpl"}}
+  <div class="row">
+    <div class="large-6 medium-8 columns">
+      <h4>{{.team.Name}}: {{"Events"|T}}</h4>
+
+      <div class="panel">
+        <form action="/events/create/{{.id}}" method="POST">
+          {{template "teams_events_form.tmpl" .}}
+          <div class="row end">
+            <div class="columns">
+              <input type="submit" class="button tiny radius" value="{{"Add events"|T}}" />
+              <input type="button" class="button tiny radius" value="{{"Cancel events"|T}}" data-action="/events/cancel/{{.id}}" />
+              <input type="button" class="button tiny radius" value="{{"Remove events"|T}}" data-action="/events/remove/{{.id}}" />
+              <a href="/teams" class="info button tiny radius right">{{"Cancel"|T}}</a>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  {{template "teams_events_list.tmpl" .}}
+{{end}}

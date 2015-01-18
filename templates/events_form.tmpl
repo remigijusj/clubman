@@ -1,0 +1,68 @@
+  <div class="row">
+    <div class="small-4 columns">
+      <label for="instructor_id">{{"Team"|T}}</label>
+    </div>
+    <div class="small-8 columns">
+      <select id="team_id" name="team_id">
+        {{$team_id := .form.TeamId}}
+        {{range (listRecords "team_names_all")}}
+        <option value="{{.Id}}" {{if eq $team_id .Id }}selected{{end}}>{{.Text}}</option>
+        {{end}}
+      </select> 
+    </div>
+    <div class="small-12 columns description">
+      {{"The team of which the event is part"|T}}
+    </div>
+  </div>
+  <div class="row">
+    <div class="small-4 columns">
+      <label for="date">{{"Date"|T}}</label>
+    </div>
+    <div class="small-8 columns">
+      <input id="date" name="date" type="text" value="{{.form.Date}}" placeholder="{{.date}}" class="date" />
+    </div>
+    <div class="small-12 columns description">
+      {{"What date the event will take place"|T}}
+    </div>
+  </div>
+  <div class="row">
+    <div class="small-4 columns">
+      <label for="time">{{"Start time"|T}}</label>
+    </div>
+    <div class="small-2 columns">
+      <input id="time" name="time" type="text" value="{{.form.Time}}" size="5" placeholder="06:40" />
+    </div>
+    <div class="small-12 columns description">
+      {{"At what time the event will start"|T}}
+    </div>
+  </div>
+  <div class="row">
+    <div class="small-4 columns">
+      <label for="minutes">{{"Duration"|T}}</label>
+    </div>
+    <div class="small-2 columns">
+      <input id="minutes" name="minutes" type="text" value="{{or .form.Minutes "60"}}" size="2" placeholder="60" />
+    </div>
+    <div class="small-6 columns">
+      min
+    </div>
+    <div class="small-12 columns description">
+      {{"How many minutes will the event last"|T}}
+    </div>
+  </div>
+  <div class="row">
+    <div class="small-4 columns">
+      <label for="status">{{"Status"|T}}</label>
+    </div>
+    <div class="small-8 columns">
+      <select id="status" name="status">
+        {{$status := .form.Status}}
+        {{range statusList "event"}}
+        <option value="{{.Status}}" {{if eq $status .Status}}selected{{end}}>{{T .Title}}</option>
+        {{end}}
+      </select>
+    </div>
+    <div class="small-12 columns description">
+      {{"The status of the event"|T}}
+    </div>
+  </div>

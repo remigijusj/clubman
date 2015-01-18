@@ -50,5 +50,5 @@ func getDate(c *gin.Context) time.Time {
 }
 
 func today() time.Time {
-  return time.Now().Truncate(24 * time.Hour).UTC()
+  return time.Now().UTC().Truncate(24 * time.Hour)
 }

@@ -18,6 +18,10 @@ var statuses = map[string][]Status {
     Status{ 1, "Instructor"   },
     Status{ 2, "Administrator"},
   },
+  "event": []Status{
+    Status{-2, "Canceled" },
+    Status{ 0, "Active"   },
+  },
   "assignment": []Status{
     Status{-2, "Canceled" },
     Status{-1, "Waiting"  },

@@ -25,6 +25,7 @@ func init() {
   gob.Register(&UserForm{})
   gob.Register(&TeamForm{})
   gob.Register(&TeamEventsForm{})
+  gob.Register(&EventForm{})
 }
 
 func main() {

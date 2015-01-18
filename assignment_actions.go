@@ -26,7 +26,6 @@ func handleAssignmentAction(c *gin.Context, action (func(int, int) error), messa
     forwardWarning(c, defaultPage, err.Error())
     return
   }
-  path := fmt.Sprintf("/events/view/%d", event_id)
   user_id, ok := getIntQuery(c, "user_id")
   if !ok {
     // action of self if no user_id
@@ -36,8 +35,12 @@ func handleAssignmentAction(c *gin.Context, action (func(int, int) error), messa
   }
   err = action(event_id, user_id)
   if err != nil {
-    forwardWarning(c, path, err.Error())
+    forwardWarning(c, eventsViewPath(event_id), err.Error())
   } else {
-    forwardTo(c, path, message)
+    forwardTo(c, eventsViewPath(event_id), message)
   }
+}
+
+func eventsViewPath(event_id int) string {
+  return fmt.Sprintf("/events/view/%d", event_id)
 }
