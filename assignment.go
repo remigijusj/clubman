@@ -125,3 +125,26 @@ func deleteAssignment(event_id, user_id int) error {
   }
   return nil
 }
+
+func mapAssignedPeriod(user_id int, from, till time.Time) map[string]bool {
+  data := map[string]bool{}
+  var when time.Time
+  rows, err := query["assignments_period"].Query(user_id, from.Format(dateFormat), till.Format(dateFormat))
+  if err != nil {
+    log.Printf("[APP] USER-ASSIGNMENTS-PERIOD error: %s\n", err)
+    return data
+  }
+  defer rows.Close()
+  for rows.Next() {
+    err := rows.Scan(&when)
+    if err != nil {
+      log.Printf("[APP] USER-ASSIGNMENTS-PERIOD error: %s\n", err)
+    } else {
+      data[when.UTC().Format(dateFormat)] = true // <<< key len
+    }
+  }
+  if err := rows.Err(); err != nil {
+    log.Printf("[APP] USER-ASSIGNMENTS-PERIOD error: %s\n", err)
+  }
+  return data
+}
