@@ -17,7 +17,7 @@
           </ul>
         </li>
         <li><a href="/teams">{{"Teams"|T}}</a></li>
-        <li><a href="#">{{"My assignments"|T}}</a></li>
+        <li><a href="/assignments">{{"My assignments"|T}}</a></li>
         {{if .self.IsAdmin}}
         <li class="has-dropdown">
           <a href="#">{{"Administrator"|T}}</a>
@@ -111,6 +111,9 @@
           {{template "events_view.tmpl" . }}
         {{else if eq .page "events_update"}}
           {{template "events_update.tmpl" . }}
+
+        {{else if eq .page "assignments"}}
+          {{template "assignments.tmpl" . }}
 
         {{else if eq .page "calendar_week"}}
           {{template "calendar_week.tmpl" . }}

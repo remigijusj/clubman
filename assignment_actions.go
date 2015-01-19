@@ -18,6 +18,16 @@ func handleAssignmentDelete(c *gin.Context) {
   handleAssignmentAction(c, deleteAssignment, "Assignment has been deleted")
 }
 
+func getSelfAssignmentsList(c *gin.Context) {
+  self := currentUser(c)
+  if self == nil {
+    forwardWarning(c, defaultPage, "Critical error happened, please contact website admin")
+    return
+  }
+  list := listUserAssignments(self.Id)
+  c.Set("list", list)
+}
+
 // --- local helpers ---
 
 func handleAssignmentAction(c *gin.Context, action (func(int, int) error), message string) {

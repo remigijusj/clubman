@@ -39,6 +39,7 @@ func defineRoutesInternal(r *gin.Engine) {
     a.GET("/teams/view/:id",  getTeamForm,  getTeamEventsData, displayPage)
 
     a.GET("/events/view/:id", getEventForm, getEventAssignmentsList, displayPage)
+    a.GET("/assignments",     getSelfAssignmentsList,                displayPage)
 
     a.GET("/calendar",        redirectCalendar)
     a.GET("/calendar/week",   getWeekData,  displayPage)

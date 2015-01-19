@@ -84,8 +84,8 @@ var queries = map[string]string{
   "events_delete_time": "DELETE FROM events WHERE team_id=? AND start_at=?",
   "events_delete_date": "DELETE FROM events WHERE team_id=? AND datetime(start_at, 'start of day')=?",
 
-  "assignments_event":  "SELECT event_id, user_id, status FROM assignments WHERE event_id=? ORDER BY status DESC, user_id",
-  //"assignments_user":   "SELECT event_id, status FROM assignments WHERE user_id=?",
+  "assignments_event":  "SELECT user_id, users.name, assignments.status FROM assignments JOIN users ON user_id=users.id WHERE event_id=? ORDER BY assignments.status DESC, user_id",
+  "assignments_user":   "SELECT event_id, teams.name, start_at, minutes, events.status, assignments.status FROM assignments JOIN events ON event_id=events.id JOIN teams ON team_id=teams.id WHERE user_id=? ORDER BY start_at",
   "assignment_insert":  "INSERT INTO assignments(event_id, user_id, status) VALUES (?, ?, ?)",
   "assignment_status":  "UPDATE assignments SET status=? WHERE event_id=? AND user_id=?",
   "assignment_delete":  "DELETE FROM assignments WHERE event_id=? AND user_id=?",

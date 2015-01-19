@@ -12,24 +12,22 @@
         </thead>
         <tbody>
           {{$is_admin := .self.IsAdmin}}
-          {{$user_names := .user_names}}
-          {{$id := .id}}
+          {{$event_id := .id}}
           {{range .list}}
           <tr>
             <td>
-              <a href="/users/view/{{.UserId}}">{{index $user_names .UserId}}</a>
+              <a href="/users/view/{{.UserId}}">{{.UserName}}</a>
             </td>
             <td>
               {{T (statusTitle "assignment" .Status)}}
             </td>
             {{if $is_admin}}
             <td>
-              {{if eq .Status 1}}
-              <a href="#" data-action="/assignments/create/{{$id}}?user_id={{.UserId}}">{{"Signup"|T}}</a>
+              {{if eq .Status -2}}
               {{else}}
-              <a href="#" data-action="/assignments/cancel/{{$id}}?user_id={{.UserId}}">{{"Cancel"|T}}</a>
+              <a href="#" data-action="/assignments/cancel/{{$event_id}}?user_id={{.UserId}}">{{"Cancel"|T}}</a>
               {{end}}
-              <a href="#" data-action="/assignments/delete/{{$id}}?user_id={{.UserId}}">{{"Delete"|T}}</a>
+              <a href="#" data-action="/assignments/delete/{{$event_id}}?user_id={{.UserId}}">{{"Delete"|T}}</a>
             </td>
             {{end}}
           </tr>

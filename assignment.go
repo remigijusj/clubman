@@ -2,23 +2,32 @@ package main
 
 import (
   "errors"
-  "database/sql"
   "log"
+  "time"
 )
 
-type AssignmentRecord struct {
-  TeamId   int
-  UserId   int
-  Status   int
+type EventAssignment struct {
+  UserId      int
+  UserName    string
+  Status      int
 }
 
-func listEventAssignments(event_id int) []AssignmentRecord {
+type UserAssignment struct {
+  EventId     int
+  TeamName    string
+  StartAt     time.Time
+  Minutes     int
+  EventStatus int
+  Status      int
+}
+
+func (self UserAssignment) FinishAt() time.Time {
+  return self.StartAt.Add(time.Duration(self.Minutes) * time.Minute)
+}
+
+func listEventAssignments(event_id int) []EventAssignment {
   rows, err := query["assignments_event"].Query(event_id)
-  return listAssignments(rows, err)
-}
-
-func listAssignments(rows *sql.Rows, err error) []AssignmentRecord {
-  list := []AssignmentRecord{}
+  list := []EventAssignment{}
   
   if err != nil {
     log.Printf("[APP] EVENT-ASSIGNMENTS-LIST error: %s\n", err)
@@ -26,8 +35,8 @@ func listAssignments(rows *sql.Rows, err error) []AssignmentRecord {
   }
   defer rows.Close()
   for rows.Next() {
-    var item AssignmentRecord
-    err := rows.Scan(&item.TeamId, &item.UserId, &item.Status)
+    var item EventAssignment
+    err := rows.Scan(&item.UserId, &item.UserName, &item.Status)
     if err != nil {
       log.Printf("[APP] EVENT-ASSIGNMENTS-LIST error: %s\n", err)
     } else {
@@ -36,6 +45,44 @@ func listAssignments(rows *sql.Rows, err error) []AssignmentRecord {
   }
   if err := rows.Err(); err != nil {
     log.Printf("[APP] EVENT-ASSIGNMENTS-LIST error: %s\n", err)
+  }
+  return list
+}
+
+func findAssignment(list []EventAssignment, user *AuthInfo) *EventAssignment {
+  if user == nil {
+    return nil
+  }
+  for _, item := range list {
+    if item.UserId == user.Id {
+      return &item
+    }
+  }
+  return nil
+}
+
+func listUserAssignments(user_id int) []UserAssignment {
+  rows, err := query["assignments_user"].Query(user_id)
+  list := []UserAssignment{}
+
+  if err != nil {
+    log.Printf("[APP] USER-ASSIGNMENTS-LIST error: %s\n", err)
+    return list
+  }
+  defer rows.Close()
+  for rows.Next() {
+    var item UserAssignment
+    err := rows.Scan(&item.EventId, &item.TeamName, &item.StartAt, &item.Minutes, &item.EventStatus, &item.Status)
+    if err != nil {
+      log.Printf("[APP] USER-ASSIGNMENTS-LIST error: %s\n", err)
+    } else {
+      // WARNING: see the comment in listEvents  
+      item.StartAt = item.StartAt.UTC()
+      list = append(list, item)
+    }
+  }
+  if err := rows.Err(); err != nil {
+    log.Printf("[APP] USER-ASSIGNMENTS-LIST error: %s\n", err)
   }
   return list
 }
@@ -75,18 +122,6 @@ func deleteAssignment(event_id, user_id int) error {
   num, err := res.RowsAffected()
   if num == 0 || err != nil {
     return errors.New("Assignment could not be deleted")
-  }
-  return nil
-}
-
-func findAssignment(list []AssignmentRecord, user *AuthInfo) *AssignmentRecord {
-  if user == nil {
-    return nil
-  }
-  for _, item := range list {
-    if item.UserId == user.Id {
-      return &item
-    }
   }
   return nil
 }
