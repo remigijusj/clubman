@@ -17,6 +17,7 @@ func getWeekData(c *gin.Context) {
   c.Set("date", d)
   c.Set("prev", d.AddDate(0, 0, -7))
   c.Set("next", d.AddDate(0, 0, 7))
+  c.Set("today", today())
 
   e := listWeekEventsGrouped(d)
   c.Set("events", e)

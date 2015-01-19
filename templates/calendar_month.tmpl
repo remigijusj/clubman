@@ -56,7 +56,7 @@
             <div class="inner">
               {{range $list}}
               {{$team := (index $teams .TeamId)}}
-              <a href="/events/view/{{.Id}}">{{$team.Name}}</a><br/>
+              <a href="/events/view/{{.Id}}" title="{{.StartAt.Format timeFormat}} &ndash; {{.FinishAt.Format timeFormat}}">{{$team.Name}}</a><br/>
               {{end}}
             </div>
           </div>
