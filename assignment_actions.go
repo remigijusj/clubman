@@ -28,6 +28,17 @@ func getSelfAssignmentsList(c *gin.Context) {
   c.Set("list", list)
 }
 
+func getUserAssignmentsList(c *gin.Context) {
+  user_id, err := getIntParam(c, "id")
+  if err != nil {
+    forwardWarning(c, defaultPage, err.Error())
+    return
+  }
+  list := listUserAssignments(user_id)
+  c.Set("list", list)
+  c.Set("id", user_id)
+}
+
 // --- local helpers ---
 
 func handleAssignmentAction(c *gin.Context, action (func(int, int) error), message string) {

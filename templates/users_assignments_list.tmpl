@@ -1,0 +1,40 @@
+  <table class="list">
+    <thead>
+      <tr>
+        <td>{{"Team"|T}}</td>
+        <td>{{"Date"|T}}</td>
+        <td>{{"Time"|T}}</td>
+        <td>{{"Status"|T}}</td>
+        <td>{{"Actions"|T}}</td>
+      </tr>
+    </thead>
+    <tbody>
+      {{$is_admin := .self.IsAdmin}}
+      {{$lang := .lang}}
+      {{range .list}}
+      <tr>
+        <td>
+          <a href="/events/view/{{.EventId}}" {{if eq .EventStatus -2}}class="canceled"{{end}}>{{.TeamName}}</a>
+        </td>
+        <td>
+          {{.StartAt.Format (dateFormat $lang)}}
+        </td>
+        <td>
+          {{.StartAt.Format timeFormat}} &ndash; {{.FinishAt.Format timeFormat}}
+        </td>
+        <td>
+          {{T (statusTitle "assignment" .Status)}}
+        </td>
+        <td>
+          {{if eq .Status -2}}
+          {{else}}
+          <a href="#" data-action="/assignments/cancel/{{.EventId}}">{{"Cancel"|T}}</a>
+          {{end}}
+          {{if $is_admin}}
+          <a href="#" data-action="/assignments/delete/{{.EventId}}">{{"Delete"|T}}</a>
+          {{end}}
+        </td>
+      </tr>
+      {{end}}
+    </tbody>
+  </table>

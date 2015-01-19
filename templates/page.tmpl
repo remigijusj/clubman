@@ -95,6 +95,8 @@
           {{template "users_create.tmpl" . }}
         {{else if eq .page "users_update"}}
           {{template "users_update.tmpl" . }}
+        {{else if eq .page "users_view"}}
+          {{template "users_view.tmpl" . }}
 
         {{else if eq .page "teams"}}
           {{template "teams.tmpl" . }}
