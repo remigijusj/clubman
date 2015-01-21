@@ -199,57 +199,6 @@ func (self TeamEventsData) iterate(callback func(time.Time) bool) int {
   return cnt
 }
 
-func listWeekEventsGrouped(date time.Time) [][][]EventRecord {
-  from := date
-  till := date.AddDate(0, 0, 7)
-
-  data := make([][][]EventRecord, 3) // SEE: chooseWeekRow
-  for w := 0; w < len(data); w++ {
-    data[w] = make([][]EventRecord, 7)
-    for d := 0; d < 7; d++ {
-      data[w][d] = []EventRecord{}
-    }
-  }
-
-  rows, err := query["events_period"].Query(from.Format(dateFormat), till.Format(dateFormat))
-  list := listEvents(rows, err)
-
-  for _, event := range list {
-    d := event.StartAt.Truncate(24 * time.Hour)
-    w := chooseWeekRow(event.StartAt)
-    i := wdIndex(d)
-    data[w][i] = append(data[w][i], event)
-  }
-
-  return data
-}
-
-func listMonthEventsGrouped(date time.Time) [][][]EventRecord {
-  from := weekFirst(date)
-  till := weekFirst(date.AddDate(0, 1, 0)).AddDate(0, 0, 7)
-  weeks := daysDiff(from, till) / 7
-
-  data := make([][][]EventRecord, weeks)
-  for w := 0; w < len(data); w++ {
-    data[w] = make([][]EventRecord, 7)
-    for d := 0; d < 7; d++ {
-      data[w][d] = []EventRecord{}
-    }
-  }
-
-  rows, err := query["events_period"].Query(from.Format(dateFormat), till.Format(dateFormat))
-  list := listEvents(rows, err)
-
-  for _, event := range list {
-    d := event.StartAt.Truncate(24 * time.Hour)
-    w := daysDiff(from, d) / 7
-    i := wdIndex(d)
-    data[w][i] = append(data[w][i], event)
-  }
-
-  return data
-}
-
 func fetchEvent(event_id int) (EventForm, error) {
   var form EventForm
   err := query["event_select"].QueryRow(event_id).Scan(&form.TeamId, &form.StartAt, &form.Minutes, &form.Status)
@@ -312,12 +261,4 @@ func parseEventForm(form *EventForm, lang string) error {
 
 func minutesValid(minutes int) bool {
   return minutes > 0 && minutes < 6 * 60
-}
-
-func chooseWeekRow(t time.Time) int {
-  switch h := t.Hour(); {
-  case h < 12: return 0;
-  case h < 16: return 1;
-  default:     return 2;
-  }
 }

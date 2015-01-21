@@ -140,7 +140,7 @@ func mapAssignedPeriod(user_id int, from, till time.Time) map[string]bool {
     if err != nil {
       log.Printf("[APP] USER-ASSIGNMENTS-PERIOD error: %s\n", err)
     } else {
-      data[when.UTC().Format(dateFormat)] = true // <<< key len
+      data[when.UTC().Format(dateFormat)] = true
     }
   }
   if err := rows.Err(); err != nil {
