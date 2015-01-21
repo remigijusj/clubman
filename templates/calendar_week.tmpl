@@ -5,11 +5,11 @@
       <ul class="calendar">
         <li class="title">
           <div class="left">
-            <a href="?date={{.prev.Format "2006-01-02"}}"><i><small>{{"Prev"|T}}</small></i></a>
+            <a href="?date={{printDate .prev}}"><i><small>{{"Prev"|T}}</small></i></a>
           </div>
-          <span class="date changer">{{.date.Format (dateFormat .lang)}}</span>
+          <a href="#" class="date changer">{{localDate .date .lang}}</a>
           <div class="right">
-            <a href="?date={{.next.Format "2006-01-02"}}"><i><small>{{"Next"|T}}</small></i></a>
+            <a href="?date={{printDate .next}}"><i><small>{{"Next"|T}}</small></i></a>
           </div>
         </li>
         <li class="day-header">
@@ -60,7 +60,7 @@
         <li class="week">
           {{range $d, $list := $week}}
           {{$date := calcMonthDate $date 0 $d}}
-          <div class="small-1 medium-1 large-1 day {{if index $assigned ($date.Format "2006-01-02")}}active{{end}} {{if eq $date.String $today.String}}today{{end}}">
+          <div class="small-1 medium-1 large-1 day {{if index $assigned (printDate $date)}}active{{end}} {{if eq $date.String $today.String}}today{{end}}">
             <div class="num"></div>
             {{range $list}}
             <div class="inner">
@@ -68,7 +68,7 @@
                 {{$team := (index $teams .TeamId)}}
                 <b>{{$team.Name}}</b><br/>
                 {{$team.UserName}}<br/>
-                {{.StartAt.Format timeFormat}} &ndash; {{.FinishAt.Format timeFormat}}
+                {{printTime .StartAt}} &ndash; {{printTime .FinishAt}}
               </a>
             </div>
             {{end}}

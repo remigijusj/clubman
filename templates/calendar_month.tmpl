@@ -5,11 +5,11 @@
       <ul class="calendar">
         <li class="title">
           <div class="left">
-            <a href="?date={{.prev.Format "2006-01-02"}}"><i><small>{{"Prev"|T}}</small></i></a>
+            <a href="?date={{printDate .prev}}"><i><small>{{"Prev"|T}}</small></i></a>
           </div>
-          <span class="date changer">{{.date.Format "January"|T}}</span>
+          <a href="#" class="date changer">{{.date.Format "January"|T}}</a>
           <div class="right">
-            <a href="?date={{.next.Format "2006-01-02"}}"><i><small>{{"Next"|T}}</small></i></a>
+            <a href="?date={{printDate .next}}"><i><small>{{"Next"|T}}</small></i></a>
           </div>
         </li>
         <li class="day-header">
@@ -52,12 +52,12 @@
         <li class="week">
           {{range $d, $list := $week}}
           {{$date := calcMonthDate $date $w $d}}
-          <div class="small-1 medium-1 large-1 day {{if index $assigned ($date.Format "2006-01-02")}}active{{end}} {{if eq $date.String $today.String}}today{{end}} {{if eq $date.Month $prev.Month}}previous-month{{end}} {{if eq $date.Month $next.Month}}next-month{{end}}">
+          <div class="small-1 medium-1 large-1 day {{if index $assigned (printDate $date)}}active{{end}} {{if eq $date.String $today.String}}today{{end}} {{if eq $date.Month $prev.Month}}previous-month{{end}} {{if eq $date.Month $next.Month}}next-month{{end}}">
             <div class="num">{{$date.Day}}</div>
             <div class="inner">
               {{range $list}}
               {{$team := (index $teams .TeamId)}}
-              <a href="/events/view/{{.Id}}" title="{{.StartAt.Format timeFormat}} &ndash; {{.FinishAt.Format timeFormat}}">{{$team.Name}}</a><br/>
+              <a href="/events/view/{{.Id}}" title="{{printTime .StartAt}} &ndash; {{printTime .FinishAt}}">{{$team.Name}}</a><br/>
               {{end}}
             </div>
           </div>

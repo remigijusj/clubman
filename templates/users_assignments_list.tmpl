@@ -17,13 +17,13 @@
           <a href="/events/view/{{.EventId}}" {{if eq .EventStatus -2}}class="canceled"{{end}}>{{.TeamName}}</a>
         </td>
         <td>
-          {{.StartAt.Format (dateFormat $lang)}}
+          {{localDate .StartAt $lang}}
         </td>
         <td>
-          {{.StartAt.Format timeFormat}} &ndash; {{.FinishAt.Format timeFormat}}
+          {{printTime .StartAt}} &ndash; {{printTime .FinishAt}}
         </td>
         <td>
-          {{T (statusTitle "assignment" .Status)}}
+          {{statusTitle "assignment" .Status|T}}
         </td>
         <td>
           {{if eq .Status -2}}

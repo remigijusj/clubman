@@ -19,13 +19,13 @@
               <a href="/events/view/{{.Id}}">{{"Event"|T}} {{.Id}}</a>
             </td>
             <td>
-              {{.StartAt.Format (dateFormat $lang)}}
+              {{localDate .StartAt $lang}}
             </td>
             <td>
               {{.StartAt.Format "Monday"|T}}
             </td>
             <td>
-              {{.StartAt.Format timeFormat}}
+              {{printTime .StartAt}}
             </td>
             <td>
               {{.Minutes}} {{"min"|T}}

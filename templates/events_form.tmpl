@@ -58,7 +58,7 @@
       <select id="status" name="status">
         {{$status := .form.Status}}
         {{range statusList "event"}}
-        <option value="{{.Status}}" {{if eq $status .Status}}selected{{end}}>{{T .Title}}</option>
+        <option value="{{.Status}}" {{if eq $status .Status}}selected{{end}}>{{.Title|T}}</option>
         {{end}}
       </select>
     </div>

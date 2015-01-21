@@ -3,6 +3,7 @@ package main
 import (
   "html/template"
   "net/http"
+  "time"
 
   "github.com/gin-gonic/gin"
 )
@@ -24,8 +25,9 @@ var helpers = template.FuncMap{
   "userName":      userName,
   "teamName":      teamName,
   "serverName": func() string { return serverName },
-  "timeFormat": func() string { return timeFormat },
-  "dateFormat": func(lang string) string { return dateFormats[lang] },
+  "printTime":  func(t time.Time) string { return t.Format(timeFormat) },
+  "printDate":  func(t time.Time) string { return t.Format(dateFormat) },
+  "localDate":  func(t time.Time, lang string) string { return t.Format(dateFormats[lang]) },
   "truncate":   func(i int, s string) string { return s[0:i] },
   "T": func(key string) string { return key },
 }

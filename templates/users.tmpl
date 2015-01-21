@@ -28,7 +28,7 @@
               {{.Email}}
             </td>
             <td>
-              {{T (statusTitle "user" .Status)}}
+              {{statusTitle "user" .Status|T}}
             </td>
             <td>
               {{if ne .Id $selfId }}

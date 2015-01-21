@@ -19,8 +19,8 @@
               <a href="/events/update/{{.id}}" class="button tiny radius right right-1">{{"Edit"|T}}</a>
             {{end}}
             <b>{{"Team"|T}}</b>: <a href="/teams/view/{{.form.TeamId}}">{{teamName .form.TeamId}}</a><br/>
-            <b>{{"Date"|T}}</b>: {{.form.StartAt.Format (dateFormat .lang)}}<br/>
-            <b>{{"Time"|T}}</b>: {{.form.StartAt.Format timeFormat}} &ndash; {{.form.FinishAt.Format timeFormat}}<br/>
+            <b>{{"Date"|T}}</b>: {{localDate .form.StartAt .lang}}<br/>
+            <b>{{"Time"|T}}</b>: {{printTime .form.StartAt}} &ndash; {{printTime .form.FinishAt}}<br/>
             <b>{{"Participants"|T}}</b>: {{len .list}}<br/>
           </small>
         </div>
