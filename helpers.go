@@ -150,6 +150,19 @@ func getFlashedForm(c *gin.Context) interface{} {
   return session.Values["form"]
 }
 
+func setSavedPath(c *gin.Context, path string) {
+  session, _ := cookie.Get(c.Request, "saved-path")
+  defer session.Save(c.Request, c.Writer)
+  session.Values["path"] = path
+}
+
+func getSavedPath(c *gin.Context) interface{} {
+  session, _ := cookie.Get(c.Request, "saved-path")
+  defer session.Save(c.Request, c.Writer)
+  session.Options.MaxAge = -1
+  return session.Values["path"]
+}
+
 func deleteSession(c *gin.Context) {
   session, _ := cookie.Get(c.Request, sessionKey)
   defer session.Save(c.Request, c.Writer)

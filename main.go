@@ -87,13 +87,18 @@ func authRequired() gin.HandlerFunc {
   return func(c *gin.Context) {
     if auth := getSessionAuthInfo(c); auth != nil {
       c.Set("self", *auth)
-      return
+      if path, ok := getSavedPath(c).(string); ok {
+        c.Redirect(302, path)
+        c.Abort(0)
+      }
+    } else {
+      if c.Request.URL.Path != "/" {
+        setSessionAlert(c, &Alert{"warning", TC(c, "You are not authorized to view this page")})
+      }
+      setSavedPath(c, c.Request.URL.Path)
+      c.Redirect(302, "/login")
+      c.Abort(0)
     }
-    if c.Request.URL.Path != "/" {
-      setSessionAlert(c, &Alert{"warning", TC(c, "You are not authorized to view this page")})
-    }
-    c.Redirect(302, "/login")
-    c.Abort(0)
   }
 }
 
