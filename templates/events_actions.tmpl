@@ -12,16 +12,20 @@
           <small>
             {{if eq .form.Status 0}}
               {{if not .signed_up}}
-              <input type="button" data-action="/assignments/create/{{.id}}" class="button tiny radius right" value="{{"Signup"|T}}" />
+              <input type="button" data-action="/assignments/create/{{.id}}" class="button tiny radius right" value="{{"Signup myself"|T}}" />
               {{else}}
               <input type="button" data-action="/assignments/delete/{{.id}}" class="button tiny radius right" value="{{"Cancel myself"|T}}" />
               {{end}}
             {{end}}
-            {{if .self.IsAdmin}}
-              <a href="/events/update/{{.id}}" class="button tiny radius right right-1">{{"Edit"|T}}</a>
-            {{end}}
             <b>{{"Time"|T}}</b>: {{printTime .form.StartAt}} &ndash; {{printTime .form.FinishAt}}<br/>
             <b>{{"Instructor"|T}}</b>: {{userName .team.InstructorId}}<br/>
+            {{if .self.IsAdmin}}
+            <div class="right">
+              <a href="/events/update/{{.id}}" class="button tiny radius right">{{"Edit"|T}}</a>
+              <input type="button" class="button tiny radius right right-1" value="{{"Add user"|T}}" />
+              &nbsp;
+            </div>
+            {{end}}
             {{if gt .team.UsersMin 0}}
             <b>{{"Min participants"|T}}</b>: {{.team.UsersMin}}<br/>
             {{end}}
