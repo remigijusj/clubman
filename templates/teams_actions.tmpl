@@ -20,7 +20,7 @@
       </div>
     </div>
   </div>
-  {{template "teams_events_list.tmpl" .}}
+  {{template "teams_events_list.tmpl" . }}
 {{end}}
 {{define "teams_update.tmpl"}}
   <div class="row">
@@ -71,7 +71,7 @@
 
       <div class="panel">
         <form action="/events/create/{{.id}}" method="POST">
-          {{template "teams_events_form.tmpl" .}}
+          {{template "teams_events_form.tmpl" . }}
           <div class="row end">
             <div class="columns">
               <input type="submit" class="button tiny radius" value="{{"Add events"|T}}" />
@@ -84,5 +84,5 @@
       </div>
     </div>
   </div>
-  {{template "teams_events_list.tmpl" .}}
+  {{template "teams_events_list.tmpl" . }}
 {{end}}

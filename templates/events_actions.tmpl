@@ -1,43 +1,67 @@
 {{define "events_view.tmpl"}}
-  <form method="POST">
-    <div class="row">
-      <div class="large-6 medium-8 columns">
-        <h4>
-          <a href="/teams/view/{{.form.TeamId}}">{{.team.Name}}</a>
-          {{localDate .form.StartAt .lang}}
-          {{if eq .form.Status -2}} &ndash; {{"Canceled"|T}}{{end}}
-        </h4>
-  
-        <div class="panel">
-          <small>
-            {{if eq .form.Status 0}}
-              {{if not .signed_up}}
-              <input type="button" data-action="/assignments/create/{{.id}}" class="button tiny radius right" value="{{"Signup myself"|T}}" />
-              {{else}}
-              <input type="button" data-action="/assignments/delete/{{.id}}" class="button tiny radius right" value="{{"Cancel myself"|T}}" />
-              {{end}}
+  <div class="row">
+    <div class="large-12 columns">
+      <h4>
+        <a href="/teams/view/{{.form.TeamId}}">{{.team.Name}}</a>
+        {{localDate .form.StartAt .lang}}
+        {{if eq .form.Status -2}} &ndash; {{"Canceled"|T}}{{end}}
+      </h4>
+    </div>
+  </div>
+  <div class="row end" {{if .self.IsAdmin}}data-equalizer{{end}}>
+    <div class="large-6 medium-6 columns" data-equalizer-watch>
+      <div class="panel" data-equalizer-watch>
+        <form method="POST">
+          {{if eq .form.Status 0}}
+            {{if not .signed_up}}
+            <input type="button" data-action="/assignments/create/{{.id}}" class="button tiny radius right" value="{{"Signup myself"|T}}" />
+            {{else}}
+            <input type="button" data-action="/assignments/delete/{{.id}}" class="button tiny radius right" value="{{"Cancel myself"|T}}" />
             {{end}}
+          {{end}}
+          <small>
             <b>{{"Time"|T}}</b>: {{printTime .form.StartAt}} &ndash; {{printTime .form.FinishAt}}<br/>
             <b>{{"Instructor"|T}}</b>: {{userName .team.InstructorId}}<br/>
-            {{if .self.IsAdmin}}
-            <div class="right">
-              <a href="/events/update/{{.id}}" class="button tiny radius right">{{"Edit"|T}}</a>
-              <input type="button" class="button tiny radius right right-1" value="{{"Add user"|T}}" />
-              &nbsp;
-            </div>
-            {{end}}
             {{if gt .team.UsersMin 0}}
             <b>{{"Min participants"|T}}</b>: {{.team.UsersMin}}<br/>
             {{end}}
             {{if gt .team.UsersMax 0}}
             <b>{{"Max participants"|T}}</b>: {{.team.UsersMax}}<br/>
             {{end}}
-            <b>{{"Participants"|T}}</b>: {{len .list}}<br/>
+            <b>{{"Participants"|T}}</b>: {{len .list}}
           </small>
-        </div>
+        </form>
       </div>
     </div>
-    {{template "events_assignments_list.tmpl" .}}
+    {{if .self.IsAdmin}}
+    <div class="large-6 medium-6 columns">
+      <div class="panel" data-equalizer-watch>
+        <form method="POST" action="/assignments/create/{{.id}}">
+          <div class="row">
+            <div class="small-8 columns">
+              <select name="user_id" id="user_id" class="select2">
+                <option value="0">{{"Choose user"|T}}</option>
+                {{range (listRecords "users_on_active")}}
+                <option value="{{.Id}}">{{.Text}}</option>
+                {{end}} 
+              </select>
+            </div>
+            <div class="small-4 columns">
+              <input type="submit" class="button tiny radius right" value="{{"Signup user"|T}}" />
+            </div>
+          </div>
+          <div class="row end">
+            <div class="columns">
+              <a href="/events/update/{{.id}}" class="button tiny radius">{{"Edit event"|T}}</a>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+    {{end}}
+  </div>
+  <form method="POST">
+    {{template "events_assignments_list.tmpl" . }}
   </form>
 {{end}}
 {{define "events_update.tmpl"}}

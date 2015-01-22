@@ -211,7 +211,7 @@ func mapUserNames(user_ids []int) map[int]string {
     return data
   }
 
-  rows, err := queryMultiple("user_names", user_ids)
+  rows, err := queryMultiple("users_names", user_ids)
   if err != nil {
     log.Printf("[APP] USER-NAMES error: %s\n", err)
     return data

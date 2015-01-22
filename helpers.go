@@ -95,7 +95,7 @@ func getIntParam(c *gin.Context, name string) (int, error) {
 
 // NOTE: optional, therefore not error
 func getIntQuery(c *gin.Context, name string) (int, bool) {
-  s := c.Request.URL.Query().Get(name)
+  s := c.Request.FormValue(name)
   v, err := strconv.Atoi(s)
   if err != nil {
     return 0, false

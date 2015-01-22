@@ -1,6 +1,7 @@
 package main
 
 import (
+  "errors"
   "fmt"
 
   "github.com/gin-gonic/gin"
@@ -39,21 +40,33 @@ func getUserAssignmentsList(c *gin.Context) {
 
 func handleAssignmentAction(c *gin.Context, action (func(int, int) error), message string) {
   event_id, err := getIntParam(c, "event_id")
-  auth := currentUser(c)
-  if err != nil || auth == nil {
+  self := currentUser(c)
+  if err != nil || self == nil {
     forwardWarning(c, defaultPage, err.Error())
     return
   }
-  user_id, ok := getIntQuery(c, "user_id")
-  if !isAdmin(c) || !ok {
-    user_id = auth.Id // defaults to self
+  user_id, err := extractUserId(c, self)
+  if err == nil {
+    err = action(event_id, user_id)
   }
-  err = action(event_id, user_id)
   if err != nil {
     forwardWarning(c, eventsViewPath(event_id), err.Error())
   } else {
     forwardTo(c, eventsViewPath(event_id), message)
   }
+}
+
+func extractUserId(c *gin.Context, self *AuthInfo) (int, error) {
+  if isAdmin(c) {
+    if user_id, ok := getIntQuery(c, "user_id"); ok {
+      if user_id > 0 {
+        return user_id, nil
+      } else {
+        return 0, errors.New("Please choose a user to signup")
+      }
+    }
+  }
+  return self.Id, nil
 }
 
 func eventsViewPath(event_id int) string {
