@@ -100,19 +100,6 @@ func createAssignment(event_id, user_id int) error {
   return nil
 }
 
-func cancelAssignment(event_id, user_id int) error {
-  res, err := query["assignment_status"].Exec(-2, event_id, user_id)
-  if err != nil {
-    log.Printf("[APP] ASSIGNMENTS-STATUS error: %s, %d, %d\n", err, event_id, user_id)
-    return errors.New("Assignment could not be updated")
-  }
-  num, err := res.RowsAffected()
-  if num == 0 || err != nil {
-    return errors.New("Assignment could not be updated")
-  }
-  return nil
-}
-
 func deleteAssignment(event_id, user_id int) error {
   res, err := query["assignment_delete"].Exec(event_id, user_id)
   if err != nil {

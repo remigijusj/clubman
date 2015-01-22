@@ -10,10 +10,6 @@ func handleAssignmentCreate(c *gin.Context) {
   handleAssignmentAction(c, createAssignment, "Assignment has been created")
 }
 
-func handleAssignmentCancel(c *gin.Context) {
-  handleAssignmentAction(c, cancelAssignment, "Assignment has been canceled")
-}
-
 func handleAssignmentDelete(c *gin.Context) {
   handleAssignmentAction(c, deleteAssignment, "Assignment has been deleted")
 }
@@ -43,16 +39,14 @@ func getUserAssignmentsList(c *gin.Context) {
 
 func handleAssignmentAction(c *gin.Context, action (func(int, int) error), message string) {
   event_id, err := getIntParam(c, "event_id")
-  if err != nil {
+  auth := currentUser(c)
+  if err != nil || auth == nil {
     forwardWarning(c, defaultPage, err.Error())
     return
   }
   user_id, ok := getIntQuery(c, "user_id")
-  if !ok {
-    // action of self if no user_id
-    if auth := currentUser(c); auth != nil {
-      user_id = auth.Id
-    }
+  if !isAdmin(c) || !ok {
+    user_id = auth.Id // defaults to self
   }
   err = action(event_id, user_id)
   if err != nil {

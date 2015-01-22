@@ -1,18 +1,18 @@
   <div class="row">
     <div class="large-12 columns">
+      {{$event_id := .id}}
+      {{$actions := and .self.IsAdmin (eq .form.Status 0)}}
       <table class="list">
         <thead>
           <tr>
             <td>{{"User"|T}}</td>
             <td>{{"Status"|T}}</td>
-            {{if .self.IsAdmin}}
+            {{if $actions}}
             <td>{{"Actions"|T}}</td>
             {{end}}
           </tr>
         </thead>
         <tbody>
-          {{$is_admin := .self.IsAdmin}}
-          {{$event_id := .id}}
           {{range .list}}
           <tr>
             <td>
@@ -21,13 +21,9 @@
             <td>
               {{statusTitle "assignment" .Status|T}}
             </td>
-            {{if $is_admin}}
+            {{if $actions}}
             <td>
-              {{if eq .Status -2}}
-              {{else}}
-              <a href="#" data-action="/assignments/cancel/{{$event_id}}?user_id={{.UserId}}">{{"Cancel"|T}}</a>
-              {{end}}
-              <a href="#" data-action="/assignments/delete/{{$event_id}}?user_id={{.UserId}}">{{"Delete"|T}}</a>
+              <a href="#" data-action="/assignments/delete/{{$event_id}}?user_id={{.UserId}}">{{"Cancel"|T}}</a>
             </td>
             {{end}}
           </tr>

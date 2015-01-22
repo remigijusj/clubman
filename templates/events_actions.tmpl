@@ -11,12 +11,10 @@
         <div class="panel">
           <small>
             {{if eq .form.Status 0}}
-              {{if .signed_up}}
-                {{if eq .signed_up.Status 0}}
-                <input type="button" data-action="/assignments/cancel/{{.id}}" class="button tiny radius right" value="{{"Cancel"|T}}" />
-                {{end}}
-              {{else}}
+              {{if not .signed_up}}
               <input type="button" data-action="/assignments/create/{{.id}}" class="button tiny radius right" value="{{"Signup"|T}}" />
+              {{else}}
+              <input type="button" data-action="/assignments/delete/{{.id}}" class="button tiny radius right" value="{{"Cancel myself"|T}}" />
               {{end}}
             {{end}}
             {{if .self.IsAdmin}}
@@ -51,7 +49,7 @@
               <input type="submit" class="button tiny radius" value="{{"Save"|T}}" />
               <input type="button" class="button tiny radius" value="{{"Delete"|T}}" data-action="/events/delete/{{.id}}" data-confirm="{{"Are you sure?"|T}}" />
               &nbsp;&nbsp;
-              <a href="/events/view/{{.id}}" class="info button tiny radius right">{{"Cancel"|T}}</a>
+              <a href="/events/view/{{.id}}" class="info button tiny radius right">{{"Back"|T}}</a>
             </div>
           </div>
         </form>

@@ -10,11 +10,13 @@
     </thead>
     <tbody>
       {{$is_admin := .self.IsAdmin}}
+      {{$user_id := .id}}
       {{$lang := .lang}}
       {{range .list}}
+      {{$canceled := eq .EventStatus -2}}
       <tr>
         <td>
-          <a href="/events/view/{{.EventId}}" {{if eq .EventStatus -2}}class="canceled"{{end}}>{{.TeamName}}</a>
+          <a href="/events/view/{{.EventId}}" {{if $canceled}}class="canceled"{{end}}>{{.TeamName}}</a>
         </td>
         <td>
           {{localDate .StartAt $lang}}
@@ -26,12 +28,12 @@
           {{statusTitle "assignment" .Status|T}}
         </td>
         <td>
-          {{if eq .Status -2}}
+          {{if $user_id}}
+            {{if $is_admin}}
+            <a href="#" data-action="/assignments/delete/{{.EventId}}?user_id={{$user_id}}">{{"Cancel"|T}}</a>
+            {{end}}
           {{else}}
-          <a href="#" data-action="/assignments/cancel/{{.EventId}}">{{"Cancel"|T}}</a>
-          {{end}}
-          {{if $is_admin}}
-          <a href="#" data-action="/assignments/delete/{{.EventId}}">{{"Delete"|T}}</a>
+            <a href="#" data-action="/assignments/delete/{{.EventId}}">{{"Cancel"|T}}</a>
           {{end}}
         </td>
       </tr>
