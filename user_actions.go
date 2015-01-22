@@ -63,7 +63,7 @@ func getProfile(c *gin.Context) {
     err = errors.New("missing self")
   }
   if err != nil {
-    forwardTo(c, defaultPage, "Critical error happened, please contact website admin")
+    forwardWarning(c, defaultPage, panicError)
     c.Abort(0)
   } else {
     c.Set("form", form)

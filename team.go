@@ -112,9 +112,3 @@ func validateTeam(name string, users_min, users_max, instructor_id int) error {
   }
   return nil
 }
-
-func teamName(team_id int) (string, error) {
-  var name string
-  err := query["team_name"].QueryRow(team_id).Scan(&name)
-  return name, err
-}

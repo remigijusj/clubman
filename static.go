@@ -29,6 +29,7 @@ const (
   defaultPage = "/calendar/week" // not "/"
   timeFormat = "15:04"
   dateFormat = "2006-01-02" // db
+  panicError = "Critical error happened, please contact website admin"
 
   reloadTmpl = true // DEBUG mode
 )
@@ -69,8 +70,7 @@ var queries = map[string]string{
   "team_insert":        "INSERT INTO teams(name, users_min, users_max, instructor_id) VALUES (?, ?, ?, ?)",
   "team_update":        "UPDATE teams SET name=?, users_min=?, users_max=?, instructor_id=? WHERE id=?",
   "team_delete":        "DELETE FROM teams WHERE id=?",
-  "team_name":          "SELECT name FROM teams WHERE id=?",
-  "team_names_all":     "SELECT id, name FROM teams ORDEr BY name",
+  "team_names_all":     "SELECT id, name FROM teams ORDER BY name",
 
   "events_team":        "SELECT id, team_id, start_at, minutes, status FROM events WHERE team_id=? AND start_at >= date('now') ORDER BY start_at",
   "events_period":      "SELECT id, team_id, start_at, minutes, status FROM events WHERE start_at >= ? AND start_at < ? AND status>=0 ORDER BY start_at",

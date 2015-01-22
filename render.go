@@ -23,7 +23,6 @@ var helpers = template.FuncMap{
   "statusTitle":   statusTitle,
   "statusList":    statusList,
   "userName":      userName,
-  "teamName":      teamName,
   "serverName": func() string { return serverName },
   "printTime":  func(t time.Time) string { return t.Format(timeFormat) },
   "printDate":  func(t time.Time) string { return t.Format(dateFormat) },

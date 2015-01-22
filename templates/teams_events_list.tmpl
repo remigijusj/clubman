@@ -3,10 +3,9 @@
       <table class="list">
         <thead>
           <tr>
-            <td>{{"Event"|T}}</td>
             <td>{{"Date"|T}}</td>
             <td>{{"Weekday"|T}}</td>
-            <td>{{"Start time"|T}}</td>
+            <td>{{"Time"|T}}</td>
             <td>{{"Duration"|T}}</td>
             <td>{{"Participants"|T}}</td>
           </tr>
@@ -16,16 +15,13 @@
           {{range .list}}
           <tr>
             <td>
-              <a href="/events/view/{{.Id}}">{{"Event"|T}} {{.Id}}</a>
-            </td>
-            <td>
-              {{localDate .StartAt $lang}}
+              <a href="/events/view/{{.Id}}">{{localDate .StartAt $lang}}</a>
             </td>
             <td>
               {{.StartAt.Format "Monday"|T}}
             </td>
             <td>
-              {{printTime .StartAt}}
+              {{printTime .StartAt}} &ndash; {{printTime .FinishAt}}
             </td>
             <td>
               {{.Minutes}} {{"min"|T}}

@@ -21,7 +21,7 @@ func handleAssignmentDelete(c *gin.Context) {
 func getSelfAssignmentsList(c *gin.Context) {
   self := currentUser(c)
   if self == nil {
-    forwardWarning(c, defaultPage, "Critical error happened, please contact website admin")
+    forwardWarning(c, defaultPage, panicError)
     return
   }
   list := listUserAssignments(self.Id)

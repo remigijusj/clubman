@@ -37,7 +37,21 @@ func getEventForm(c *gin.Context) {
   }
 }
 
-func getEventAssignmentsList(c *gin.Context) {
+func getEventTeam(c *gin.Context) {
+  var team TeamForm
+  form, err := c.Get("form")
+  if event, ok := form.(EventForm); ok {
+    team, err = fetchTeam(event.TeamId)
+  }
+  if err != nil {
+    forwardWarning(c, defaultPage, panicError)
+    c.Abort(0)
+  } else {
+    c.Set("team", team)
+  }
+}
+
+func getEventAssignments(c *gin.Context) {
   event_id, err := getIntParam(c, "id")
   if err != nil {
     forwardWarning(c, defaultPage, err.Error())

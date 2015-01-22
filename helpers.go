@@ -88,7 +88,7 @@ func getIntParam(c *gin.Context, name string) (int, error) {
   s := c.Params.ByName(name)
   v, err := strconv.Atoi(s)
   if err != nil {
-    return 0, errors.New("Critical error happened, please contact website admin")
+    return 0, errors.New(panicError)
   }
   return v, nil
 }
