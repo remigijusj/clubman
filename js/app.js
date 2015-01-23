@@ -1,19 +1,13 @@
 $(function(){
   // foundation
   $(document).foundation();
-  // buttons
+  // actions
   $('input[data-action],a[data-action]').click(function(e){
     e.preventDefault();
-    var el = $(this);
-    var form = el.closest('form');
-    var action = el.data('action');
-    if (action == '') {
-      action = el.attr('href');
-    }
-    var consent = el.data('confirm');
-    if (!consent || confirm(consent)) {
-      form.prop('action', action).submit();
-    }
+    performAction($(this));
+  });
+  $('select[data-action]').change(function(){
+    performAction($(this));
   });
   // datepicker
   $('.date').fdatepicker({
@@ -23,7 +17,8 @@ $(function(){
   });
   $('.date.changer').on('changeDate', function(e){
     var date = e.date.toISOString().substr(0,10);
-    location.href = location.href.replace(/\?date=.*|$/, '?date='+date)
+    Qurl().query('date', date);
+    location.reload();
   });
   // select
   $.extend($.fn.select2.defaults, $.fn.select2.locales[language]);
@@ -33,4 +28,17 @@ $(function(){
 function dateFormat() {
   if (language == 'da') return 'dd/mm yyyy';
   return 'yyyy-mm-dd';
+}
+
+function performAction(el) {
+  var form = el.closest('form');
+  var action = el.data('action') || el.attr('href');
+  var consent = el.data('confirm');
+  if (consent && !confirm(consent)) {
+    return;
+  }
+  if (action) {
+    form.prop('action', action);
+  }
+  form.submit();
 }

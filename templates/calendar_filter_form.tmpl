@@ -1,0 +1,18 @@
+  <div class="row">
+    <div class="small-6 columns">
+      <form method="GET">
+        <div class="row">
+          <div class="small-8 columns">
+            {{$team_id := .team_id}}
+            <select name="team_id" id="team_id" class="select2" data-action>
+              <option value="0">{{"All teams"|T}}</option>
+              {{range (listRecords "team_names_all")}}
+              <option value="{{.Id}}" {{if eq .Id $team_id}}selected{{end}}>{{.Text}}</option>
+              {{end}} 
+            </select>
+            <input type="hidden" name="date" value="{{printDate .date}}" />
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>

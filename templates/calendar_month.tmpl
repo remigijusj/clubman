@@ -2,14 +2,15 @@
     <div class="columns">
       <h4>{{"Calendar"|T}}</h4>
 
+      {{template "calendar_filter_form.tmpl" . }}
       <ul class="calendar">
         <li class="title">
           <div class="left">
-            <a href="?date={{printDate .prev}}"><i><small>{{"Prev"|T}}</small></i></a>
+            <a href="?date={{printDate .prev}}{{if ne .team_id 0}}&team_id={{.team_id}}{{end}}"><i><small>{{"Prev"|T}}</small></i></a>
           </div>
-          <a href="#" class="date changer">{{.date.Format "January"|T}}</a>
+          <a href="#" class="date changer" data-date-start-view="1">{{.date.Format "January"|T}}</a>
           <div class="right">
-            <a href="?date={{printDate .next}}"><i><small>{{"Next"|T}}</small></i></a>
+            <a href="?date={{printDate .next}}{{if ne .team_id 0}}&team_id={{.team_id}}{{end}}"><i><small>{{"Next"|T}}</small></i></a>
           </div>
         </li>
         <li class="day-header">

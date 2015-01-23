@@ -19,7 +19,10 @@ func getWeekData(c *gin.Context) {
   c.Set("next", next)
   c.Set("today", today())
 
-  e := listWeekEventsGrouped(d)
+  team_id, _ := getIntQuery(c, "team_id")
+  c.Set("team_id", team_id)
+
+  e := listWeekEventsGrouped(d, team_id)
   c.Set("events", e)
   t := indexTeams()
   c.Set("teams", t)
@@ -36,12 +39,15 @@ func getMonthData(c *gin.Context) {
   prev := d.AddDate(0, -1, 0)
   next := d.AddDate(0, 1, 0)
 
+  team_id, _ := getIntQuery(c, "team_id")
+  c.Set("team_id", team_id)
+
   c.Set("date", d)
   c.Set("prev", prev)
   c.Set("next", next)
   c.Set("today", today())
 
-  e := listMonthEventsGrouped(d)
+  e := listMonthEventsGrouped(d, team_id)
   c.Set("events", e)
   t := indexTeams()
   c.Set("teams", t)

@@ -4,22 +4,16 @@ import (
   "time"
 )
 
-func listWeekEventsGrouped(date time.Time) [][][]EventRecord {
+func listWeekEventsGrouped(date time.Time, team_id int) [][][]EventRecord {
   from := date
   till := date.AddDate(0, 0, 7)
-
-  data := make([][][]EventRecord, 3) // SEE: chooseWeekRow
-  for w := 0; w < len(data); w++ {
-    data[w] = make([][]EventRecord, 7)
-    for d := 0; d < 7; d++ {
-      data[w][d] = []EventRecord{}
-    }
-  }
+  data := prepareNestedSlice(3) // SEE: chooseWeekRow
 
   rows, err := query["events_period"].Query(from.Format(dateFormat), till.Format(dateFormat))
   list := listEvents(rows, err)
 
   for _, event := range list {
+    if team_id > 0 && event.TeamId != team_id { continue }
     d := event.StartAt.Truncate(24 * time.Hour)
     w := chooseWeekRow(event.StartAt)
     i := wdIndex(d)
@@ -29,29 +23,34 @@ func listWeekEventsGrouped(date time.Time) [][][]EventRecord {
   return data
 }
 
-func listMonthEventsGrouped(date time.Time) [][][]EventRecord {
+func listMonthEventsGrouped(date time.Time, team_id int) [][][]EventRecord {
   from := weekFirst(date)
   till := weekFirst(date.AddDate(0, 1, 0)).AddDate(0, 0, 7)
   weeks := daysDiff(from, till) / 7
-
-  data := make([][][]EventRecord, weeks)
-  for w := 0; w < len(data); w++ {
-    data[w] = make([][]EventRecord, 7)
-    for d := 0; d < 7; d++ {
-      data[w][d] = []EventRecord{}
-    }
-  }
+  data := prepareNestedSlice(weeks)
 
   rows, err := query["events_period"].Query(from.Format(dateFormat), till.Format(dateFormat))
   list := listEvents(rows, err)
 
   for _, event := range list {
+    if team_id > 0 && event.TeamId != team_id { continue }
     d := event.StartAt.Truncate(24 * time.Hour)
     w := daysDiff(from, d) / 7
     i := wdIndex(d)
     data[w][i] = append(data[w][i], event)
   }
 
+  return data
+}
+
+func prepareNestedSlice(rows int) [][][]EventRecord {
+  data := make([][][]EventRecord, rows)
+  for w := 0; w < len(data); w++ {
+    data[w] = make([][]EventRecord, 7)
+    for d := 0; d < 7; d++ {
+      data[w][d] = []EventRecord{}
+    }
+  }
   return data
 }
 
