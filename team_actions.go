@@ -22,6 +22,8 @@ func getTeamEventsData(c *gin.Context) {
   } else {
     list := listTeamEvents(team_id)
     c.Set("list", list)
+    counts := countEventAssignments(list)
+    c.Set("counts", counts)
   }
 }
 

@@ -91,4 +91,5 @@ var queries = map[string]string{
   "assignment_insert":  "INSERT INTO assignments(event_id, user_id, status) VALUES (?, ?, ?)",
   "assignment_delete":  "DELETE FROM assignments WHERE event_id=? AND user_id=?",
   "assignments_delete_event": "DELETE FROM assignments WHERE event_id=?",
+  "assignments_count":  "SELECT event_id, count(user_id) FROM assignments WHERE event_id in (?) GROUP BY event_id",
 }

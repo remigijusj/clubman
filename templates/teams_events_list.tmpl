@@ -11,6 +11,7 @@
           </tr>
         </thead>
         <tbody>
+          {{$counts := .counts}}
           {{$lang := .lang}}
           {{range .list}}
           <tr>
@@ -27,7 +28,7 @@
               {{.Minutes}} {{"min"|T}}
             </td>
             <td>
-              0
+              {{index $counts .Id}}
             </td>
           </tr>
           {{end}}

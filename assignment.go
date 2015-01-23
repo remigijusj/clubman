@@ -135,3 +135,37 @@ func mapAssignedPeriod(user_id int, from, till time.Time) map[string]bool {
   }
   return data
 }
+
+func countEventAssignments(list []EventRecord) map[int]int {
+  data := make(map[int]int, len(list))
+  if len(list) == 0 {
+    return data
+  }
+
+  event_ids := make([]int, len(list))
+  for i, item := range list {
+    event_ids[i] = item.Id
+  }
+
+  rows, err := queryMultiple("assignments_count", event_ids)
+  if err != nil {
+    log.Printf("[APP] ASSIGNMENTS-COUNT error: %s\n", err)
+    return data
+  }
+  defer rows.Close()
+
+  var event_id, count int
+  for rows.Next() {
+    err := rows.Scan(&event_id, &count)
+    if err != nil {
+      log.Printf("[APP] ASSIGNMENTS-COUNT error: %s\n", err)
+    } else {
+      data[event_id] = count
+    }
+  }
+  if err := rows.Err(); err != nil {
+    log.Printf("[APP] ASSIGNMENTS-COUNT error: %s\n", err)
+  }
+
+  return data
+}
