@@ -1,34 +1,39 @@
   <div class="row">
-    <div class="large-12 columns">
+    <div class="columns">
+
       {{$event_id := .id}}
       {{$actions := and .self.IsAdmin (eq .form.Status 0)}}
-      <table class="list">
-        <thead>
-          <tr>
-            <td>{{"User"|T}}</td>
-            <td>{{"Status"|T}}</td>
-            {{if $actions}}
-            <td>{{"Actions"|T}}</td>
+
+      <form method="POST">
+        <table class="list">
+          <thead>
+            <tr>
+              <td>{{"User"|T}}</td>
+              <td>{{"Status"|T}}</td>
+              {{if $actions}}
+              <td>{{"Actions"|T}}</td>
+              {{end}}
+            </tr>
+          </thead>
+          <tbody>
+            {{range .list}}
+            <tr>
+              <td>
+                <a href="/users/view/{{.UserId}}">{{.UserName}}</a>
+              </td>
+              <td>
+                {{statusTitle "assignment" .Status|T}}
+              </td>
+              {{if $actions}}
+              <td>
+                <a href="/assignments/delete/{{$event_id}}?user_id={{.UserId}}" data-action>{{"Cancel"|T}}</a>
+              </td>
+              {{end}}
+            </tr>
             {{end}}
-          </tr>
-        </thead>
-        <tbody>
-          {{range .list}}
-          <tr>
-            <td>
-              <a href="/users/view/{{.UserId}}">{{.UserName}}</a>
-            </td>
-            <td>
-              {{statusTitle "assignment" .Status|T}}
-            </td>
-            {{if $actions}}
-            <td>
-              <a href="#" data-action="/assignments/delete/{{$event_id}}?user_id={{.UserId}}">{{"Cancel"|T}}</a>
-            </td>
-            {{end}}
-          </tr>
-          {{end}}
-        </tbody>
-      </table>
+          </tbody>
+        </table>
+      </form>
+
     </div>
   </div>

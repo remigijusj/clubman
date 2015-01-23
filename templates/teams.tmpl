@@ -2,18 +2,19 @@
     <div class="large-8 columns">
       <h4>{{"Teams"|T}}</h4>
 
+      {{$self := .self}}
+
       <table class="list">
         <thead>
           <tr>
             <td>{{"Name"|T}}</td>
             <td>{{"Instructor"|T}}</td>
-            {{if .self.IsAdmin}}
+            {{if $self.IsAdmin}}
             <td>{{"Actions"|T}}</td>
             {{end}}
           </tr>
         </thead>
         <tbody>
-          {{ $self := .self }}
           {{range .list}}
           <tr>
             <td>
@@ -33,6 +34,7 @@
           {{end}}
         </tbody>
       </table>
+
       {{if .self.IsAdmin}}
       <p>
         <a href="/teams/create" class="button tiny radius">{{"Create team"|T}}</a>

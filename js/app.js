@@ -7,6 +7,9 @@ $(function(){
     var el = $(this);
     var form = el.closest('form');
     var action = el.data('action');
+    if (action == '') {
+      action = el.attr('href');
+    }
     var consent = el.data('confirm');
     if (!consent || confirm(consent)) {
       form.prop('action', action).submit();

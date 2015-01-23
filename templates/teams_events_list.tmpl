@@ -1,5 +1,8 @@
   <div class="row">
-    <div class="large-12 columns">
+    <div class="columns">
+      {{$counts := .counts}}
+      {{$lang := .lang}}
+
       <table class="list">
         <thead>
           <tr>
@@ -11,10 +14,8 @@
           </tr>
         </thead>
         <tbody>
-          {{$counts := .counts}}
-          {{$lang := .lang}}
           {{range .list}}
-          <tr>
+          <tr {{if eq .Status -2}}class="canceled"{{end}}>
             <td>
               <a href="/events/view/{{.Id}}">{{localDate .StartAt $lang}}</a>
             </td>
@@ -36,10 +37,11 @@
       </table>
     </div>
   </div>
+
   <p>
     {{if .full}}
     <a href="?">{{"Show current"|T}}</a>
     {{else}}
-    <a href="?date=2015-01-01">{{"Show all"|T}}</a>
+    <a href="?date={{defaultDate}}">{{"Show all"|T}}</a>
     {{end}}
   </p>

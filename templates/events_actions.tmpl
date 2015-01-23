@@ -1,6 +1,6 @@
 {{define "events_view.tmpl"}}
   <div class="row">
-    <div class="large-12 columns">
+    <div class="columns">
       <h4>
         <a href="/teams/view/{{.form.TeamId}}">{{.team.Name}}</a>
         {{localDate .form.StartAt .lang}}
@@ -60,9 +60,7 @@
     </div>
     {{end}}
   </div>
-  <form method="POST">
-    {{template "events_assignments_list.tmpl" . }}
-  </form>
+  {{template "events_assignments_list.tmpl" . }}
 {{end}}
 {{define "events_update.tmpl"}}
   <div class="row">

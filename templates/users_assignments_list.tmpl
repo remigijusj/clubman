@@ -1,49 +1,52 @@
-  <table class="list">
-    <thead>
-      <tr>
-        <td>{{"Team"|T}}</td>
-        <td>{{"Date"|T}}</td>
-        <td>{{"Time"|T}}</td>
-        <td>{{"Status"|T}}</td>
-        <td>{{"Actions"|T}}</td>
-      </tr>
-    </thead>
-    <tbody>
-      {{$is_admin := .self.IsAdmin}}
-      {{$user_id := .id}}
-      {{$lang := .lang}}
-      {{range .list}}
-      {{$canceled := eq .EventStatus -2}}
-      <tr>
-        <td>
-          <a href="/events/view/{{.EventId}}" {{if $canceled}}class="canceled"{{end}}>{{.TeamName}}</a>
-        </td>
-        <td>
-          {{localDate .StartAt $lang}}
-        </td>
-        <td>
-          {{printTime .StartAt}} &ndash; {{printTime .FinishAt}}
-        </td>
-        <td>
-          {{statusTitle "assignment" .Status|T}}
-        </td>
-        <td>
-          {{if $user_id}}
-            {{if $is_admin}}
-            <a href="#" data-action="/assignments/delete/{{.EventId}}?user_id={{$user_id}}">{{"Cancel"|T}}</a>
+  {{$is_admin := .self.IsAdmin}}
+  {{$user_id := .id}}
+  {{$lang := .lang}}
+
+  <form method="POST">
+    <table class="list">
+      <thead>
+        <tr>
+          <td>{{"Team"|T}}</td>
+          <td>{{"Date"|T}}</td>
+          <td>{{"Time"|T}}</td>
+          <td>{{"Status"|T}}</td>
+          <td>{{"Actions"|T}}</td>
+        </tr>
+      </thead>
+      <tbody>
+        {{range .list}}
+        <tr>
+          <td>
+            <a href="/events/view/{{.EventId}}">{{.TeamName}}</a>
+          </td>
+          <td>
+            {{localDate .StartAt $lang}}
+          </td>
+          <td>
+            {{printTime .StartAt}} &ndash; {{printTime .FinishAt}}
+          </td>
+          <td>
+            {{statusTitle "assignment" .Status|T}}
+          </td>
+          <td>
+            {{if $user_id}}
+              {{if $is_admin}}
+              <a href="/assignments/delete/{{.EventId}}?user_id={{$user_id}}" data-action>{{"Cancel"|T}}</a>
+              {{end}}
+            {{else}}
+              <a href="/assignments/delete/{{.EventId}}" data-action>{{"Cancel"|T}}</a>
             {{end}}
-          {{else}}
-            <a href="#" data-action="/assignments/delete/{{.EventId}}">{{"Cancel"|T}}</a>
-          {{end}}
-        </td>
-      </tr>
-      {{end}}
-    </tbody>
-  </table>
+          </td>
+        </tr>
+        {{end}}
+      </tbody>
+    </table>
+  </form>
+
   <p>
     {{if .full}}
     <a href="?">{{"Show current"|T}}</a>
     {{else}}
-    <a href="?date=2015-01-01">{{"Show all"|T}}</a>
+    <a href="?date={{defaultDate}}">{{"Show all"|T}}</a>
     {{end}}
   </p>

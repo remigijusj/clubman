@@ -77,7 +77,6 @@
   </div>
 {{end}}
 {{define "users_view.tmpl"}}
-<form method="POST">
   <div class="row">
     <div class="large-6 medium-8 columns">
       <h4>{{userName .id}}</h4>
@@ -85,5 +84,4 @@
       {{template "users_assignments_list.tmpl" . }}
     </div>
   </div>
-</form>
 {{end}}

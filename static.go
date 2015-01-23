@@ -27,9 +27,9 @@ const (
   minPassLen = 6
   defaultLang = "da"
   defaultPage = "/calendar/week" // not "/"
+  defaultDate = "2015-01-01"
   timeFormat = "15:04"
   dateFormat = "2006-01-02" // db
-  firstDate  = "2015-01-01"
   panicError = "Critical error happened, please contact website admin"
 
   reloadTmpl = true // DEBUG mode
@@ -79,9 +79,9 @@ var queries = map[string]string{
   "event_select":       "SELECT team_id, start_at, minutes, status FROM events WHERE id=?",
   "event_insert":       "INSERT INTO events(team_id, start_at, minutes, status) VALUES (?, ?, ?, ?)",
   "event_update":       "UPDATE events SET team_id=?, start_at=?, minutes=?, status=? WHERE id=?",
-  "event_delete":       "DELETE FROM events WHERE id=?",
   "events_status_time": "UPDATE events SET status=? WHERE team_id=? AND start_at=?",
   "events_status_date": "UPDATE events SET status=? WHERE team_id=? AND datetime(start_at,'start of day')=?",
+  "event_delete":       "DELETE FROM events WHERE id=?",
   "events_delete_team": "DELETE FROM events WHERE team_id=?",
   "events_delete_time": "DELETE FROM events WHERE team_id=? AND start_at=?",
   "events_delete_date": "DELETE FROM events WHERE team_id=? AND datetime(start_at, 'start of day')=?",
@@ -90,7 +90,7 @@ var queries = map[string]string{
   "assignments_user":   "SELECT event_id, teams.name, start_at, minutes, events.status, assignments.status FROM assignments JOIN events ON event_id=events.id JOIN teams ON team_id=teams.id WHERE user_id=? AND events.start_at >= ? ORDER BY start_at",
   "assignments_period": "SELECT start_at FROM assignments JOIN events ON event_id=events.id WHERE user_id=? AND start_at >= ? AND start_at < ?",
   "assignment_insert":  "INSERT INTO assignments(event_id, user_id, status) VALUES (?, ?, ?)",
-  "assignment_delete":  "DELETE FROM assignments WHERE event_id=? AND user_id=?",
+  "assignment_delete":        "DELETE FROM assignments WHERE event_id=? AND user_id=?",
   "assignments_delete_event": "DELETE FROM assignments WHERE event_id=?",
   "assignments_count":  "SELECT event_id, count(user_id) FROM assignments WHERE event_id in (?) GROUP BY event_id",
 }

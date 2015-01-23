@@ -185,7 +185,7 @@ func validateUser(name, email, mobile, password string, allowEmpty bool, languag
     return errors.New("Email has invalid format")
   }
   if !regex["mobile_validate"].MatchString(strings.Replace(mobile, " ", "", -1)) {
-    return errors.New("Phone number has invalid format")
+    return errors.New("Phone number must have format +45 12345678")
   }
   if len(password) < minPassLen && !(allowEmpty && password == "") {
     return errorWithA("Password must have at least %d characters", minPassLen)
