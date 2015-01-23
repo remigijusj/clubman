@@ -1,8 +1,6 @@
 package main
 
 import (
-  "time"
-
   "github.com/gin-gonic/gin"
 )
 
@@ -11,7 +9,7 @@ func redirectCalendar(c *gin.Context) {
 }
 
 func getWeekData(c *gin.Context) {
-  d := getDate(c)
+  d, _ := getDateQuery(c, "date")
   d = weekFirst(d) // monday
   prev := d.AddDate(0, 0, -7)
   next := d.AddDate(0, 0, 7)
@@ -33,7 +31,7 @@ func getWeekData(c *gin.Context) {
 }
 
 func getMonthData(c *gin.Context) {
-  d := getDate(c)
+  d, _ := getDateQuery(c, "date")
   d = monthFirst(d)
   prev := d.AddDate(0, -1, 0)
   next := d.AddDate(0, 1, 0)
@@ -52,18 +50,4 @@ func getMonthData(c *gin.Context) {
     a := mapAssignedPeriod(self.Id, prev, next)
     c.Set("assigned", a)
   }
-}
-
-// --- local helpers ---
-
-func getDate(c *gin.Context) time.Time {
-  date, err := time.Parse("2006-01-02", c.Request.URL.Query().Get("date"))
-  if err != nil {
-    date = today()
-  }
-  return date
-}
-
-func today() time.Time {
-  return time.Now().UTC().Truncate(24 * time.Hour)
 }

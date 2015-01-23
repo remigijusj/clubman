@@ -40,3 +40,10 @@
       {{end}}
     </tbody>
   </table>
+  <p>
+    {{if .full}}
+    <a href="?">{{"Show current"|T}}</a>
+    {{else}}
+    <a href="?date=2015-01-01">{{"Show all"|T}}</a>
+    {{end}}
+  </p>

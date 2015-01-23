@@ -21,8 +21,10 @@ func getSelfAssignmentsList(c *gin.Context) {
     forwardWarning(c, defaultPage, panicError)
     return
   }
-  list := listUserAssignments(self.Id)
+  date, full := getDateQuery(c, "date")
+  list := listUserAssignments(self.Id, date)
   c.Set("list", list)
+  c.Set("full", full)
 }
 
 func getUserAssignmentsList(c *gin.Context) {
@@ -31,8 +33,10 @@ func getUserAssignmentsList(c *gin.Context) {
     forwardWarning(c, defaultPage, err.Error())
     return
   }
-  list := listUserAssignments(user_id)
+  date, full := getDateQuery(c, "date")
+  list := listUserAssignments(user_id, date)
   c.Set("list", list)
+  c.Set("full", full)
   c.Set("id", user_id)
 }
 

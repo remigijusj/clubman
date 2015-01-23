@@ -29,6 +29,7 @@ const (
   defaultPage = "/calendar/week" // not "/"
   timeFormat = "15:04"
   dateFormat = "2006-01-02" // db
+  firstDate  = "2015-01-01"
   panicError = "Critical error happened, please contact website admin"
 
   reloadTmpl = true // DEBUG mode
@@ -73,7 +74,7 @@ var queries = map[string]string{
   "team_delete":        "DELETE FROM teams WHERE id=?",
   "team_names_all":     "SELECT id, name FROM teams ORDER BY name",
 
-  "events_team":        "SELECT id, team_id, start_at, minutes, status FROM events WHERE team_id=? AND start_at >= date('now') ORDER BY start_at",
+  "events_team":        "SELECT id, team_id, start_at, minutes, status FROM events WHERE team_id=? AND start_at >= ? ORDER BY start_at",
   "events_period":      "SELECT id, team_id, start_at, minutes, status FROM events WHERE start_at >= ? AND start_at < ? AND status>=0 ORDER BY start_at",
   "event_select":       "SELECT team_id, start_at, minutes, status FROM events WHERE id=?",
   "event_insert":       "INSERT INTO events(team_id, start_at, minutes, status) VALUES (?, ?, ?, ?)",
@@ -86,7 +87,7 @@ var queries = map[string]string{
   "events_delete_date": "DELETE FROM events WHERE team_id=? AND datetime(start_at, 'start of day')=?",
 
   "assignments_event":  "SELECT user_id, users.name, assignments.status FROM assignments JOIN users ON user_id=users.id WHERE event_id=? ORDER BY user_id",
-  "assignments_user":   "SELECT event_id, teams.name, start_at, minutes, events.status, assignments.status FROM assignments JOIN events ON event_id=events.id JOIN teams ON team_id=teams.id WHERE user_id=? AND events.start_at >= date('now') ORDER BY start_at",
+  "assignments_user":   "SELECT event_id, teams.name, start_at, minutes, events.status, assignments.status FROM assignments JOIN events ON event_id=events.id JOIN teams ON team_id=teams.id WHERE user_id=? AND events.start_at >= ? ORDER BY start_at",
   "assignments_period": "SELECT start_at FROM assignments JOIN events ON event_id=events.id WHERE user_id=? AND start_at >= ? AND start_at < ?",
   "assignment_insert":  "INSERT INTO assignments(event_id, user_id, status) VALUES (?, ?, ?)",
   "assignment_delete":  "DELETE FROM assignments WHERE event_id=? AND user_id=?",

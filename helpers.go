@@ -7,6 +7,7 @@ import (
   "log"
   "strconv"
   "strings"
+  "time"
 
   "code.google.com/p/go.crypto/bcrypt"
   "github.com/gin-gonic/gin"
@@ -84,6 +85,8 @@ func forwardWarning(c *gin.Context, route string, message string, args ...interf
   c.Redirect(302, route)
 }
 
+// --- params helpers ---
+
 func getIntParam(c *gin.Context, name string) (int, error) {
   s := c.Params.ByName(name)
   v, err := strconv.Atoi(s)
@@ -101,6 +104,14 @@ func getIntQuery(c *gin.Context, name string) (int, bool) {
     return 0, false
   }
   return v, true
+}
+
+func getDateQuery(c *gin.Context, name string) (time.Time, bool) {
+  date, err := time.Parse("2006-01-02", c.Request.FormValue(name))
+  if err != nil {
+    return today(), false
+  }
+  return date, true
 }
 
 // --- session helpers ---

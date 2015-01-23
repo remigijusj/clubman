@@ -50,8 +50,8 @@ func (self EventForm) FinishAt() time.Time {
   return self.StartAt.Add(time.Duration(self.Minutes) * time.Minute)
 }
 
-func listTeamEvents(team_id int) []EventRecord {
-  rows, err := query["events_team"].Query(team_id)
+func listTeamEvents(team_id int, date_from time.Time) []EventRecord {
+  rows, err := query["events_team"].Query(team_id, date_from.Format(dateFormat))
   return listEvents(rows, err)
 }
 

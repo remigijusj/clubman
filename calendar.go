@@ -95,3 +95,7 @@ func calcMonthDate(date time.Time, w, d int) time.Time {
 func hourDuration(when time.Time) time.Duration {
   return when.Sub(when.Truncate(24 * time.Hour))
 }
+
+func today() time.Time {
+  return time.Now().UTC().Truncate(24 * time.Hour)
+}

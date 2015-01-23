@@ -20,8 +20,10 @@ func getTeamEventsData(c *gin.Context) {
     forwardWarning(c, "/teams", err.Error())
     c.Abort(0)
   } else {
-    list := listTeamEvents(team_id)
+    date, full := getDateQuery(c, "date")
+    list := listTeamEvents(team_id, date)
     c.Set("list", list)
+    c.Set("full", full)
     counts := countEventAssignments(list)
     c.Set("counts", counts)
   }

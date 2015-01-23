@@ -61,8 +61,8 @@ func findAssignment(list []EventAssignment, user *AuthInfo) *EventAssignment {
   return nil
 }
 
-func listUserAssignments(user_id int) []UserAssignment {
-  rows, err := query["assignments_user"].Query(user_id)
+func listUserAssignments(user_id int, date_from time.Time) []UserAssignment {
+  rows, err := query["assignments_user"].Query(user_id, date_from.Format(dateFormat))
   list := []UserAssignment{}
 
   if err != nil {
