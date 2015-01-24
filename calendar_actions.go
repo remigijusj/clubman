@@ -24,7 +24,7 @@ func getWeekData(c *gin.Context) {
   events, eids := listWeekEventsGrouped(date, team_id)
   c.Set("events", events)
 
-  setCommonData(c, eids)
+  setCommonCalendarData(c, eids)
 }
 
 func getMonthData(c *gin.Context) {
@@ -43,10 +43,10 @@ func getMonthData(c *gin.Context) {
   events, eids := listMonthEventsGrouped(date, team_id)
   c.Set("events", events)
 
-  setCommonData(c, eids)
+  setCommonCalendarData(c, eids)
 }
 
-func setCommonData(c *gin.Context, eids []int) {
+func setCommonCalendarData(c *gin.Context, eids []int) {
   c.Set("today", today())
 
   teams := indexTeams()

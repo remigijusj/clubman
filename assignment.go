@@ -88,7 +88,7 @@ func listUserAssignments(user_id int, date_from time.Time) []UserAssignment {
 }
 
 func createAssignment(event_id, user_id int) error {
-  res, err := query["assignment_insert"].Exec(event_id, user_id, 0)
+  res, err := query["assignment_insert"].Exec(event_id, user_id, 1)
   if err != nil {
     log.Printf("[APP] ASSIGNMENTS-CREATE error: %s, %d, %d\n", err, event_id, user_id)
     return errors.New("Assignment could not be created")

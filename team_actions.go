@@ -19,16 +19,21 @@ func getTeamEventsData(c *gin.Context) {
   if err != nil {
     forwardWarning(c, "/teams", err.Error())
     c.Abort(0)
-  } else {
-    date, full := getDateQuery(c, "date")
-    list := listTeamEvents(team_id, date)
-    eids := collectEventIds(list)
+    return
+  }
+  date, full := getDateQuery(c, "date")
+  list := listTeamEvents(team_id, date)
+  eids := collectEventIds(list)
 
-    c.Set("list", list)
-    c.Set("full", full)
+  c.Set("list", list)
+  c.Set("full", full)
 
-    counts := mapParticipantCounts(eids)
-    c.Set("counts", counts)
+  counts := mapParticipantCounts(eids)
+  c.Set("counts", counts)
+
+  if self := currentUser(c); self != nil {
+    assigned := mapAssignedStatus(eids, self.Id)
+    c.Set("assigned", assigned)
   }
 }
 

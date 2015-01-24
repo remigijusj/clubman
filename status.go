@@ -23,8 +23,8 @@ var statuses = map[string][]Status {
     Status{ 0, "Active"   },
   },
   "assignment": []Status{
-    Status{-1, "Waiting"  },
-    Status{ 0, "Active"   },
+    Status{-1, "Waiting"   },
+    Status{ 1, "Confirmed" },
   },
 }
 
