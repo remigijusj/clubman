@@ -88,9 +88,9 @@ var queries = map[string]string{
 
   "assignments_event":  "SELECT user_id, users.name, assignments.status FROM assignments JOIN users ON user_id=users.id WHERE event_id=? ORDER BY user_id",
   "assignments_user":   "SELECT event_id, teams.name, start_at, minutes, events.status, assignments.status FROM assignments JOIN events ON event_id=events.id JOIN teams ON team_id=teams.id WHERE user_id=? AND events.start_at >= ? ORDER BY start_at",
-  "assignments_period": "SELECT start_at FROM assignments JOIN events ON event_id=events.id WHERE user_id=? AND start_at >= ? AND start_at < ?",
   "assignment_insert":  "INSERT INTO assignments(event_id, user_id, status) VALUES (?, ?, ?)",
-  "assignment_delete":        "DELETE FROM assignments WHERE event_id=? AND user_id=?",
-  "assignments_delete_event": "DELETE FROM assignments WHERE event_id=?",
-  "assignments_count":  "SELECT event_id, count(user_id) FROM assignments WHERE event_id in (?) GROUP BY event_id",
+  "assignment_delete":  "DELETE FROM assignments WHERE event_id=? AND user_id=?",
+  "assignments_clean":  "DELETE FROM assignments WHERE event_id=?",
+  "assignments_status": "SELECT event_id, status FROM assignments WHERE event_id IN (?) AND user_id=?",
+  "assignments_count":  "SELECT event_id, count(user_id) FROM assignments WHERE event_id IN (?) GROUP BY event_id",
 }

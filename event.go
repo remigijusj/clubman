@@ -57,7 +57,7 @@ func listTeamEvents(team_id int, date_from time.Time) []EventRecord {
 
 func listEvents(rows *sql.Rows, err error) []EventRecord {
   list := []EventRecord{}
-  
+
   if err != nil {
     log.Printf("[APP] TEAM-EVENTS-LIST error: %s\n", err)
     return list
@@ -206,7 +206,7 @@ func fetchEvent(event_id int) (EventForm, error) {
     log.Printf("[APP] EVENT-SELECT error: %s, %#v\n", err, form)
     err = errors.New("Event was not found")
   }
-  // WARNING: see the comment in listEvents  
+  // WARNING: see the comment in listEvents
   form.StartAt = form.StartAt.UTC()
   return form, err
 }
@@ -230,7 +230,7 @@ func deleteEvent(event_id int) error {
     log.Printf("[APP] EVENT-DELETE error: %s, %d\n", err, event_id)
     return errors.New("Event could not be deleted")
   }
-  _, err = query["assignments_delete_event"].Exec(event_id)
+  _, err = query["assignments_clean"].Exec(event_id)
   if err != nil {
     log.Printf("[APP] EVENT-DELETE-ASSIGNMENTS error: %s, %d\n", err, event_id)
     return nil
@@ -261,4 +261,12 @@ func parseEventForm(form *EventForm, lang string) error {
 
 func minutesValid(minutes int) bool {
   return minutes > 0 && minutes < 6 * 60
+}
+
+func collectEventIds(list []EventRecord) []int {
+  event_ids := make([]int, len(list))
+  for i, item := range list {
+    event_ids[i] = item.Id
+  }
+  return event_ids
 }

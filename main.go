@@ -129,16 +129,17 @@ func getLang(c *gin.Context) string {
   return defaultLang
 }
 
-func queryMultiple(name string, list []int) (*sql.Rows, error) {
+func queryMultiple(name string, list []int, extra ...interface{}) (*sql.Rows, error) {
   if len(list) == 0 {
     return nil, errors.New("Can't query with empty args")
   }
   qry := strings.Replace(queries[name], "(?)", "(?"+strings.Repeat(",?", len(list)-1)+")", 1)
 
-  args := make([]interface{}, len(list))
+  args := make([]interface{}, len(list)+len(extra))
   for i, item := range list {
     args[i] = item
   }
+  copy(args[len(list):], extra)
 
   return db.Query(qry, args...)
 }

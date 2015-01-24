@@ -9,51 +9,54 @@ func redirectCalendar(c *gin.Context) {
 }
 
 func getWeekData(c *gin.Context) {
-  d, _ := getDateQuery(c, "date")
-  d = weekFirst(d) // monday
-  prev := d.AddDate(0, 0, -7)
-  next := d.AddDate(0, 0, 7)
+  date, _ := getDateQuery(c, "date")
+  date = weekFirst(date) // monday
+  c.Set("date", date)
 
-  c.Set("date", d)
+  prev := date.AddDate(0, 0, -7)
+  next := date.AddDate(0, 0, 7)
   c.Set("prev", prev)
   c.Set("next", next)
-  c.Set("today", today())
 
   team_id, _ := getIntQuery(c, "team_id")
   c.Set("team_id", team_id)
 
-  e := listWeekEventsGrouped(d, team_id)
-  c.Set("events", e)
-  t := indexTeams()
-  c.Set("teams", t)
+  events, eids := listWeekEventsGrouped(date, team_id)
+  c.Set("events", events)
 
-  if self := currentUser(c); self != nil {
-    a := mapAssignedPeriod(self.Id, prev, next)
-    c.Set("assigned", a)
-  }
+  setCommonData(c, eids)
 }
 
 func getMonthData(c *gin.Context) {
-  d, _ := getDateQuery(c, "date")
-  d = monthFirst(d)
-  prev := d.AddDate(0, -1, 0)
-  next := d.AddDate(0, 1, 0)
+  date, _ := getDateQuery(c, "date")
+  date = monthFirst(date)
+  c.Set("date", date)
+
+  prev := date.AddDate(0, -1, 0)
+  next := date.AddDate(0, 1, 0)
+  c.Set("prev", prev)
+  c.Set("next", next)
 
   team_id, _ := getIntQuery(c, "team_id")
   c.Set("team_id", team_id)
 
-  c.Set("date", d)
-  c.Set("prev", prev)
-  c.Set("next", next)
+  events, eids := listMonthEventsGrouped(date, team_id)
+  c.Set("events", events)
+
+  setCommonData(c, eids)
+}
+
+func setCommonData(c *gin.Context, eids []int) {
   c.Set("today", today())
 
-  e := listMonthEventsGrouped(d, team_id)
-  c.Set("events", e)
-  t := indexTeams()
-  c.Set("teams", t)
+  teams := indexTeams()
+  c.Set("teams", teams)
+
+  counts := mapParticipantCounts(eids)
+  c.Set("counts", counts)
 
   if self := currentUser(c); self != nil {
-    a := mapAssignedPeriod(self.Id, prev, next)
-    c.Set("assigned", a)
+    assigned := mapAssignedStatus(eids, self.Id)
+    c.Set("assigned", assigned)
   }
 }

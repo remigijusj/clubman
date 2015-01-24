@@ -113,38 +113,36 @@ func deleteAssignment(event_id, user_id int) error {
   return nil
 }
 
-func mapAssignedPeriod(user_id int, from, till time.Time) map[string]bool {
-  data := map[string]bool{}
-  var when time.Time
-  rows, err := query["assignments_period"].Query(user_id, from.Format(dateFormat), till.Format(dateFormat))
+func mapAssignedStatus(event_ids []int, user_id int) map[int]int {
+  data := make(map[int]int, len(event_ids))
+
+  rows, err := queryMultiple("assignments_status", event_ids, user_id)
   if err != nil {
     log.Printf("[APP] USER-ASSIGNMENTS-PERIOD error: %s\n", err)
     return data
   }
   defer rows.Close()
+
+  var event_id, status int
   for rows.Next() {
-    err := rows.Scan(&when)
+    err := rows.Scan(&event_id, &status)
     if err != nil {
       log.Printf("[APP] USER-ASSIGNMENTS-PERIOD error: %s\n", err)
     } else {
-      data[when.UTC().Format(dateFormat)] = true
+      data[event_id] = status
     }
   }
   if err := rows.Err(); err != nil {
     log.Printf("[APP] USER-ASSIGNMENTS-PERIOD error: %s\n", err)
   }
+
   return data
 }
 
-func countEventAssignments(list []EventRecord) map[int]int {
-  data := make(map[int]int, len(list))
-  if len(list) == 0 {
+func mapParticipantCounts(event_ids []int) map[int]int {
+  data := make(map[int]int, len(event_ids))
+  if len(event_ids) == 0 {
     return data
-  }
-
-  event_ids := make([]int, len(list))
-  for i, item := range list {
-    event_ids[i] = item.Id
   }
 
   rows, err := queryMultiple("assignments_count", event_ids)

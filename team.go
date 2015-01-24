@@ -24,6 +24,7 @@ func listTeamsByQuery(q url.Values) []TeamRecord {
   return listTeams(query["teams_all"].Query())
 }
 
+// NOTE: with more teams, we could pass event_ids to select
 func indexTeams() map[int]TeamRecord {
   rows, err := query["teams_all"].Query()
   list := listTeams(rows, err)

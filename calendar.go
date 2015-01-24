@@ -4,7 +4,9 @@ import (
   "time"
 )
 
-func listWeekEventsGrouped(date time.Time, team_id int) [][][]EventRecord {
+type Calendar [][][]EventRecord
+
+func listWeekEventsGrouped(date time.Time, team_id int) (Calendar, []int) {
   from := date
   till := date.AddDate(0, 0, 7)
   data := prepareNestedSlice(3) // SEE: chooseWeekRow
@@ -20,10 +22,10 @@ func listWeekEventsGrouped(date time.Time, team_id int) [][][]EventRecord {
     data[w][i] = append(data[w][i], event)
   }
 
-  return data
+  return data, collectEventIds(list)
 }
 
-func listMonthEventsGrouped(date time.Time, team_id int) [][][]EventRecord {
+func listMonthEventsGrouped(date time.Time, team_id int) (Calendar, []int) {
   from := weekFirst(date)
   till := weekFirst(date.AddDate(0, 1, 0)).AddDate(0, 0, 7)
   weeks := daysDiff(from, till) / 7
@@ -40,10 +42,10 @@ func listMonthEventsGrouped(date time.Time, team_id int) [][][]EventRecord {
     data[w][i] = append(data[w][i], event)
   }
 
-  return data
+  return data, collectEventIds(list)
 }
 
-func prepareNestedSlice(rows int) [][][]EventRecord {
+func prepareNestedSlice(rows int) Calendar {
   data := make([][][]EventRecord, rows)
   for w := 0; w < len(data); w++ {
     data[w] = make([][]EventRecord, 7)
@@ -51,7 +53,7 @@ func prepareNestedSlice(rows int) [][][]EventRecord {
       data[w][d] = []EventRecord{}
     }
   }
-  return data
+  return Calendar(data)
 }
 
 func chooseWeekRow(t time.Time) int {

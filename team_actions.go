@@ -22,9 +22,12 @@ func getTeamEventsData(c *gin.Context) {
   } else {
     date, full := getDateQuery(c, "date")
     list := listTeamEvents(team_id, date)
+    eids := collectEventIds(list)
+
     c.Set("list", list)
     c.Set("full", full)
-    counts := countEventAssignments(list)
+
+    counts := mapParticipantCounts(eids)
     c.Set("counts", counts)
   }
 }

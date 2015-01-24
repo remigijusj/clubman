@@ -48,12 +48,13 @@
         {{$next := .next}}
         {{$today := .today}}
         {{$teams := .teams}}
+        {{$counts := .counts}}
         {{$assigned := .assigned}}
         {{range $w, $week := .events}}
         <li class="week">
           {{range $d, $list := $week}}
           {{$date := calcMonthDate $date $w $d}}
-          <div class="small-1 medium-1 large-1 day {{if index $assigned (printDate $date)}}active{{end}} {{if eq $date.String $today.String}}today{{end}} {{if eq $date.Month $prev.Month}}previous-month{{end}} {{if eq $date.Month $next.Month}}next-month{{end}}">
+          <div class="small-1 medium-1 large-1 day {{if eq $date.String $today.String}}today{{end}} {{if eq $date.Month $prev.Month}}previous-month{{end}} {{if eq $date.Month $next.Month}}next-month{{end}}">
             <div class="num">{{$date.Day}}</div>
             <div class="inner">
               {{range $list}}
