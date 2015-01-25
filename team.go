@@ -113,3 +113,12 @@ func validateTeam(name string, users_min, users_max, instructor_id int) error {
   }
   return nil
 }
+
+func maxTeamUsersTx(tx *sql.Tx, event_id int) (int, error) {
+  var max int
+  err := tx.Stmt(query["team_users_max"]).QueryRow(event_id).Scan(&max)
+  if err != nil {
+    log.Printf("[APP] TEAM-USERS-MAX error: %s, %d\n", err, event_id)
+  }
+  return max, err
+}

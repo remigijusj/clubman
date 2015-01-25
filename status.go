@@ -7,7 +7,10 @@ type Status struct {
 
 const (
   userStatusWaiting = -1
-  userStatusAdmin = 2
+  userStatusAdmin   = 2
+  assignmentStatusWaiting   = -2
+  assignmentStatusNotified  = -1
+  assignmentStatusConfirmed = 1
 )
 
 var statuses = map[string][]Status {
@@ -23,8 +26,9 @@ var statuses = map[string][]Status {
     Status{ 0, "Active"   },
   },
   "assignment": []Status{
-    Status{-1, "Waiting"   },
-    Status{ 1, "Confirmed" },
+    Status{-2, "Waiting"              },
+    Status{-1, "Waiting confirmation" },
+    Status{ 1, "Confirmed"            },
   },
 }
 

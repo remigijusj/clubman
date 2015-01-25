@@ -1,6 +1,7 @@
 package main
 
 import (
+  "database/sql"
   "errors"
   "fmt"
 
@@ -33,33 +34,81 @@ func getUserAssignmentsList(c *gin.Context) {
 }
 
 func handleAssignmentCreate(c *gin.Context) {
-  handleAssignmentAction(c, createAssignment)
+  event_id, user_id, tx := prepareAssignmentAction(c)
+  if tx == nil { return }
+
+  status, err := decideAssignmentStatus(event_id, tx)
+  if err != nil {
+    failAssignmentAction(c, event_id, tx, "")
+    return
+  }
+  err = createAssignmentTx(tx, event_id, user_id, status)
+  if err != nil {
+    failAssignmentAction(c, event_id, tx, "Subscription failed, perhaps user is already subscribed")
+    return
+  }
+
+  message := assignmentCreateSuccess(c, user_id, status)
+  completeAssignmentAction(c, event_id, tx, message)
 }
 
 func handleAssignmentDelete(c *gin.Context) {
-  handleAssignmentAction(c, deleteAssignment)
+  event_id, user_id, tx := prepareAssignmentAction(c)
+  if tx == nil { return }
+
+  err := deleteAssignmentTx(tx, event_id, user_id)
+  if err != nil {
+    failAssignmentAction(c, event_id, tx, "")
+    return
+  }
+
+  message := assignmentDeleteSuccess(c, user_id)
+  if ok := completeAssignmentAction(c, event_id, tx, message); ok {
+    go afterAssignmentDelete(event_id, getLang(c))
+  }
 }
 
 // --- local helpers ---
 
-func handleAssignmentAction(c *gin.Context, action (func(int, int) (bool, string))) {
+func prepareAssignmentAction(c *gin.Context) (int, int, *sql.Tx) {
   event_id, err := getIntParam(c, "event_id")
   self := currentUser(c)
   if err != nil || self == nil {
     gotoWarning(c, defaultPage, err.Error())
-    return
+    return 0, 0, nil
   }
   user_id, err := extractUserId(c, self)
   if err != nil {
     gotoWarning(c, eventsViewPath(event_id), err.Error())
-    return
+    return 0, 0, nil
   }
-  ok, message := action(event_id, user_id)
-  if ok {
-    gotoSuccess(c, eventsViewPath(event_id), message)
-  } else {
-    gotoWarning(c, eventsViewPath(event_id), message)
+
+  tx, err := db.Begin()
+  if err != nil {
+    failAssignmentAction(c, event_id, nil, "")
+    return 0, 0, nil
   }
+  return event_id, user_id, tx
+}
+
+func completeAssignmentAction(c *gin.Context, event_id int, tx *sql.Tx, message string) bool {
+  err := tx.Commit()
+  if err != nil {
+    failAssignmentAction(c, event_id, nil, "")
+    return false
+  }
+  gotoSuccess(c, eventsViewPath(event_id), message)
+  return true
+}
+
+func failAssignmentAction(c *gin.Context, event_id int, tx *sql.Tx, message string) {
+  if tx != nil {
+    tx.Rollback()
+  }
+  if message == "" {
+    message = "Action could not be completed, please try again later"
+  }
+  gotoWarning(c, eventsViewPath(event_id), message)
 }
 
 func extractUserId(c *gin.Context, self *AuthInfo) (int, error) {
@@ -77,4 +126,55 @@ func extractUserId(c *gin.Context, self *AuthInfo) (int, error) {
 
 func eventsViewPath(event_id int) string {
   return fmt.Sprintf("/events/view/%d", event_id)
+}
+
+func decideAssignmentStatus(event_id int, tx *sql.Tx) (int, error) {
+  max, err := maxTeamUsersTx(tx, event_id)
+  if err != nil {
+    return 0, err
+  }
+  cnt, err := countAssignmentsTx(tx, event_id)
+  if err != nil {
+    return 0, err
+  }
+  status := assignmentStatusConfirmed
+  if cnt >= max {
+    status = assignmentStatusWaiting
+  }
+  return status, nil
+}
+
+func assignmentCreateSuccess(c *gin.Context, user_id, status int) string {
+  self := currentUser(c)
+  if self == nil {
+    return panicError
+  }
+  switch status {
+  case assignmentStatusConfirmed:
+    if self.Id == user_id {
+      return "Your subscription has been confirmed"
+    } else {
+      return "User has been subscribed"
+    }
+  case assignmentStatusWaiting:
+    if self.Id == user_id {
+      return "You have been put on the waiting list. If somebody unsubscribes you will be notified"
+    } else {
+      return "User has been put on the waiting list"
+    }
+  default:
+    return panicError
+  }
+}
+
+func assignmentDeleteSuccess(c *gin.Context, user_id int) string {
+  self := currentUser(c)
+  if self == nil {
+    return panicError
+  }
+  if self.Id == user_id {
+    return "Your subscription has been canceled"
+  } else {
+    return "User subscription has been canceled"
+  }
 }

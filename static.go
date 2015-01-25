@@ -68,11 +68,12 @@ var queries = map[string]string{
   "user_name":          "SELECT name FROM users WHERE id=?",
 
   "teams_all":          "SELECT teams.id, teams.name, users.name FROM teams LEFT JOIN users ON teams.instructor_id=users.id ORDER BY teams.name",
+  "team_names_all":     "SELECT id, name FROM teams ORDER BY name",
   "team_select":        "SELECT name, users_min, users_max, instructor_id FROM teams WHERE id=?",
+  "team_users_max":     "SELECT users_max FROM events LEFT JOIN teams on team_id=teams.id WHERE events.id=?",
   "team_insert":        "INSERT INTO teams(name, users_min, users_max, instructor_id) VALUES (?, ?, ?, ?)",
   "team_update":        "UPDATE teams SET name=?, users_min=?, users_max=?, instructor_id=? WHERE id=?",
   "team_delete":        "DELETE FROM teams WHERE id=?",
-  "team_names_all":     "SELECT id, name FROM teams ORDER BY name",
 
   "events_team":        "SELECT id, team_id, start_at, minutes, status FROM events WHERE team_id=? AND start_at >= ? ORDER BY start_at",
   "events_period":      "SELECT id, team_id, start_at, minutes, status FROM events WHERE start_at >= ? AND start_at < ? AND status>=0 ORDER BY start_at",
@@ -88,9 +89,12 @@ var queries = map[string]string{
 
   "assignments_event":  "SELECT user_id, users.name, assignments.status FROM assignments JOIN users ON user_id=users.id WHERE event_id=? ORDER BY assignments.status DESC, assignments.id",
   "assignments_user":   "SELECT event_id, teams.name, start_at, minutes, events.status, assignments.status FROM assignments JOIN events ON event_id=events.id JOIN teams ON team_id=teams.id WHERE user_id=? AND events.start_at >= ? ORDER BY start_at",
-  "assignment_insert":  "INSERT INTO assignments(event_id, user_id, status) VALUES (?, ?, ?)",
-  "assignment_delete":  "DELETE FROM assignments WHERE event_id=? AND user_id=?",
-  "assignments_clean":  "DELETE FROM assignments WHERE event_id=?",
   "assignments_status": "SELECT event_id, status FROM assignments WHERE event_id IN (?) AND user_id=?",
   "assignments_count":  "SELECT event_id, count(user_id) FROM assignments WHERE event_id IN (?) GROUP BY event_id",
+  "assignments_check":  "SELECT status, count(id) FROM assignments WHERE event_id=? GROUP BY status",
+  "assignments_first":  "SELECT user_id FROM assignments WHERE event_id=? AND status=? ORDER BY id",
+  "assignment_insert":  "INSERT INTO assignments(event_id, user_id, status) VALUES (?, ?, ?)",
+  "assignment_update":  "UPDATE assignment SET status=? WHERE event_id=? AND user_id=?",
+  "assignment_delete":  "DELETE FROM assignments WHERE event_id=? AND user_id=?",
+  "assignments_clean":  "DELETE FROM assignments WHERE event_id=?",
 }

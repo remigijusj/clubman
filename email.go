@@ -26,6 +26,7 @@ func sendEmail(to, subject, body string) error {
   return mailer.Send(msg)
 }
 
+// NOTE: delayed
 func sendResetEmail(lang, email, token string) {
   obj := map[string]string{
     "host": serverHost,
@@ -41,4 +42,9 @@ func sendResetEmail(lang, email, token string) {
   if err != nil {
     log.Printf("[APP] RESET-EMAIL error: %s, token=%s, email=%s\n", err, token, email)
   }
+}
+
+// <<< TODO: implement
+func sendWaitingConfirmationEmail(lang, email string, user_id, event_id int) {
+  log.Printf("=> SEND-WAIT-CONFIRM: %s, %s, %d, %d\n", lang, email, user_id, event_id)
 }
