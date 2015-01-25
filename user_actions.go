@@ -19,13 +19,13 @@ func handleLogin(c *gin.Context) {
     showError(c, err)
   } else {
     setSessionAuthInfo(c, auth)
-    forwardTo(c, defaultPage, "")
+    gotoSuccess(c, defaultPage, "")
   }
 }
 
 func handleLogout(c *gin.Context) {
   deleteSession(c)
-  forwardTo(c, "/login", "")
+  gotoSuccess(c, "/login", "")
 }
 
 func handleForgot(c *gin.Context) {
@@ -38,7 +38,7 @@ func handleForgot(c *gin.Context) {
   if !ok {
     showError(c, errors.New("Reminder email could not be sent"))
   } else {
-    forwardTo(c, "/login", "Email with instructions was sent to %s", form.Email)
+    gotoSuccess(c, "/login", "Email with instructions was sent to %s", form.Email)
   }
 }
 
@@ -46,10 +46,10 @@ func handleReset(c *gin.Context) {
   q := c.Request.URL.Query()
   auth, err := loginUserByToken(q.Get("token"), q.Get("email"))
   if err != nil {
-    forwardWarning(c, "/login", "Password reset request is invalid or expired")
+    gotoWarning(c, "/login", "Password reset request is invalid or expired")
   } else {
     setSessionAuthInfo(c, auth)
-    forwardTo(c, "/profile", "Please enter new password and click Save")
+    gotoSuccess(c, "/profile", "Please enter new password and click Save")
   }
 }
 
@@ -63,7 +63,7 @@ func getProfile(c *gin.Context) {
     err = errors.New("missing self")
   }
   if err != nil {
-    forwardWarning(c, defaultPage, panicError)
+    gotoWarning(c, defaultPage, panicError)
     c.Abort(0)
   } else {
     c.Set("form", form)
@@ -91,7 +91,7 @@ func handleProfile(c *gin.Context) {
   if err != nil {
     showError(c, err, &form)
   } else {
-    forwardTo(c, defaultPage, "User profile has been updated")
+    gotoSuccess(c, defaultPage, "User profile has been updated")
   }
 }
 
@@ -120,7 +120,7 @@ func getUserForm(c *gin.Context) {
     form, err = fetchUserProfile(user_id)
   }
   if err != nil {
-    forwardWarning(c, "/users", err.Error())
+    gotoWarning(c, "/users", err.Error())
     c.Abort(0)
   } else {
     c.Set("id", user_id)
@@ -144,9 +144,9 @@ func handleUserCreate(c *gin.Context) {
     showError(c, err, &form)
   } else {
     if isAuthenticated(c) {
-      forwardTo(c, "/users", "User profile has been created")
+      gotoSuccess(c, "/users", "User profile has been created")
     } else {
-      forwardTo(c, "/login", "User profile has been created. Please wait for administrator confirmation")
+      gotoSuccess(c, "/login", "User profile has been created. Please wait for administrator confirmation")
     }
   }
 }
@@ -165,7 +165,7 @@ func handleUserUpdate(c *gin.Context) {
   if err != nil {
     showError(c, err, &form)
   } else {
-    forwardTo(c, "/users", "User profile has been updated")
+    gotoSuccess(c, "/users", "User profile has been updated")
   }
 }
 
@@ -177,7 +177,7 @@ func handleUserDelete(c *gin.Context) {
   if err != nil {
     showError(c, err)
   } else {
-    forwardTo(c, "/users", "User profile has been deleted")
+    gotoSuccess(c, "/users", "User profile has been deleted")
   }
 }
 

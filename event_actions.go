@@ -28,7 +28,7 @@ func getEventForm(c *gin.Context) {
     form, err = fetchEvent(event_id)
   }
   if err != nil {
-    forwardWarning(c, defaultPage, err.Error())
+    gotoWarning(c, defaultPage, err.Error())
     c.Abort(0)
   } else {
     setEventUpdateExtras(c, &form)
@@ -44,7 +44,7 @@ func getEventTeam(c *gin.Context) {
     team, err = fetchTeam(event.TeamId)
   }
   if err != nil {
-    forwardWarning(c, defaultPage, panicError)
+    gotoWarning(c, defaultPage, panicError)
     c.Abort(0)
   } else {
     c.Set("team", team)
@@ -54,7 +54,7 @@ func getEventTeam(c *gin.Context) {
 func getEventAssignments(c *gin.Context) {
   event_id, err := getIntParam(c, "id")
   if err != nil {
-    forwardWarning(c, defaultPage, err.Error())
+    gotoWarning(c, defaultPage, err.Error())
     c.Abort(0)
   } else {
     list := listEventAssignments(event_id)
@@ -77,7 +77,7 @@ func handleEventUpdate(c *gin.Context) {
   if err != nil {
     showError(c, err, &form)
   } else {
-    forwardTo(c, eventsViewPath(event_id), "Event has been updated")
+    gotoSuccess(c, eventsViewPath(event_id), "Event has been updated")
   }
 }
 
@@ -89,7 +89,7 @@ func handleEventDelete(c *gin.Context) {
   if err != nil {
     showError(c, err)
   } else {
-    forwardTo(c, defaultPage, "Event has been deleted")
+    gotoSuccess(c, defaultPage, "Event has been deleted")
   }
 }
 
@@ -111,7 +111,7 @@ func handleEventsFormAction(c *gin.Context, action (func(int, *TeamEventsForm, s
   if err != nil {
     showError(c, err, &form, teamsEventsPath(team_id))
   } else {
-    forwardTo(c, teamsEventsPath(team_id), message, cnt)
+    gotoSuccess(c, teamsEventsPath(team_id), message, cnt)
   }
 }
 

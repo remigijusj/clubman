@@ -7,18 +7,10 @@ import (
   "github.com/gin-gonic/gin"
 )
 
-func handleAssignmentCreate(c *gin.Context) {
-  handleAssignmentAction(c, createAssignment, "Assignment has been created")
-}
-
-func handleAssignmentDelete(c *gin.Context) {
-  handleAssignmentAction(c, deleteAssignment, "Assignment has been deleted")
-}
-
 func getSelfAssignmentsList(c *gin.Context) {
   self := currentUser(c)
   if self == nil {
-    forwardWarning(c, defaultPage, panicError)
+    gotoWarning(c, defaultPage, panicError)
     return
   }
   date, full := getDateQuery(c, "date")
@@ -30,7 +22,7 @@ func getSelfAssignmentsList(c *gin.Context) {
 func getUserAssignmentsList(c *gin.Context) {
   user_id, err := getIntParam(c, "id")
   if err != nil {
-    forwardWarning(c, defaultPage, err.Error())
+    gotoWarning(c, defaultPage, err.Error())
     return
   }
   date, full := getDateQuery(c, "date")
@@ -40,23 +32,33 @@ func getUserAssignmentsList(c *gin.Context) {
   c.Set("id", user_id)
 }
 
+func handleAssignmentCreate(c *gin.Context) {
+  handleAssignmentAction(c, createAssignment)
+}
+
+func handleAssignmentDelete(c *gin.Context) {
+  handleAssignmentAction(c, deleteAssignment)
+}
+
 // --- local helpers ---
 
-func handleAssignmentAction(c *gin.Context, action (func(int, int) error), message string) {
+func handleAssignmentAction(c *gin.Context, action (func(int, int) (bool, string))) {
   event_id, err := getIntParam(c, "event_id")
   self := currentUser(c)
   if err != nil || self == nil {
-    forwardWarning(c, defaultPage, err.Error())
+    gotoWarning(c, defaultPage, err.Error())
     return
   }
   user_id, err := extractUserId(c, self)
-  if err == nil {
-    err = action(event_id, user_id)
-  }
   if err != nil {
-    forwardWarning(c, eventsViewPath(event_id), err.Error())
+    gotoWarning(c, eventsViewPath(event_id), err.Error())
+    return
+  }
+  ok, message := action(event_id, user_id)
+  if ok {
+    gotoSuccess(c, eventsViewPath(event_id), message)
   } else {
-    forwardTo(c, eventsViewPath(event_id), message)
+    gotoWarning(c, eventsViewPath(event_id), message)
   }
 }
 

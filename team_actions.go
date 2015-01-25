@@ -17,7 +17,7 @@ func getTeamList(c *gin.Context) {
 func getTeamEventsData(c *gin.Context) {
   team_id, err := getIntParam(c, "id")
   if err != nil {
-    forwardWarning(c, "/teams", err.Error())
+    gotoWarning(c, "/teams", err.Error())
     c.Abort(0)
     return
   }
@@ -49,7 +49,7 @@ func getTeamForm(c *gin.Context) {
     form, err = fetchTeam(team_id)
   }
   if err != nil {
-    forwardWarning(c, "/teams", err.Error())
+    gotoWarning(c, "/teams", err.Error())
     c.Abort(0)
   } else {
     c.Set("id", team_id)
@@ -67,7 +67,7 @@ func handleTeamCreate(c *gin.Context) {
   if err != nil {
     showError(c, err, &form)
   } else {
-    forwardTo(c, "/teams", "Team has been created")
+    gotoSuccess(c, "/teams", "Team has been created")
   }
 }
 
@@ -84,7 +84,7 @@ func handleTeamUpdate(c *gin.Context) {
   if err != nil {
     showError(c, err, &form)
   } else {
-    forwardTo(c, "/teams", "Team has been updated")
+    gotoSuccess(c, "/teams", "Team has been updated")
   }
 }
 
@@ -96,7 +96,7 @@ func handleTeamDelete(c *gin.Context) {
   if err != nil {
     showError(c, err)
   } else {
-    forwardTo(c, "/teams", "Team has been deleted")
+    gotoSuccess(c, "/teams", "Team has been deleted")
   }
 }
 

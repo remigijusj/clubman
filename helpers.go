@@ -71,14 +71,14 @@ func showError(c *gin.Context, err error, extra ...interface{}) {
   c.Redirect(302, route)
 }
 
-func forwardTo(c *gin.Context, route string, message string, args ...interface{}) {
+func gotoSuccess(c *gin.Context, route string, message string, args ...interface{}) {
   if len(message) > 0 {
     setSessionAlert(c, &Alert{"success", TC(c, message, args...)})
   }
   c.Redirect(302, route)
 }
 
-func forwardWarning(c *gin.Context, route string, message string, args ...interface{}) {
+func gotoWarning(c *gin.Context, route string, message string, args ...interface{}) {
   if len(message) > 0 {
     setSessionAlert(c, &Alert{"warning", TC(c, message, args...)})
   }

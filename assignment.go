@@ -1,7 +1,6 @@
 package main
 
 import (
-  "errors"
   "log"
   "time"
 )
@@ -87,30 +86,30 @@ func listUserAssignments(user_id int, date_from time.Time) []UserAssignment {
   return list
 }
 
-func createAssignment(event_id, user_id int) error {
+func createAssignment(event_id, user_id int) (bool, string) {
   res, err := query["assignment_insert"].Exec(event_id, user_id, 1)
   if err != nil {
     log.Printf("[APP] ASSIGNMENTS-CREATE error: %s, %d, %d\n", err, event_id, user_id)
-    return errors.New("Assignment could not be created")
+    return false, "Assignment could not be created"
   }
   num, err := res.RowsAffected()
   if num == 0 || err != nil {
-    return errors.New("Assignment could not be created")
+    return false, "Assignment could not be created"
   }
-  return nil
+  return true, "Assignment has been created"
 }
 
-func deleteAssignment(event_id, user_id int) error {
+func deleteAssignment(event_id, user_id int) (bool, string) {
   res, err := query["assignment_delete"].Exec(event_id, user_id)
   if err != nil {
     log.Printf("[APP] ASSIGNMENTS-DELETE error: %s, %d, %d\n", err, event_id, user_id)
-    return errors.New("Assignment could not be deleted")
+    return false, "Assignment could not be deleted"
   }
   num, err := res.RowsAffected()
   if num == 0 || err != nil {
-    return errors.New("Assignment could not be deleted")
+    return false, "Assignment could not be deleted"
   }
-  return nil
+  return true, "Assignment has been deleted"
 }
 
 func mapAssignedStatus(event_ids []int, user_id int) map[int]int {
