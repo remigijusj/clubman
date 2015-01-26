@@ -145,7 +145,7 @@ func mapParticipantCounts(event_ids []int) map[int]int {
     return data
   }
 
-  rows, err := queryMultiple("assignments_count", event_ids)
+  rows, err := queryMultiple("assignments_counts", event_ids)
   if err != nil {
     log.Printf("[APP] ASSIGNMENTS-COUNT error: %s\n", err)
     return data
@@ -170,7 +170,7 @@ func mapParticipantCounts(event_ids []int) map[int]int {
 
 func countAssignmentsTx(tx *sql.Tx, event_id int) (int, error) {
   var count int
-  err := tx.Stmt(query["assignments_count"]).QueryRow(event_id).Scan(&event_id, &count)
+  err := tx.Stmt(query["assignments_count"]).QueryRow(event_id).Scan(&count)
   if err != nil {
     log.Printf("[APP] ASSIGNMENTS-COUNT-EVENT error: %s, %d\n", err, event_id)
   }

@@ -33,6 +33,12 @@ type UserRecord struct {
   Status   int
 }
 
+type UserContact struct {
+  Id       int
+  Email    string
+  Mobile   string
+}
+
 func loginUserByForm(form *LoginForm) (*AuthInfo, error) {
   var auth AuthInfo
   var user_password string
