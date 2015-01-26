@@ -68,6 +68,20 @@ func handleAssignmentDelete(c *gin.Context) {
   }
 }
 
+func handleAssignmentConfirm(c *gin.Context) {
+  event_id, user_id, tx := prepareAssignmentAction(c)
+  if tx == nil { return }
+
+  err := confirmAssignmentTx(tx, event_id, user_id)
+  if err != nil {
+    failAssignmentAction(c, event_id, tx, "Action failed, perhaps the subscription is already confrmed or canceled")
+    return
+  }
+
+  message := assignmentConfirmSuccess(c, user_id)
+  completeAssignmentAction(c, event_id, tx, message)
+}
+
 // --- local helpers ---
 
 func prepareAssignmentAction(c *gin.Context) (int, int, *sql.Tx) {
@@ -176,5 +190,17 @@ func assignmentDeleteSuccess(c *gin.Context, user_id int) string {
     return "Your subscription has been canceled"
   } else {
     return "User subscription has been canceled"
+  }
+}
+
+func assignmentConfirmSuccess(c *gin.Context, user_id int) string {
+  self := currentUser(c)
+  if self == nil {
+    return panicError
+  }
+  if self.Id == user_id {
+    return "Your subscription has been confirmed"
+  } else {
+    return "User subscription has been confirmed"
   }
 }

@@ -3,6 +3,7 @@ package main
 import (
   "database/sql"
   "errors"
+  "fmt"
   "log"
 )
 
@@ -67,4 +68,22 @@ func updateAssignmentStatusTx(tx *sql.Tx, event_id, user_id, status int) error {
     return err
   }
   return nil
+}
+
+func confirmAssignmentTx(tx *sql.Tx, event_id, user_id int) (err error) {
+  defer func() {
+    log.Printf("[APP] ASSIGNMENT-CONFIRM-STATUS error: %s, %d, %d\n", err, event_id, user_id)
+  }()
+
+  var status int
+  err = tx.Stmt(query["assignments_status"]).QueryRow(event_id, user_id).Scan(&event_id, &status)
+  if err != nil { return }
+
+  if status != assignmentStatusNotified {
+    err = errors.New(fmt.Sprintf("invalid status: %d", status))
+  }
+  if err != nil { return }
+
+  err = updateAssignmentStatusTx(tx, event_id, user_id, assignmentStatusConfirmed)
+  return
 }

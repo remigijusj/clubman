@@ -27,6 +27,9 @@
               {{if $actions}}
               <td>
                 <a href="/assignments/delete/{{$event_id}}?user_id={{.UserId}}" data-action>{{"Cancel"|T}}</a>
+                {{if ne .Status 1}}
+                <a href="/assignments/confirm/{{$event_id}}?user_id={{.UserId}}" data-action>{{"Confirm"|T}}</a>
+                {{end}}
               </td>
               {{end}}
             </tr>
