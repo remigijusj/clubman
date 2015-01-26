@@ -13,10 +13,15 @@
       <div class="panel" data-equalizer-watch>
         <form method="POST">
           {{if eq .form.Status 0}}
+            {{$filled_up := and (gt .team.UsersMax 0) (ge (len .list) .team.UsersMax)}}
             {{if not .signed_up}}
-            <input type="button" data-action="/assignments/create/{{.id}}" class="button tiny radius right" value="{{"Signup myself"|T}}" />
+              {{$confirm := $filled_up}}
+              {{$msg := "This event is filled. Would like to be on the waiting list? If somebody unsubscribes you will get a notification"}}
+            <input type="button" data-action="/assignments/create/{{.id}}" class="button tiny radius right" {{if $confirm}}data-confirm="{{$msg|T}}"{{end}} value="{{"Signup myself"|T}}" />
             {{else}}
-            <input type="button" data-action="/assignments/delete/{{.id}}" class="button tiny radius right" value="{{"Cancel myself"|T}}" />
+              {{$confirm := and $filled_up (eq .signed_up.Status 1)}}
+              {{$msg := "Do you really want to cancel? Your space will be taken by another user"}}
+            <input type="button" data-action="/assignments/delete/{{.id}}" class="button tiny radius right" {{if $confirm}}data-confirm="{{$msg|T}}"{{end}} value="{{"Cancel myself"|T}}" />
             {{end}}
           {{end}}
           <small>
