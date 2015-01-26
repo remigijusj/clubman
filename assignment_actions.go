@@ -147,15 +147,17 @@ func decideAssignmentStatus(event_id int, tx *sql.Tx) (int, error) {
   if err != nil {
     return 0, err
   }
+  if max == 0 {
+    return assignmentStatusConfirmed, nil
+  }
   cnt, err := countAssignmentsTx(tx, event_id)
   if err != nil {
     return 0, err
   }
-  status := assignmentStatusConfirmed
   if cnt >= max {
-    status = assignmentStatusWaiting
+    return assignmentStatusWaiting, nil
   }
-  return status, nil
+  return assignmentStatusConfirmed, nil
 }
 
 func assignmentCreateSuccess(c *gin.Context, user_id, status int) string {

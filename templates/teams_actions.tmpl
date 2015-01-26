@@ -70,13 +70,13 @@
       <h4>{{.team.Name}}: {{"Events"|T}}</h4>
 
       <div class="panel">
-        <form action="/events/create/{{.id}}" method="POST">
+        <form action="/events/multi/create/{{.id}}" method="POST">
           {{template "teams_events_form.tmpl" . }}
           <div class="row end">
             <div class="columns">
               <input type="submit" class="button tiny radius" value="{{"Add events"|T}}" />
-              <input type="button" class="button tiny radius" value="{{"Cancel events"|T}}" data-action="/events/cancel/{{.id}}" />
-              <input type="button" class="button tiny radius" value="{{"Remove events"|T}}" data-action="/events/remove/{{.id}}" />
+              <input type="button" class="button tiny radius" value="{{"Cancel events"|T}}" data-action="/events/multi/cancel/{{.id}}" />
+              <input type="button" class="button tiny radius" value="{{"Remove events"|T}}" data-action="/events/multi/remove/{{.id}}" />
               <a href="/teams" class="info button tiny radius right">{{"Back"|T}}</a>
             </div>
           </div>

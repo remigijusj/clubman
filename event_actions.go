@@ -81,6 +81,18 @@ func handleEventUpdate(c *gin.Context) {
   }
 }
 
+func handleEventCancel(c *gin.Context) {
+  event_id, err := getIntParam(c, "id")
+  if err == nil {
+    err = cancelEvent(event_id)
+  }
+  if err != nil {
+    gotoWarning(c, eventsViewPath(event_id), err.Error())
+  } else {
+    gotoSuccess(c, eventsViewPath(event_id), "Event has been deleted")
+  }
+}
+
 func handleEventDelete(c *gin.Context) {
   event_id, err := getIntParam(c, "id")
   if err == nil {

@@ -42,6 +42,7 @@
     <div class="large-6 medium-6 columns">
       <div class="panel" data-equalizer-watch>
         <form method="POST" action="/assignments/create/{{.id}}">
+          {{if eq .form.Status 0}}
           <div class="row">
             <div class="small-8 columns">
               <select name="user_id" id="user_id" class="select2">
@@ -55,9 +56,15 @@
               <input type="submit" class="button tiny radius right" value="{{"Signup user"|T}}" />
             </div>
           </div>
+          {{end}}
           <div class="row end">
             <div class="columns">
               <a href="/events/update/{{.id}}" class="button tiny radius right">{{"Edit event"|T}}</a>
+              {{if eq .form.Status 0}}
+                {{$confirm := gt (len .list) 0}}
+                {{$msg := "Are you sure? Event subscriptions will be deleted"}}
+              <input type="button" data-action="/events/cancel/{{.id}}" class="button tiny radius right right-1" {{if $confirm}}data-confirm="{{$msg|T}}"{{end}} value="{{"Cancel event"|T}}" />
+              {{end}}
             </div>
           </div>
         </form>
@@ -65,7 +72,9 @@
     </div>
     {{end}}
   </div>
-  {{template "events_assignments_list.tmpl" . }}
+  {{if and (eq .form.Status 0) (gt (len .list) 0)}}
+    {{template "events_assignments_list.tmpl" . }}
+  {{end}}
 {{end}}
 {{define "events_update.tmpl"}}
   <div class="row">

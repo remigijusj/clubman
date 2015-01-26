@@ -176,3 +176,11 @@ func countAssignmentsTx(tx *sql.Tx, event_id int) (int, error) {
   }
   return count, err
 }
+
+func removeAssignments(event_id int) error {
+  _, err := query["assignments_clean"].Exec(event_id)
+  if err != nil {
+    log.Printf("[APP] ASSIGNMENTS-CLEAN error: %s, %d\n", err, event_id)
+  }
+  return err
+}

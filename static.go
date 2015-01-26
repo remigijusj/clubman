@@ -77,15 +77,14 @@ var queries = map[string]string{
 
   "events_team":        "SELECT id, team_id, start_at, minutes, status FROM events WHERE team_id=? AND start_at >= ? ORDER BY start_at",
   "events_period":      "SELECT id, team_id, start_at, minutes, status FROM events WHERE start_at >= ? AND start_at < ? AND status>=0 ORDER BY start_at",
+  "events_by_time":     "SELECT id FROM events WHERE team_id=? AND start_at=?",
+  "events_by_date":     "SELECT id FROM events WHERE team_id=? AND datetime(start_at,'start of day')=?",
   "event_select":       "SELECT team_id, start_at, minutes, status FROM events WHERE id=?",
   "event_insert":       "INSERT INTO events(team_id, start_at, minutes, status) VALUES (?, ?, ?, ?)",
   "event_update":       "UPDATE events SET team_id=?, start_at=?, minutes=?, status=? WHERE id=?",
-  "events_status_time": "UPDATE events SET status=? WHERE team_id=? AND start_at=?",
-  "events_status_date": "UPDATE events SET status=? WHERE team_id=? AND datetime(start_at,'start of day')=?",
+  "event_status":       "UPDATE events SET status=? WHERE id=?",
   "event_delete":       "DELETE FROM events WHERE id=?",
   "events_delete_team": "DELETE FROM events WHERE team_id=?",
-  "events_delete_time": "DELETE FROM events WHERE team_id=? AND start_at=?",
-  "events_delete_date": "DELETE FROM events WHERE team_id=? AND datetime(start_at, 'start of day')=?",
 
   "assignments_event":  "SELECT user_id, users.name, assignments.status FROM assignments JOIN users ON user_id=users.id WHERE event_id=? ORDER BY assignments.status DESC, assignments.id",
   "assignments_user":   "SELECT event_id, teams.name, start_at, minutes, events.status, assignments.status FROM assignments JOIN events ON event_id=events.id JOIN teams ON team_id=teams.id WHERE user_id=? AND events.start_at >= ? ORDER BY start_at",
