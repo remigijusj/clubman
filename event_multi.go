@@ -101,7 +101,7 @@ func cancelEvents(team_id int, form *TeamEventsForm, lang string) (int, error) {
     }
     num, _ := res.RowsAffected()
     if num > 0 {
-      removeAssignments(event_id)
+      clearAssignments(event_id)
     }
     return int(num)
   })
@@ -121,7 +121,7 @@ func removeEvents(team_id int, form *TeamEventsForm, lang string) (int, error) {
     }
     num, _ := res.RowsAffected()
     if num > 0 {
-      removeAssignments(event_id)
+      clearAssignments(event_id)
     }
     return int(num)
   })

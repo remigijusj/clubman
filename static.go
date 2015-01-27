@@ -84,7 +84,7 @@ var queries = map[string]string{
   "event_update":       "UPDATE events SET team_id=?, start_at=?, minutes=?, status=? WHERE id=?",
   "event_status":       "UPDATE events SET status=? WHERE id=?",
   "event_delete":       "DELETE FROM events WHERE id=?",
-  "events_delete_team": "DELETE FROM events WHERE team_id=?",
+  "events_clear":       "DELETE FROM events WHERE team_id=?",
 
   "assignments_event":  "SELECT user_id, users.name, assignments.status FROM assignments JOIN users ON user_id=users.id WHERE event_id=? ORDER BY assignments.status DESC, assignments.id",
   "assignments_user":   "SELECT event_id, teams.name, start_at, minutes, events.status, assignments.status FROM assignments JOIN events ON event_id=events.id JOIN teams ON team_id=teams.id WHERE user_id=? AND events.start_at >= ? ORDER BY start_at",
@@ -96,5 +96,5 @@ var queries = map[string]string{
   "assignment_insert":  "INSERT INTO assignments(event_id, user_id, status) VALUES (?, ?, ?)",
   "assignment_update":  "UPDATE assignments SET status=? WHERE event_id=? AND user_id=?",
   "assignment_delete":  "DELETE FROM assignments WHERE event_id=? AND user_id=?",
-  "assignments_clean":  "DELETE FROM assignments WHERE event_id=?",
+  "assignments_clear":  "DELETE FROM assignments WHERE event_id=?",
 }

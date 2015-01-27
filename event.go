@@ -87,7 +87,7 @@ func updateEvent(event_id int, form *EventForm, lang string) error {
     return errors.New("Event could not be updated")
   }
   if form.Status == eventStatusCanceled {
-    removeAssignments(event_id)
+    clearAssignments(event_id)
   }
   return nil
 }
@@ -98,7 +98,7 @@ func cancelEvent(event_id int) error {
     log.Printf("[APP] EVENT-CANCEL error: %s, %d\n", err, event_id)
     return errors.New("Event could not be canceled")
   }
-  removeAssignments(event_id)
+  clearAssignments(event_id)
   return nil
 }
 
@@ -108,8 +108,16 @@ func deleteEvent(event_id int) error {
     log.Printf("[APP] EVENT-DELETE error: %s, %d\n", err, event_id)
     return errors.New("Event could not be deleted")
   }
-  removeAssignments(event_id)
+  clearAssignments(event_id)
   return nil
+}
+
+func clearEvents(team_id int) error {
+  _, err := query["events_clear"].Exec(team_id)
+  if err != nil {
+    log.Printf("[APP] EVENTS-CLEAR error: %s, %d\n", err, team_id)
+  }
+  return err
 }
 
 func parseEventForm(form *EventForm, lang string) error {
