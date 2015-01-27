@@ -77,8 +77,7 @@ var queries = map[string]string{
 
   "events_team":        "SELECT id, team_id, start_at, minutes, status FROM events WHERE team_id=? AND start_at >= ? ORDER BY start_at",
   "events_period":      "SELECT id, team_id, start_at, minutes, status FROM events WHERE start_at >= ? AND start_at < ? AND status>=0 ORDER BY start_at",
-  "events_by_time":     "SELECT id FROM events WHERE team_id=? AND start_at=?",
-  "events_by_date":     "SELECT id FROM events WHERE team_id=? AND datetime(start_at,'start of day')=?",
+  "events_multi":       "SELECT id, start_at FROM events WHERE team_id=? AND start_at >= ? AND start_at < ?",
   "event_select":       "SELECT team_id, start_at, minutes, status FROM events WHERE id=?",
   "event_insert":       "INSERT INTO events(team_id, start_at, minutes, status) VALUES (?, ?, ?, ?)",
   "event_update":       "UPDATE events SET team_id=?, start_at=?, minutes=?, status=? WHERE id=?",

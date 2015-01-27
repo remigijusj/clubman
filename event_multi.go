@@ -37,43 +37,45 @@ func (self TeamEventsData) eachTime(callback func(time.Time) int) int {
   return cnt
 }
 
-// TODO: optimize queries, add error
-func (self TeamEventsData) listEventIds(team_id int) []int {
-  list := []int{}
+func (self TeamEventsData) eventIds(team_id int) (list []int) {
+  list = []int{}
 
-  kind := self.queryKind()
-  self.eachTime(func(date time.Time) int {
-    rows, err := query[kind].Query(team_id, date)
+  var err error
+  defer func() {
     if err != nil {
-      log.Printf("[APP] EVENTS-EACH-ASSIGNMENT error: %s, %d, %s\n", err, team_id, date)
-      return 0
+      log.Printf("[APP] EVENTS-MULTI error: %s, %d, %v\n", err, team_id, self)
     }
-    defer rows.Close()
+  }()
 
-    var event_id int
-    for rows.Next() {
-      err := rows.Scan(&event_id)
-      if err != nil {
-        log.Printf("[APP] EVENTS-EACH-ASSIGNMENT error: %s, %d, %s\n", err, team_id, date)
-        continue
-      }
+  rows, err := query["events_multi"].Query(team_id, self.DateFrom.Format(dateFormat), self.DateTill.AddDate(0, 0, 1).Format(dateFormat))
+  if err != nil { return }
+  defer rows.Close()
+
+  var event_id int
+  var start_at time.Time
+  for rows.Next() {
+    err := rows.Scan(&event_id, &start_at)
+    if err != nil { return }
+    // WARNING: see the comment in listEvents
+    if self.matchTime(start_at.UTC()) {
       list = append(list, event_id)
     }
-    if err := rows.Err(); err != nil {
-      log.Printf("[APP] EVENTS-EACH-ASSIGNMENT error: %s, %d, %s\n", err, team_id, date)
-    }
+  }
+  err = rows.Err()
 
-    return 0
-  })
-
-  return list
+  return
 }
 
-func (self TeamEventsData) queryKind() string {
-  if self.StartAt.IsZero() {
-    return "events_by_date"
-  } else{
-    return "events_by_time"
+func (self TeamEventsData) matchTime(t time.Time) bool {
+  wday := int(t.Weekday())
+  if !self.Weekdays[wday] {
+    return false
+  }
+  s := self.StartAt
+  if s.IsZero() {
+    return true
+  } else {
+    return s.Hour() == t.Hour() && s.Minute() == t.Minute()
   }
 }
 
@@ -85,7 +87,7 @@ func createEvents(team_id int, form *TeamEventsForm, lang string) (int, error) {
   cnt := data.eachTime(func(date time.Time) int {
     res, err := query["event_insert"].Exec(team_id, date, data.Minutes, 0)
     if err != nil {
-      log.Printf("[APP] EVENTS-CREATE error: %s, %d, %s\n", err, team_id, date)
+      log.Printf("[APP] EVENT-INSERT error: %s, %d, %s, %d\n", err, team_id, date, data.Minutes)
       return 0
     }
     num, _ := res.RowsAffected()
@@ -99,13 +101,13 @@ func cancelEvents(team_id int, form *TeamEventsForm, lang string) (int, error) {
   if err != nil {
     return 0, err
   }
-  list := data.listEventIds(team_id)
+  list := data.eventIds(team_id)
   if len(list) == 0 {
     return 0, nil
   }
   res, err := multiExec("event_status", eventStatusCanceled, list)
   if err != nil {
-    log.Printf("[APP] EVENTS-CANCEL error: %s, %v\n", err, list)
+    log.Printf("[APP] EVENT-STATUS error: %s, %v\n", err, list)
     return 0, nil
   }
   num, _ := res.RowsAffected()
@@ -120,13 +122,13 @@ func removeEvents(team_id int, form *TeamEventsForm, lang string) (int, error) {
   if err != nil {
     return 0, err
   }
-  list := data.listEventIds(team_id)
+  list := data.eventIds(team_id)
   if len(list) == 0 {
     return 0, nil
   }
   res, err := multiExec("event_delete", list)
   if err != nil {
-    log.Printf("[APP] EVENTS-REMOVE error: %s, %v\n", err, list)
+    log.Printf("[APP] EVENT-DELETE error: %s, %v\n", err, list)
     return 0, nil
   }
   num, _ := res.RowsAffected()

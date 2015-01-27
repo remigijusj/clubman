@@ -35,26 +35,27 @@ func indexTeams() map[int]TeamRecord {
   return data
 }
 
-func listTeams(rows *sql.Rows, err error) []TeamRecord {
-  list := []TeamRecord{}
-  if err != nil {
-    log.Printf("[APP] TEAM-LIST error: %s\n", err)
-    return list
-  }
-  defer rows.Close()
-  for rows.Next() {
-    var item TeamRecord
-    err := rows.Scan(&item.Id, &item.Name, &item.UserName)
+func listTeams(rows *sql.Rows, err error) (list []TeamRecord) {
+  list = []TeamRecord{}
+
+  defer func() {
     if err != nil {
       log.Printf("[APP] TEAM-LIST error: %s\n", err)
-    } else {
-      list = append(list, item)
     }
+  }()
+  if err != nil { return }
+
+  defer rows.Close()
+
+  for rows.Next() {
+    var item TeamRecord
+    err = rows.Scan(&item.Id, &item.Name, &item.UserName)
+    if err != nil { return }
+    list = append(list, item)
   }
-  if err := rows.Err(); err != nil {
-    log.Printf("[APP] TEAM-LIST error: %s\n", err)
-  }
-  return list
+  err = rows.Err()
+
+  return
 }
 
 func fetchTeam(team_id int) (TeamForm, error) {
@@ -74,7 +75,7 @@ func createTeam(form *TeamForm) error {
   }
   _, err = query["team_insert"].Exec(form.Name, form.UsersMin, form.UsersMax, form.InstructorId)
   if err != nil {
-    log.Printf("[APP] TEAM-CREATE error: %s, %v\n", err, form)
+    log.Printf("[APP] TEAM-INSERT error: %s, %v\n", err, form)
     return errors.New("Team could not be created")
   }
   return nil

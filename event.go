@@ -38,30 +38,30 @@ func listTeamEvents(team_id int, date_from time.Time) []EventRecord {
   return listEvents(rows, err)
 }
 
-func listEvents(rows *sql.Rows, err error) []EventRecord {
-  list := []EventRecord{}
+func listEvents(rows *sql.Rows, err error) (list []EventRecord) {
+  list = []EventRecord{}
 
-  if err != nil {
-    log.Printf("[APP] TEAM-EVENTS-LIST error: %s\n", err)
-    return list
-  }
+  defer func() {
+    if err != nil {
+      log.Printf("[APP] EVENTS-TEAM error: %s\n", err)
+    }
+  }()
+  if err != nil { return }
+
   defer rows.Close()
+
   for rows.Next() {
     var item EventRecord
-    err := rows.Scan(&item.Id, &item.TeamId, &item.StartAt, &item.Minutes, &item.Status)
-    if err != nil {
-      log.Printf("[APP] TEAM-EVENTS-LIST error: %s\n", err)
-    } else {
-      // WARNING: we interpret datetimes in DB literally as entered, but all data being UTC
-      //   time.Parse gives UTC already, but rows.Scan gives us local times (why?), so convert!
-      item.StartAt = item.StartAt.UTC()
-      list = append(list, item)
-    }
+    err = rows.Scan(&item.Id, &item.TeamId, &item.StartAt, &item.Minutes, &item.Status)
+    if err != nil { return }
+    // WARNING: we interpret datetimes in DB literally as entered, but all data being UTC
+    //   time.Parse gives UTC already, but rows.Scan gives us local times (why?), so convert!
+    item.StartAt = item.StartAt.UTC()
+    list = append(list, item)
   }
-  if err := rows.Err(); err != nil {
-    log.Printf("[APP] TEAM-EVENTS-LIST error: %s\n", err)
-  }
-  return list
+  err = rows.Err()
+
+  return
 }
 
 func fetchEvent(event_id int) (EventForm, error) {
@@ -95,7 +95,7 @@ func updateEvent(event_id int, form *EventForm, lang string) error {
 func cancelEvent(event_id int) error {
   _, err := query["event_status"].Exec(eventStatusCanceled, event_id)
   if err != nil {
-    log.Printf("[APP] EVENT-CANCEL error: %s, %d\n", err, event_id)
+    log.Printf("[APP] EVENT-STATUS error: %s, %d\n", err, event_id)
     return errors.New("Event could not be canceled")
   }
   clearAssignments(event_id)

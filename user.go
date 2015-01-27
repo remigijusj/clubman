@@ -93,26 +93,27 @@ func listUsersByQuery(q url.Values) []UserRecord {
   }
 }
 
-func listUsers(rows *sql.Rows, err error) []UserRecord {
-  list := []UserRecord{}
-  if err != nil {
-    log.Printf("[APP] USER-LIST error: %s\n", err)
-    return list
-  }
-  defer rows.Close()
-  for rows.Next() {
-    var item UserRecord
-    err := rows.Scan(&item.Id, &item.Name, &item.Email, &item.Status)
+func listUsers(rows *sql.Rows, err error) (list []UserRecord) {
+  list = []UserRecord{}
+
+  defer func() {
     if err != nil {
       log.Printf("[APP] USER-LIST error: %s\n", err)
-    } else {
-      list = append(list, item)
     }
+  }()
+  if err != nil { return }
+
+  defer rows.Close()
+
+  for rows.Next() {
+    var item UserRecord
+    err = rows.Scan(&item.Id, &item.Name, &item.Email, &item.Status)
+    if err != nil { return }
+    list = append(list, item)
   }
-  if err := rows.Err(); err != nil {
-    log.Printf("[APP] USER-LIST error: %s\n", err)
-  }
-  return list
+  err = rows.Err()
+
+  return
 }
 
 func fetchUserProfile(user_id int) (UserForm, error) {
@@ -211,31 +212,29 @@ func userName(user_id int) (string, error) {
   return name, err
 }
 
-func mapUserNames(user_ids []int) map[int]string {
-  data := make(map[int]string, len(user_ids))
-  if len(user_ids) == 0 {
-    return data
-  }
+func mapUserNames(user_ids []int) (data map[int]string) {
+  data = make(map[int]string, len(user_ids))
+  if len(user_ids) == 0 { return }
+
+  var err error
+  defer func() {
+    if err != nil {
+      log.Printf("[APP] USER-NAMES error: %s, %v\n", err, user_ids)
+    }
+  }()
 
   rows, err := multiQuery("users_names", user_ids)
-  if err != nil {
-    log.Printf("[APP] USER-NAMES error: %s\n", err)
-    return data
-  }
+  if err != nil { return }
   defer rows.Close()
 
   var user_id int
   var name string
   for rows.Next() {
-    err := rows.Scan(&user_id, &name)
-    if err != nil {
-      log.Printf("[APP] USER-NAMES error: %s\n", err)
-    } else {
-      data[user_id] = name
-    }
+    err = rows.Scan(&user_id, &name)
+    if err != nil { return }
+    data[user_id] = name
   }
-  if err := rows.Err(); err != nil {
-    log.Printf("[APP] USER-NAMES error: %s\n", err)
-  }
-  return data
+  err = rows.Err()
+
+  return
 }

@@ -128,7 +128,7 @@ func getLang(c *gin.Context) string {
   return defaultLang
 }
 
-func multiQuery(name string, ints []int, args ...interface{}) (*sql.Rows, error) {
+func multiQuery(name string, args ...interface{}) (*sql.Rows, error) {
   qry, list := multi(name, args...)
   return db.Query(qry, list...)
 }
