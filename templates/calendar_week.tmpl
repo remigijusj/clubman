@@ -49,7 +49,7 @@
           {{range $d, $list := (index .events 0)}}
           {{$date := calcMonthDate $date 0 $d}}
           <div class="small-1 medium-1 large-1 day">
-            <small>{{$date.Day}}</small>
+            <small>{{$date.Day}} {{$date.Format "Jan"|T}}</small>
           </div>
           {{end}}
         </li>

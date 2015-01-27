@@ -3,7 +3,6 @@ package main
 import (
   "database/sql"
   "encoding/gob"
-  "errors"
   "log"
   "regexp"
   "strings"
@@ -129,17 +128,31 @@ func getLang(c *gin.Context) string {
   return defaultLang
 }
 
-func queryMultiple(name string, list []int, extra ...interface{}) (*sql.Rows, error) {
-  if len(list) == 0 {
-    return nil, errors.New("Can't query with empty args")
-  }
-  qry := strings.Replace(queries[name], "(?)", "(?"+strings.Repeat(",?", len(list)-1)+")", 1)
+func multiQuery(name string, ints []int, args ...interface{}) (*sql.Rows, error) {
+  qry, list := multi(name, args...)
+  return db.Query(qry, list...)
+}
 
-  args := make([]interface{}, len(list)+len(extra))
-  for i, item := range list {
-    args[i] = item
-  }
-  copy(args[len(list):], extra)
+func multiExec(name string, args ...interface{}) (sql.Result, error) {
+  qry, list := multi(name, args...)
+  return db.Exec(qry, list...)
+}
 
-  return db.Query(qry, args...)
+// expands int slice arguments for IN-queries
+// WARNING: caller is reponsible for ensuring non-empty slices
+func multi(name string, args ...interface{}) (string, []interface{}) {
+  qry := queries[name]
+  list := []interface{}{}
+  for _, item := range args {
+    if ints, ok := item.([]int); ok {
+      for _, it := range ints {
+        list = append(list, it)
+      }
+      // WARNING: a hack, only works once!
+      qry = strings.Replace(qry, "(?)", "(?"+strings.Repeat(",?", len(ints)-1)+")", 1)
+    } else {
+      list = append(list, item)
+    }
+  }
+  return qry, list
 }

@@ -115,8 +115,11 @@ func deleteAssignmentTx(tx *sql.Tx, event_id, user_id int) error {
 
 func mapAssignedStatus(event_ids []int, user_id int) map[int]int {
   data := make(map[int]int, len(event_ids))
+  if len(event_ids) == 0 {
+    return data
+  }
 
-  rows, err := queryMultiple("assignments_status", event_ids, user_id)
+  rows, err := multiQuery("assignments_status", event_ids, user_id)
   if err != nil {
     log.Printf("[APP] USER-ASSIGNMENTS-PERIOD error: %s\n", err)
     return data
@@ -145,7 +148,7 @@ func mapParticipantCounts(event_ids []int) map[int]int {
     return data
   }
 
-  rows, err := queryMultiple("assignments_counts", event_ids)
+  rows, err := multiQuery("assignments_counts", event_ids)
   if err != nil {
     log.Printf("[APP] ASSIGNMENTS-COUNT error: %s\n", err)
     return data
@@ -177,10 +180,13 @@ func countAssignmentsTx(tx *sql.Tx, event_id int) (int, error) {
   return count, err
 }
 
-func clearAssignments(event_id int) error {
-  _, err := query["assignments_clear"].Exec(event_id)
+func clearAssignments(event_ids ...int) error {
+  if len(event_ids) == 0 {
+    return nil
+  }
+  _, err := multiExec("assignments_clear", event_ids)
   if err != nil {
-    log.Printf("[APP] ASSIGNMENTS-CLEAR error: %s, %d\n", err, event_id)
+    log.Printf("[APP] ASSIGNMENTS-CLEAR error: %s, %v\n", err, event_ids)
   }
   return err
 }

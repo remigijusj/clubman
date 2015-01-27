@@ -37,15 +37,12 @@ func (self TeamEventsData) eachTime(callback func(time.Time) int) int {
   return cnt
 }
 
-func (self TeamEventsData) eachEvent(team_id int, callback func(int) int) int {
-  var kind string
-  if self.StartAt.IsZero() {
-    kind = "events_by_date"
-  } else{
-    kind = "events_by_time"
-  }
+// TODO: optimize queries, add error
+func (self TeamEventsData) listEventIds(team_id int) []int {
+  list := []int{}
 
-  return self.eachTime(func(date time.Time) int {
+  kind := self.queryKind()
+  self.eachTime(func(date time.Time) int {
     rows, err := query[kind].Query(team_id, date)
     if err != nil {
       log.Printf("[APP] EVENTS-EACH-ASSIGNMENT error: %s, %d, %s\n", err, team_id, date)
@@ -53,7 +50,6 @@ func (self TeamEventsData) eachEvent(team_id int, callback func(int) int) int {
     }
     defer rows.Close()
 
-    cnt := 0
     var event_id int
     for rows.Next() {
       err := rows.Scan(&event_id)
@@ -61,14 +57,24 @@ func (self TeamEventsData) eachEvent(team_id int, callback func(int) int) int {
         log.Printf("[APP] EVENTS-EACH-ASSIGNMENT error: %s, %d, %s\n", err, team_id, date)
         continue
       }
-      cnt += callback(event_id)
+      list = append(list, event_id)
     }
     if err := rows.Err(); err != nil {
       log.Printf("[APP] EVENTS-EACH-ASSIGNMENT error: %s, %d, %s\n", err, team_id, date)
     }
 
-    return cnt
+    return 0
   })
+
+  return list
+}
+
+func (self TeamEventsData) queryKind() string {
+  if self.StartAt.IsZero() {
+    return "events_by_date"
+  } else{
+    return "events_by_time"
+  }
 }
 
 func createEvents(team_id int, form *TeamEventsForm, lang string) (int, error) {
@@ -93,19 +99,20 @@ func cancelEvents(team_id int, form *TeamEventsForm, lang string) (int, error) {
   if err != nil {
     return 0, err
   }
-  cnt := data.eachEvent(team_id, func(event_id int) int {
-    res, err := query["event_status"].Exec(eventStatusCanceled, event_id)
-    if err != nil {
-      log.Printf("[APP] EVENTS-CANCEL error: %s, %d\n", err, event_id)
-      return 0
-    }
-    num, _ := res.RowsAffected()
-    if num > 0 {
-      clearAssignments(event_id)
-    }
-    return int(num)
-  })
-  return cnt, nil
+  list := data.listEventIds(team_id)
+  if len(list) == 0 {
+    return 0, nil
+  }
+  res, err := multiExec("event_status", eventStatusCanceled, list)
+  if err != nil {
+    log.Printf("[APP] EVENTS-CANCEL error: %s, %v\n", err, list)
+    return 0, nil
+  }
+  num, _ := res.RowsAffected()
+  if num > 0 {
+    clearAssignments(list...)
+  }
+  return int(num), nil
 }
 
 func removeEvents(team_id int, form *TeamEventsForm, lang string) (int, error) {
@@ -113,19 +120,20 @@ func removeEvents(team_id int, form *TeamEventsForm, lang string) (int, error) {
   if err != nil {
     return 0, err
   }
-  cnt := data.eachEvent(team_id, func(event_id int) int {
-    res, err := query["event_delete"].Exec(event_id)
-    if err != nil {
-      log.Printf("[APP] EVENTS-REMOVE error: %s, %d\n", err, event_id)
-      return 0
-    }
-    num, _ := res.RowsAffected()
-    if num > 0 {
-      clearAssignments(event_id)
-    }
-    return int(num)
-  })
-  return cnt, nil
+  list := data.listEventIds(team_id)
+  if len(list) == 0 {
+    return 0, nil
+  }
+  res, err := multiExec("event_delete", list)
+  if err != nil {
+    log.Printf("[APP] EVENTS-REMOVE error: %s, %v\n", err, list)
+    return 0, nil
+  }
+  num, _ := res.RowsAffected()
+  if num > 0 {
+    clearAssignments(list...)
+  }
+  return int(num), nil
 }
 
 func parseEventsForm(form *TeamEventsForm, need_time bool, lang string) (*TeamEventsData, error) {
