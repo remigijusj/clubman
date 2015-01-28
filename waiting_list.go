@@ -21,7 +21,7 @@ func afterAssignmentDelete(event_id int) {
   err = tx.Commit()
   if err != nil { return }
 
-  sendEventConfirmLink(user_id, event_id)
+  notifyEventConfirm(user_id, event_id)
 }
 
 func firstWaitingUserTx(tx *sql.Tx, event_id int) (int, error) {

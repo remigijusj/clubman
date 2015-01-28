@@ -22,6 +22,9 @@ const (
   smsPass    = ""
   smsFrom    = ""
 
+  workdayFrom = "08:00" // contact email/sms
+  workdayTill = "16:00"
+
   sessionKey = "session"
   bcryptCost = 10
   minPassLen = 6

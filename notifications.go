@@ -8,11 +8,26 @@ import (
   "log"
   "net/http"
   "net/url"
+  "time"
 
   "gopkg.in/gomail.v1"
 )
 
+const (
+  contactEmail = 1
+  contactSMS   = 2
+)
+
 var mails *template.Template
+
+func (self UserContact) chooseMethod() int {
+  now := time.Now().Format(timeFormat)
+  if now < workdayFrom || now >= workdayTill {
+    return contactSMS
+  } else {
+    return contactEmail
+  }
+}
 
 func loadMailTemplates(pattern string) {
   mails = template.Must(template.New("").Funcs(helpers).ParseGlob("mails/*"))
@@ -85,7 +100,7 @@ func sendResetLinkEmail(lang, email, token string) {
   }
 }
 
-func sendEventConfirmLink(user_id, event_id int) {
+func notifyEventConfirm(user_id, event_id int) {
   user, err := userContact(user_id)
   if err != nil {
     log.Printf("[APP] SEND-EVENT-CONFIRM: %v, %d, %d, %v\n", err, user_id, event_id, user)
@@ -96,7 +111,12 @@ func sendEventConfirmLink(user_id, event_id int) {
     log.Printf("[APP] SEND-EVENT-CONFIRM: %v, %d, %d, %v\n", err, user_id, event_id, event)
     return
   }
-  sendEventConfirmLinkEmail(user.Language, user.Email, event_id, &event)
+  switch user.chooseMethod() {
+  case contactEmail:
+    sendEventConfirmLinkEmail(user.Language, user.Email, event_id, &event)
+  case contactSMS:
+    sendEventConfirmLinkSMS(user.Language, user.Mobile, event_id, &event)
+  }
 }
 
 func sendEventConfirmLinkEmail(lang, email string, event_id int, event *EventInfo) {
@@ -115,4 +135,16 @@ func sendEventConfirmLinkEmail(lang, email string, event_id int, event *EventInf
   if err != nil {
     log.Printf("[APP] SEND-EVENT-CONFIRM-EMAIL error: %s\n", err)
   }
+}
+
+func sendEventConfirmLinkSMS(lang, mobile string, event_id int, event *EventInfo) {
+  var buf bytes.Buffer
+  buf.WriteString(T(lang, "Another user has unsubscribed from %s", event.Name))
+  buf.WriteString(", ")
+  buf.WriteString(event.StartAt.Format(dateFormats[lang]))
+  buf.WriteString(". ")
+  buf.WriteString(T(lang, "Please login to %s and confirm", serverHost))
+  message := buf.String()
+
+  sendSMS(mobile, message)
 }
