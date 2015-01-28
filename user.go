@@ -34,9 +34,9 @@ type UserRecord struct {
 }
 
 type UserContact struct {
-  Id       int
   Email    string
   Mobile   string
+  Language string
 }
 
 func loginUserByForm(form *LoginForm) (*AuthInfo, error) {
@@ -56,7 +56,7 @@ func loginUserByForm(form *LoginForm) (*AuthInfo, error) {
 }
 
 // NOTE: we don't reveal if email is missing or another problem occured
-func sendResetLink(form *ForgotForm, lang string) bool {
+func generatePasswordReset(form *ForgotForm, lang string) bool {
   token := generateToken(16)
   res, err := query["password_forgot"].Exec(token, form.Email)
   if err != nil {
@@ -68,7 +68,7 @@ func sendResetLink(form *ForgotForm, lang string) bool {
     log.Printf("[APP] RESET-FORM failure 2: %s, %s, %s\n", err, token, form.Email)
     return false
   }
-  go sendResetEmail(lang, form.Email, token)
+  go sendResetLinkEmail(lang, form.Email, token)
   return true
 }
 
@@ -210,6 +210,15 @@ func userName(user_id int) (string, error) {
   var name string
   err := query["user_name"].QueryRow(user_id).Scan(&name)
   return name, err
+}
+
+func userContact(user_id int) (UserContact, error) {
+  var user UserContact
+  err := query["user_contact"].QueryRow(user_id).Scan(&user.Email, &user.Mobile, &user.Language)
+  if err != nil {
+    log.Printf("[APP] USER-CONTACT error: %s, %d, %v\n", err, user_id, user)
+  }
+  return user, err
 }
 
 func mapUserNames(user_ids []int) (data map[int]string) {

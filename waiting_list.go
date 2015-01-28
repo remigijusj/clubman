@@ -8,43 +8,43 @@ import (
 )
 
 // NOTE: delayed
-func afterAssignmentDelete(event_id int, lang string) {
+func afterAssignmentDelete(event_id int) {
   tx, err := db.Begin()
   if err != nil { return }
 
-  user, err := firstWaitingUserTx(tx, event_id)
+  user_id, err := firstWaitingUserTx(tx, event_id)
   if err != nil { tx.Rollback(); return }
 
-  err = updateAssignmentStatusTx(tx, event_id, user.Id, assignmentStatusNotified)
+  err = updateAssignmentStatusTx(tx, event_id, user_id, assignmentStatusNotified)
   if err != nil { tx.Rollback(); return }
 
   err = tx.Commit()
   if err != nil { return }
 
-  sendWaitingConfirmationEmail(lang, user.Email, user.Id, event_id)
+  sendEventConfirmLink(user_id, event_id)
 }
 
-func firstWaitingUserTx(tx *sql.Tx, event_id int) (*UserContact, error) {
+func firstWaitingUserTx(tx *sql.Tx, event_id int) (int, error) {
   max, err := maxTeamUsersTx(tx, event_id)
   if err != nil {
-    return nil, err
+    return 0, err
   }
 
   cnt, err := countNonWaitingUsersTx(tx, event_id)
   if err != nil {
-    return nil, err
+    return 0, err
   }
   if cnt >= max {
     log.Printf("[APP] ASSIGNMENTS-FIRST-WAITING condition: %d\n", event_id)
-    return nil, errors.New("")
+    return 0, errors.New("")
   }
 
-  var user UserContact
-  err = tx.Stmt(query["assignments_first"]).QueryRow(event_id, assignmentStatusWaiting).Scan(&user.Id, &user.Email, &user.Mobile)
+  var user_id int
+  err = tx.Stmt(query["assignments_first"]).QueryRow(event_id, assignmentStatusWaiting).Scan(&user_id)
   if err != nil {
-    log.Printf("[APP] ASSIGNMENTS-FIRST-WAITING error: %s, %d, %v\n", err, event_id, user)
+    log.Printf("[APP] ASSIGNMENTS-FIRST-WAITING error: %s, %d, %d\n", err, event_id, user_id)
   }
-  return &user, err
+  return user_id, err
 }
 
 // NOTE: count status IN (-1, 1)
@@ -72,7 +72,9 @@ func updateAssignmentStatusTx(tx *sql.Tx, event_id, user_id, status int) error {
 
 func confirmAssignmentTx(tx *sql.Tx, event_id, user_id int) (err error) {
   defer func() {
-    log.Printf("[APP] ASSIGNMENT-CONFIRM-STATUS error: %s, %d, %d\n", err, event_id, user_id)
+    if err != nil {
+      log.Printf("[APP] ASSIGNMENT-CONFIRM-STATUS error: %s, %d, %d\n", err, event_id, user_id)
+    }
   }()
 
   var status int

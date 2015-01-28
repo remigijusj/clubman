@@ -6,3 +6,14 @@
 <p><a href="{{.url}}">{{.url}}</a></p>
 <p>{{"This link is valid for one-time only"|T}}.</p>
 {{end}}
+
+{{define "event_confirm"}}
+<p>
+  {{T "Another user has unsubscribed from %s" .event.Name}}.<br/>
+  {{localDate .event.StartAt .lang}},
+  {{printTime .event.StartAt}} &ndash; {{printTime .event.FinishAt}}
+  <br/><br/>
+  {{"Please click the link and confirm your subscription"|T}}:
+</p>
+<p><a href="{{.url}}">{{.url}}</a></p>
+{{end}}

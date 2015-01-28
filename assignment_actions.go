@@ -64,7 +64,7 @@ func handleAssignmentDelete(c *gin.Context) {
 
   message := assignmentDeleteSuccess(c, user_id)
   if ok := completeAssignmentAction(c, event_id, tx, message); ok {
-    go afterAssignmentDelete(event_id, getLang(c))
+    go afterAssignmentDelete(event_id)
   }
 }
 

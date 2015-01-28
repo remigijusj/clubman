@@ -25,11 +25,22 @@ type EventForm struct {
   Status   int       `form:"status"`
 }
 
+type EventInfo struct {
+  Name     string
+  StartAt  time.Time
+  Minutes  int
+  Status   int
+}
+
 func (self EventRecord) FinishAt() time.Time {
   return self.StartAt.Add(time.Duration(self.Minutes) * time.Minute)
 }
 
 func (self EventForm) FinishAt() time.Time {
+  return self.StartAt.Add(time.Duration(self.Minutes) * time.Minute)
+}
+
+func (self EventInfo) FinishAt() time.Time {
   return self.StartAt.Add(time.Duration(self.Minutes) * time.Minute)
 }
 
@@ -74,6 +85,18 @@ func fetchEvent(event_id int) (EventForm, error) {
   // WARNING: see the comment in listEvents
   form.StartAt = form.StartAt.UTC()
   return form, err
+}
+
+func fetchEventInfo(event_id int) (EventInfo, error) {
+  var info EventInfo
+  err := query["event_select_info"].QueryRow(event_id).Scan(&info.Name, &info.StartAt, &info.Minutes, &info.Status)
+  if err != nil {
+    log.Printf("[APP] EVENT-SELECT-INFO error: %s, %#v\n", err, info)
+    err = errors.New("Event was not found")
+  }
+  // WARNING: see the comment in listEvents
+  info.StartAt = info.StartAt.UTC()
+  return info, err
 }
 
 func updateEvent(event_id int, form *EventForm, lang string) error {

@@ -34,7 +34,7 @@ func handleForgot(c *gin.Context) {
     showError(c, errors.New("Please enter your email"))
     return
   }
-  ok := sendResetLink(&form, getLang(c))
+  ok := generatePasswordReset(&form, getLang(c))
   if !ok {
     showError(c, errors.New("Reminder email could not be sent"))
   } else {
