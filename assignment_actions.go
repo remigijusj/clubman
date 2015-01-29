@@ -49,7 +49,11 @@ func handleAssignmentCreate(c *gin.Context) {
   }
 
   message := assignmentCreateSuccess(c, user_id, status)
-  completeAssignmentAction(c, event_id, tx, message)
+  if ok := completeAssignmentAction(c, event_id, tx, message); ok {
+    go func() {
+      notifyAssignmentAction(event_id, user_id, status)
+    }()
+  }
 }
 
 func handleAssignmentDelete(c *gin.Context) {
@@ -64,7 +68,10 @@ func handleAssignmentDelete(c *gin.Context) {
 
   message := assignmentDeleteSuccess(c, user_id)
   if ok := completeAssignmentAction(c, event_id, tx, message); ok {
-    go afterAssignmentDelete(event_id)
+    go func() {
+      notifyAssignmentAction(event_id, user_id, 0)
+      afterAssignmentDelete(event_id)
+    }()
   }
 }
 

@@ -32,7 +32,7 @@ func afterAssignmentDelete(event_id int) {
 
 func firstWaitingUserTx(tx *sql.Tx, event_id int) (int, error) {
   max, err := maxTeamUsersTx(tx, event_id)
-  if err != nil {
+  if err != nil || max == 0 {
     return 0, err
   }
 
@@ -41,14 +41,14 @@ func firstWaitingUserTx(tx *sql.Tx, event_id int) (int, error) {
     return 0, err
   }
   if cnt >= max {
-    log.Printf("[APP] ASSIGNMENTS-FIRST-WAITING condition: %d\n", event_id)
+    log.Printf("[APP] ASSIGNMENTS-FIRST-WAITING: %d, %d >= %d\n", event_id, cnt, max)
     return 0, errors.New("")
   }
 
   var user_id int
   err = tx.Stmt(query["assignments_first"]).QueryRow(event_id, assignmentStatusWaiting).Scan(&user_id)
   if err != nil {
-    log.Printf("[APP] ASSIGNMENTS-FIRST-WAITING error: %s, %d, %d\n", err, event_id, user_id)
+    log.Printf("[APP] ASSIGNMENTS-FIRST-WAITING: %d, %d\n", event_id, user_id)
   }
   return user_id, err
 }

@@ -88,7 +88,7 @@ func sendSMS(mobile, message string) {
 func compileMessage(name, lang string, data interface{}) string {
   var buf bytes.Buffer
   mails.Lookup(name).Funcs(transHelpers[lang]).Execute(&buf, data)
-  return buf.String()
+  return string(bytes.TrimSpace(buf.Bytes()))
 }
 
 // NOTE: delayed
@@ -115,6 +115,7 @@ func notifyEventConfirm(event *EventInfo, user *UserContact) {
 
 func sendEventConfirmLinkEmail(email, lang string, event *EventInfo) {
   subject := T(lang, "Confirm subscription for %s", event.Name)
+  subject = fmt.Sprintf("[%s] %s", serverName, subject)
 
   obj := map[string]interface{}{
     "lang": lang,
@@ -147,7 +148,8 @@ func notifyEventUserCancel(event *EventInfo, user *UserContact) {
 }
 
 func sendEventCancelEmail(email, lang string, event *EventInfo) {
-  subject := T(lang, "Confirm subscription for %s", event.Name)
+  subject := T(lang, "%s is canceled", event.Name)
+  subject = fmt.Sprintf("[%s] %s", serverName, subject)
 
   obj := map[string]interface{}{
     "lang": lang,
@@ -166,4 +168,31 @@ func sendEventCancelSMS(mobile, lang string, event *EventInfo) {
   message := compileMessage("event_cancel_sms", lang, obj)
 
   sendSMS(mobile, message)
+}
+
+func sendAssignmentCreatedEmail(email, lang string, event *EventInfo, confirmed bool) {
+  subject := T(lang, "Subscribed for %s", event.Name)
+  subject = fmt.Sprintf("[%s] %s", serverName, subject)
+
+  obj := map[string]interface{}{
+    "lang": lang,
+    "event": event,
+    "confirmed": confirmed,
+  }
+  message := compileMessage("assignment_create_email", lang, obj)
+
+  sendEmail(email, subject, message)
+}
+
+func sendAssignmentDeletedEmail(email, lang string, event *EventInfo) {
+  subject := T(lang, "Canceled from %s", event.Name)
+  subject = fmt.Sprintf("[%s] %s", serverName, subject)
+
+  obj := map[string]interface{}{
+    "lang": lang,
+    "event": event,
+  }
+  message := compileMessage("assignment_delete_email", lang, obj)
+
+  sendEmail(email, subject, message)
 }

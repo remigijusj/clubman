@@ -80,5 +80,8 @@ func defineRoutesAdmin(a *gin.RouterGroup) {
     ad.POST("/events/multi/remove/:team_id", handleEventsRemove)
 
     ad.POST("/assignments/confirm/:event_id", handleAssignmentConfirm)
+
+    // <<< DEBUG
+    ad.GET("/events/auto_cancel", func(c *gin.Context) { autoCancelEvents() }, redirectCalendar)
   }
 }

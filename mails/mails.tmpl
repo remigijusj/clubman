@@ -33,3 +33,27 @@
 {{define "event_cancel_sms"}}
 {{T "%s was canceled" .event.Name}}. {{localDate .event.StartAt .lang}}, {{printTime .event.StartAt}}
 {{end}}
+
+{{define "assignment_create_email"}}
+<p>
+  {{T "You are subscribed to %s" .event.Name}}.<br/>
+  {{localDate .event.StartAt .lang}},
+  {{printTime .event.StartAt}} &ndash; {{printTime .event.FinishAt}}
+</p>
+<p>
+  {{if .confirmed}}
+    <b>{{"You can participate"|T}}.</b>
+  {{else}}
+    <b>{{"You are on a waiting list"|T}}.</b>
+    {{"If somebody else cancels, you will get a notification"|T}}.
+  {{end}}
+</p>
+{{end}}
+
+{{define "assignment_delete_email"}}
+<p>
+  {{T "You are canceled from %s" .event.Name}}.<br/>
+  {{localDate .event.StartAt .lang}},
+  {{printTime .event.StartAt}} &ndash; {{printTime .event.FinishAt}}
+</p>
+{{end}}

@@ -188,3 +188,24 @@ func clearAssignments(event_ids ...int) error {
   }
   return err
 }
+
+func notifyAssignmentAction(event_id, user_id, status int) {
+  tx, err := db.Begin()
+  if err != nil { return }
+
+  user, err := fetchUserContactTx(tx, user_id)
+  if err != nil { tx.Rollback(); return }
+
+  event, err := fetchEventInfoTx(tx, event_id)
+  if err != nil { tx.Rollback(); return }
+
+  err = tx.Commit()
+  if err != nil { return }
+
+  if status != 0 {
+    confirmed := status == assignmentStatusConfirmed
+    sendAssignmentCreatedEmail(user.Email, user.Language, &event, confirmed)
+  } else {
+    sendAssignmentDeletedEmail(user.Email, user.Language, &event)
+  }
+}

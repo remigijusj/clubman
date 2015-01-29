@@ -207,15 +207,19 @@ func collectEventIds(list []EventRecord) []int {
   return event_ids
 }
 
-// NOTE: delayed, cron
+// NOTE: delayed, cron, events of tomorrow
 func autoCancelEvents() {
   date := today()
   from := date.AddDate(0, 0, 1)
   till := date.AddDate(0, 0, 2)
-  events := listEventsUnderLimit(from, till) // within next day
+
+  events := listEventsUnderLimit(from, till)
   for _, event := range events {
     rows, err := multiQuery("users_of_event", event.Id)
     users := listUsersContact(rows, err)
+
+    cancelEvent(event.Id)
+
     for _, user := range users {
       notifyEventUserCancel(&event, &user)
     }
