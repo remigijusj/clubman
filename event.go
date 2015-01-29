@@ -26,6 +26,7 @@ type EventForm struct {
 }
 
 type EventInfo struct {
+  Id       int
   Name     string
   StartAt  time.Time
   Minutes  int
@@ -54,7 +55,7 @@ func listEvents(rows *sql.Rows, err error) (list []EventRecord) {
 
   defer func() {
     if err != nil {
-      log.Printf("[APP] EVENTS-TEAM error: %s\n", err)
+      log.Printf("[APP] LIST-EVENTS error: %s\n", err)
     }
   }()
   if err != nil { return }
@@ -64,6 +65,37 @@ func listEvents(rows *sql.Rows, err error) (list []EventRecord) {
   for rows.Next() {
     var item EventRecord
     err = rows.Scan(&item.Id, &item.TeamId, &item.StartAt, &item.Minutes, &item.Status)
+    if err != nil { return }
+    // WARNING: we interpret datetimes in DB literally as entered, but all data being UTC
+    //   time.Parse gives UTC already, but rows.Scan gives us local times (why?), so convert!
+    item.StartAt = item.StartAt.UTC()
+    list = append(list, item)
+  }
+  err = rows.Err()
+
+  return
+}
+
+func listEventsUnderLimit(date_from, date_till time.Time) []EventInfo {
+  rows, err := query["events_under"].Query(date_from.Format(dateFormat), date_till.Format(dateFormat))
+  return listEventsInfo(rows, err)
+}
+
+// NOTE: compare with listEvents
+func listEventsInfo(rows *sql.Rows, err error) (list []EventInfo) {
+  list = []EventInfo{}
+  defer func() {
+    if err != nil {
+      log.Printf("[APP] LIST-EVENTS-INFO error: %s\n", err)
+    }
+  }()
+  if err != nil { return }
+
+  defer rows.Close()
+
+  for rows.Next() {
+    var item EventInfo
+    err = rows.Scan(&item.Id, &item.Name, &item.StartAt, &item.Minutes, &item.Status)
     if err != nil { return }
     // WARNING: we interpret datetimes in DB literally as entered, but all data being UTC
     //   time.Parse gives UTC already, but rows.Scan gives us local times (why?), so convert!
@@ -87,16 +119,15 @@ func fetchEvent(event_id int) (EventForm, error) {
   return form, err
 }
 
-func fetchEventInfo(event_id int) (EventInfo, error) {
-  var info EventInfo
-  err := query["event_select_info"].QueryRow(event_id).Scan(&info.Name, &info.StartAt, &info.Minutes, &info.Status)
+func fetchEventInfoTx(tx *sql.Tx, event_id int) (EventInfo, error) {
+  var event EventInfo
+  err := tx.Stmt(query["event_select_info"]).QueryRow(event_id).Scan(&event.Id, &event.Name, &event.StartAt, &event.Minutes, &event.Status)
   if err != nil {
-    log.Printf("[APP] EVENT-SELECT-INFO error: %s, %#v\n", err, info)
-    err = errors.New("Event was not found")
+    log.Printf("[APP] FETCH-EVENT-INFO: %v, %d\n", err, event_id)
+  } else {
+    event.StartAt = event.StartAt.UTC()
   }
-  // WARNING: see the comment in listEvents
-  info.StartAt = info.StartAt.UTC()
-  return info, err
+  return event, err
 }
 
 func updateEvent(event_id int, form *EventForm, lang string) error {
@@ -174,4 +205,19 @@ func collectEventIds(list []EventRecord) []int {
     event_ids[i] = item.Id
   }
   return event_ids
+}
+
+// NOTE: delayed, cron
+func autoCancelEvents() {
+  date := today()
+  from := date.AddDate(0, 0, 1)
+  till := date.AddDate(0, 0, 2)
+  events := listEventsUnderLimit(from, till) // within next day
+  for _, event := range events {
+    rows, err := multiQuery("users_of_event", event.Id)
+    users := listUsersContact(rows, err)
+    for _, user := range users {
+      notifyEventUserCancel(&event, &user)
+    }
+  }
 }

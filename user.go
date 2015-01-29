@@ -68,7 +68,7 @@ func generatePasswordReset(form *ForgotForm, lang string) bool {
     log.Printf("[APP] RESET-FORM failure 2: %s, %s, %s\n", err, token, form.Email)
     return false
   }
-  go sendResetLinkEmail(lang, form.Email, token)
+  go sendResetLinkEmail(form.Email, lang, token)
   return true
 }
 
@@ -98,7 +98,7 @@ func listUsers(rows *sql.Rows, err error) (list []UserRecord) {
 
   defer func() {
     if err != nil {
-      log.Printf("[APP] USER-LIST error: %s\n", err)
+      log.Printf("[APP] LIST-USERS error: %s\n", err)
     }
   }()
   if err != nil { return }
@@ -108,6 +108,29 @@ func listUsers(rows *sql.Rows, err error) (list []UserRecord) {
   for rows.Next() {
     var item UserRecord
     err = rows.Scan(&item.Id, &item.Name, &item.Email, &item.Status)
+    if err != nil { return }
+    list = append(list, item)
+  }
+  err = rows.Err()
+
+  return
+}
+
+func listUsersContact(rows *sql.Rows, err error) (list []UserContact) {
+  list = []UserContact{}
+
+  defer func() {
+    if err != nil {
+      log.Printf("[APP] LIST-USERS-CONTACT error: %s\n", err)
+    }
+  }()
+  if err != nil { return }
+
+  defer rows.Close()
+
+  for rows.Next() {
+    var item UserContact
+    err = rows.Scan(&item.Email, &item.Mobile, &item.Language)
     if err != nil { return }
     list = append(list, item)
   }
@@ -212,9 +235,9 @@ func userName(user_id int) (string, error) {
   return name, err
 }
 
-func userContact(user_id int) (UserContact, error) {
+func fetchUserContactTx(tx *sql.Tx, user_id int) (UserContact, error) {
   var user UserContact
-  err := query["user_contact"].QueryRow(user_id).Scan(&user.Email, &user.Mobile, &user.Language)
+  err := tx.Stmt(query["user_contact"]).QueryRow(user_id).Scan(&user.Email, &user.Mobile, &user.Language)
   if err != nil {
     log.Printf("[APP] USER-CONTACT error: %s, %d, %v\n", err, user_id, user)
   }

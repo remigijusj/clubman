@@ -10,11 +10,13 @@ import (
   "github.com/gin-gonic/gin"
   "github.com/gorilla/sessions"
   _ "github.com/mattn/go-sqlite3" // tdm-gcc
+  "github.com/robfig/cron"
 )
 
 var db *sql.DB
 var query map[string]*sql.Stmt
 var regex map[string]*regexp.Regexp
+var clock *cron.Cron
 var cookie *sessions.CookieStore
 
 func init() {
@@ -31,6 +33,8 @@ func main() {
   prepareQueries()
   prepareRegexes()
   prepareCookies()
+
+  startCronService()
 
   r := gin.Default()
   loadHtmlTemplates("templates/*", r)
@@ -66,6 +70,12 @@ func prepareCookies() {
     HttpOnly: false,
     Secure:   false,
   }
+}
+
+func startCronService() {
+  clock = cron.New()
+  clock.AddFunc(cancelHours, autoCancelEvents)
+  clock.Start()
 }
 
 func displayPage(c *gin.Context) {

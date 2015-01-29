@@ -18,10 +18,16 @@ func afterAssignmentDelete(event_id int) {
   err = updateAssignmentStatusTx(tx, event_id, user_id, assignmentStatusNotified)
   if err != nil { tx.Rollback(); return }
 
+  user, err := fetchUserContactTx(tx, user_id)
+  if err != nil { tx.Rollback(); return }
+
+  event, err := fetchEventInfoTx(tx, event_id)
+  if err != nil { tx.Rollback(); return }
+
   err = tx.Commit()
   if err != nil { return }
 
-  notifyEventConfirm(user_id, event_id)
+  notifyEventConfirm(&event, &user)
 }
 
 func firstWaitingUserTx(tx *sql.Tx, event_id int) (int, error) {

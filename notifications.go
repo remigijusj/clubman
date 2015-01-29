@@ -33,7 +33,7 @@ func loadMailTemplates(pattern string) {
   mails = template.Must(template.New("").Funcs(helpers).ParseGlob("mails/*"))
 }
 
-func sendEmail(to, subject, body string) error {
+func sendEmail(to, subject, body string) {
   msg := gomail.NewMessage()
   msg.SetHeader("From", emailsFrom)
   msg.SetHeader("To", to)
@@ -41,7 +41,10 @@ func sendEmail(to, subject, body string) error {
   msg.SetBody("text/html", body)
 
   mailer := gomail.NewMailer(emailsHost, emailsUser, emailsPass, emailsPort)
-  return mailer.Send(msg)
+  err := mailer.Send(msg)
+  if err != nil {
+    log.Printf("[APP] EMAIL error: %v, %s, %s\n", err, to, subject)
+  }
 }
 
 func sendSMS(mobile, message string) {
@@ -82,69 +85,85 @@ func sendSMS(mobile, message string) {
   return
 }
 
+func compileMessage(name, lang string, data interface{}) string {
+  var buf bytes.Buffer
+  mails.Lookup(name).Funcs(transHelpers[lang]).Execute(&buf, data)
+  return buf.String()
+}
+
 // NOTE: delayed
-func sendResetLinkEmail(lang, email, token string) {
+func sendResetLinkEmail(email, lang, token string) {
+  subject := T(lang, "Password reset for %s", serverHost)
+
   obj := map[string]string{
     "host": serverHost,
     "url":  fmt.Sprintf("%s/resets?email=%s&token=%s", serverRoot, url.QueryEscape(email), token),
   }
-  var buf bytes.Buffer
-  mails.Lookup("password_reset").Funcs(transHelpers[lang]).Execute(&buf, obj)
-  message := buf.String()
+  message := compileMessage("password_reset_email", lang, obj)
 
-  subject := T(lang, "Password reset for %s", serverHost)
-
-  err := sendEmail(email, subject, message)
-  if err != nil {
-    log.Printf("[APP] SEND-RESET error: %s, token=%s, email=%s\n", err, token, email)
-  }
+  sendEmail(email, subject, message)
 }
 
-func notifyEventConfirm(user_id, event_id int) {
-  user, err := userContact(user_id)
-  if err != nil {
-    log.Printf("[APP] SEND-EVENT-CONFIRM: %v, %d, %d, %v\n", err, user_id, event_id, user)
-    return
-  }
-  event, err := fetchEventInfo(event_id)
-  if err != nil {
-    log.Printf("[APP] SEND-EVENT-CONFIRM: %v, %d, %d, %v\n", err, user_id, event_id, event)
-    return
-  }
+func notifyEventConfirm(event *EventInfo, user *UserContact) {
   switch user.chooseMethod() {
   case contactEmail:
-    sendEventConfirmLinkEmail(user.Language, user.Email, event_id, &event)
+    sendEventConfirmLinkEmail(user.Email, user.Language, event)
   case contactSMS:
-    sendEventConfirmLinkSMS(user.Language, user.Mobile, event_id, &event)
+    sendEventConfirmLinkSMS(user.Mobile, user.Language, event)
   }
 }
 
-func sendEventConfirmLinkEmail(lang, email string, event_id int, event *EventInfo) {
-  obj := map[string]interface{}{
-    "event": event,
-    "url":  fmt.Sprintf("%s/assignments/confirm/%d", serverRoot, event_id),
-    "lang": lang,
-  }
-  var buf bytes.Buffer
-  mails.Lookup("event_confirm").Funcs(transHelpers[lang]).Execute(&buf, obj)
-  message := buf.String()
-
+func sendEventConfirmLinkEmail(email, lang string, event *EventInfo) {
   subject := T(lang, "Confirm subscription for %s", event.Name)
 
-  err := sendEmail(email, subject, message)
-  if err != nil {
-    log.Printf("[APP] SEND-EVENT-CONFIRM-EMAIL error: %s\n", err)
+  obj := map[string]interface{}{
+    "lang": lang,
+    "event": event,
+    "url":  fmt.Sprintf("%s/assignments/confirm/%d", serverRoot, event.Id),
+  }
+  message := compileMessage("event_confirm_email", lang, obj)
+
+  sendEmail(email, subject, message)
+}
+
+func sendEventConfirmLinkSMS(mobile, lang string, event *EventInfo) {
+  obj := map[string]interface{}{
+    "lang": lang,
+    "event": event,
+    "host": serverHost,
+  }
+  message := compileMessage("event_confirm_sms", lang, obj)
+
+  sendSMS(mobile, message)
+}
+
+func notifyEventUserCancel(event *EventInfo, user *UserContact) {
+  switch user.chooseMethod() {
+  case contactEmail:
+    sendEventCancelEmail(user.Email, user.Language, event)
+  case contactSMS:
+    sendEventCancelSMS(user.Mobile, user.Language, event)
   }
 }
 
-func sendEventConfirmLinkSMS(lang, mobile string, event_id int, event *EventInfo) {
-  var buf bytes.Buffer
-  buf.WriteString(T(lang, "Another user has unsubscribed from %s", event.Name))
-  buf.WriteString(", ")
-  buf.WriteString(event.StartAt.Format(dateFormats[lang]))
-  buf.WriteString(". ")
-  buf.WriteString(T(lang, "Please login to %s and confirm", serverHost))
-  message := buf.String()
+func sendEventCancelEmail(email, lang string, event *EventInfo) {
+  subject := T(lang, "Confirm subscription for %s", event.Name)
+
+  obj := map[string]interface{}{
+    "lang": lang,
+    "event": event,
+  }
+  message := compileMessage("event_cancel_email", lang, obj)
+
+  sendEmail(email, subject, message)
+}
+
+func sendEventCancelSMS(mobile, lang string, event *EventInfo) {
+  obj := map[string]interface{}{
+    "lang": lang,
+    "event": event,
+  }
+  message := compileMessage("event_cancel_sms", lang, obj)
 
   sendSMS(mobile, message)
 }

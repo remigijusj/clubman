@@ -24,6 +24,7 @@ const (
 
   workdayFrom = "08:00" // contact email/sms
   workdayTill = "16:00"
+  cancelHours = "0 0 18 * * *"
 
   sessionKey = "session"
   bcryptCost = 10
@@ -70,11 +71,12 @@ var queries = map[string]string{
   "user_delete":        "DELETE FROM users WHERE id=?",
   "user_name":          "SELECT name FROM users WHERE id=?",
   "user_contact":       "SELECT email, mobile, language FROM users WHERE id=?",
+  "users_of_event":     "SELECT email, mobile, language FROM assignments LEFT JOIN users ON user_id=users.id WHERE event_id=?",
 
   "teams_all":          "SELECT teams.id, teams.name, users.name FROM teams LEFT JOIN users ON teams.instructor_id=users.id ORDER BY teams.name",
   "team_names_all":     "SELECT id, name FROM teams ORDER BY name",
   "team_select":        "SELECT name, users_min, users_max, instructor_id FROM teams WHERE id=?",
-  "team_users_max":     "SELECT users_max FROM events LEFT JOIN teams on team_id=teams.id WHERE events.id=?",
+  "team_users_max":     "SELECT users_max FROM events LEFT JOIN teams ON team_id=teams.id WHERE events.id=?",
   "team_insert":        "INSERT INTO teams(name, users_min, users_max, instructor_id) VALUES (?, ?, ?, ?)",
   "team_update":        "UPDATE teams SET name=?, users_min=?, users_max=?, instructor_id=? WHERE id=?",
   "team_delete":        "DELETE FROM teams WHERE id=?",
@@ -82,8 +84,9 @@ var queries = map[string]string{
   "events_team":        "SELECT id, team_id, start_at, minutes, status FROM events WHERE team_id=? AND start_at >= ? ORDER BY start_at",
   "events_period":      "SELECT id, team_id, start_at, minutes, status FROM events WHERE start_at >= ? AND start_at < ? AND status>=0 ORDER BY start_at",
   "events_multi":       "SELECT id, start_at FROM events WHERE team_id=? AND start_at >= ? AND start_at < ?",
+  "events_under":       "SELECT events.id, name, start_at, minutes, events.status FROM events LEFT JOIN teams ON team_id=teams.id LEFT JOIN assignments ON event_id=events.id WHERE start_at >= ? and start_at < ? GROUP BY events.id HAVING count(user_id) < users_min",
+  "event_select_info":  "SELECT events.id, name, start_at, minutes, events.status FROM events LEFT JOIN teams ON team_id=teams.id WHERE events.id=?",
   "event_select":       "SELECT team_id, start_at, minutes, status FROM events WHERE id=?",
-  "event_select_info":  "SELECT name, start_at, minutes, status FROM events LEFT JOIN teams ON team_id=teams.id WHERE events.id=?",
   "event_insert":       "INSERT INTO events(team_id, start_at, minutes, status) VALUES (?, ?, ?, ?)",
   "event_update":       "UPDATE events SET team_id=?, start_at=?, minutes=?, status=? WHERE id=?",
   "event_status":       "UPDATE events SET status=? WHERE id IN (?)",

@@ -1,4 +1,4 @@
-{{define "password_reset"}}
+{{define "password_reset_email"}}
 <p>
   <b>{{T "You have requested password reset for %s" .host}}</b><br/>
   {{"Please click the link and change your password"|T}}:
@@ -7,7 +7,7 @@
 <p>{{"This link is valid for one-time only"|T}}.</p>
 {{end}}
 
-{{define "event_confirm"}}
+{{define "event_confirm_email"}}
 <p>
   {{T "Another user has unsubscribed from %s" .event.Name}}.<br/>
   {{localDate .event.StartAt .lang}},
@@ -16,4 +16,20 @@
   {{"Please click the link and confirm your subscription"|T}}:
 </p>
 <p><a href="{{.url}}">{{.url}}</a></p>
+{{end}}
+
+{{define "event_confirm_sms"}}
+{{T "Another user has unsubscribed from %s" .event.Name}}, {{localDate .event.StartAt .lang}}. {{T "Please login to %s and confirm" .host}}
+{{end}}
+
+{{define "event_cancel_email"}}
+<p>
+  {{T "%s was canceled" .event.Name}}.<br/>
+  {{localDate .event.StartAt .lang}},
+  {{printTime .event.StartAt}} &ndash; {{printTime .event.FinishAt}}
+</p>
+{{end}}
+
+{{define "event_cancel_sms"}}
+{{T "%s was canceled" .event.Name}}. {{localDate .event.StartAt .lang}}, {{printTime .event.StartAt}}
 {{end}}
