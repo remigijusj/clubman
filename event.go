@@ -226,7 +226,7 @@ func autoCancelEvents() {
 
   events := listEventsUnderLimit(from, till)
   for _, event := range events {
-    rows, err := multiQuery("users_of_event", event.Id)
+    rows, err := query["users_of_event"].Query(event.Id)
     users := listUsersContact(rows, err)
 
     cancelEvent(event.Id)
@@ -235,4 +235,16 @@ func autoCancelEvents() {
       notifyEventUserCancel(&event, &user)
     }
   }
+}
+
+func notifyEventParticipants(event_id int, subject, message string) int {
+  var count int
+  rows, err := query["users_of_event"].Query(event_id)
+  users := listUsersContact(rows, err)
+  for _, user := range users {
+    if ok := sendEmail(user.Email, subject, message); ok {
+      count++
+    }
+  }
+  return count
 }

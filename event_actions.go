@@ -105,6 +105,43 @@ func handleEventDelete(c *gin.Context) {
   }
 }
 
+func permitNotify(c *gin.Context) {
+  if self := currentUser(c); self != nil {
+    if self.IsAdmin() {
+      return
+    }
+    if self.Status == userStatusInstructor {
+      data, _ := c.Get("team")
+      if team, ok := data.(TeamForm); ok {
+        if team.InstructorId == self.Id {
+          return
+        }
+      }
+    }
+  }
+  gotoWarning(c, defaultPage, permitError)
+  c.Abort(0)
+}
+
+func handleEventNotify(c *gin.Context) {
+  subject := c.Request.FormValue("subject")
+  message := c.Request.FormValue("message")
+  if subject == "" || message == "" {
+    showError(c, errors.New("Please provide all details"))
+    return
+  }
+  var count int
+  event_id, err := getIntParam(c, "id")
+  if err == nil {
+    count = notifyEventParticipants(event_id, subject, message)
+  }
+  if err != nil {
+    showError(c, err)
+  } else {
+    gotoSuccess(c, eventsViewPath(event_id), "%d users have been notified", count)
+  }
+}
+
 // --- local helpers ---
 
 func handleEventsFormAction(c *gin.Context, action (func(int, *TeamEventsForm, string) (int, error)), message string) {

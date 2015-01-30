@@ -63,7 +63,6 @@
           {{range $d, $list := $week}}
           {{$date := calcMonthDate $date 0 $d}}
           <div class="small-1 medium-1 large-1 day {{if eq $date.String $today.String}}today{{end}}">
-            <div class="num"></div>
             {{range $list}}
               {{$team := index $teams .TeamId}}
               {{$part := index $assigned .Id}}

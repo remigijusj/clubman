@@ -22,8 +22,8 @@
         <li class="has-dropdown">
           <a href="#">{{"Administrator"|T}}</a>
           <ul class="dropdown">
-            <li><a href="#">{{"Activity logs"|T}}</a></li>
             <li><a href="/users">{{"Users list"|T}}</a></li>
+            <li><a href="#">{{"Activity logs"|T}}</a></li>
           </ul>
         </li>
         {{end}}
@@ -113,6 +113,8 @@
           {{template "events_view.tmpl" . }}
         {{else if eq .page "events_update"}}
           {{template "events_update.tmpl" . }}
+        {{else if eq .page "events_notify"}}
+          {{template "events_notify.tmpl" . }}
 
         {{else if eq .page "assignments"}}
           {{template "assignments.tmpl" . }}

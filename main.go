@@ -102,7 +102,7 @@ func authRequired() gin.HandlerFunc {
       }
     } else {
       if c.Request.URL.Path != "/" {
-        setSessionAlert(c, &Alert{"warning", TC(c, "You are not authorized to view this page")})
+        setSessionAlert(c, &Alert{"warning", TC(c, permitError)})
       }
       setSavedPath(c, c.Request.URL.Path)
       c.Redirect(302, "/login")
@@ -117,7 +117,7 @@ func adminRequired() gin.HandlerFunc {
       return
     }
     if c.Request.URL.Path != "/" {
-      setSessionAlert(c, &Alert{"warning", TC(c, "You are not authorized to view this page")})
+      setSessionAlert(c, &Alert{"warning", TC(c, permitError)})
     }
     c.Redirect(302, defaultPage)
     c.Abort(0)

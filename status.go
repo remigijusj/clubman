@@ -6,8 +6,9 @@ type Status struct {
 }
 
 const (
-  userStatusWaiting = -1
-  userStatusAdmin   = 2
+  userStatusWaiting    = -1
+  userStatusInstructor = 1
+  userStatusAdmin      = 2
   eventStatusCanceled = -2
   assignmentStatusWaiting   = -2
   assignmentStatusNotified  = -1

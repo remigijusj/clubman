@@ -33,7 +33,7 @@ func loadMailTemplates(pattern string) {
   mails = template.Must(template.New("").Funcs(helpers).ParseGlob("mails/*"))
 }
 
-func sendEmail(to, subject, body string) {
+func sendEmail(to, subject, body string) bool {
   msg := gomail.NewMessage()
   msg.SetHeader("From", emailsFrom)
   msg.SetHeader("To", to)
@@ -45,9 +45,10 @@ func sendEmail(to, subject, body string) {
   if err != nil {
     log.Printf("[APP] EMAIL error: %v, %s, %s\n", err, to, subject)
   }
+  return err == nil
 }
 
-func sendSMS(mobile, message string) {
+func sendSMS(mobile, message string) bool {
   v := url.Values{}
 
   v.Set("username",   smsUser)
@@ -63,26 +64,26 @@ func sendSMS(mobile, message string) {
   resp, err := http.Get(uri)
   if err != nil {
     log.Printf("[APP] SMS error: sending %s\n", err)
-    return
+    return false
   }
   defer resp.Body.Close()
 
   body, err := ioutil.ReadAll(resp.Body)
   if err != nil {
     log.Printf("[APP] SMS error: response %s\n", err)
-    return
+    return false
   }
   val, err := url.ParseQuery(string(body))
   if err != nil {
     log.Printf("[APP] SMS error: response body %s (%s)\n", err, body)
-    return
+    return false
   }
   status := val.Get("status")
   if status != "success" {
     log.Printf("[APP] SMS error: response status %s\n", status)
   }
 
-  return
+  return true
 }
 
 func compileMessage(name, lang string, data interface{}) string {
@@ -196,3 +197,4 @@ func sendAssignmentDeletedEmail(email, lang string, event *EventInfo) {
 
   sendEmail(email, subject, message)
 }
+

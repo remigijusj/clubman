@@ -8,8 +8,8 @@
       </h4>
     </div>
   </div>
-  <div class="row end" {{if .self.IsAdmin}}data-equalizer{{end}}>
-    <div class="large-6 medium-6 columns" data-equalizer-watch>
+  <div class="row end" data-equalizer>
+    <div class="large-6 medium-6 columns">
       <div class="panel" data-equalizer-watch>
         <form method="POST">
           {{if eq .form.Status 0}}
@@ -63,11 +63,24 @@
               {{if eq .form.Status 0}}
                 {{$confirm := gt (len .list) 0}}
                 {{$msg := "Are you sure? Event subscriptions will be deleted"}}
-              <input type="button" data-action="/events/cancel/{{.id}}" class="button tiny radius right right-1" {{if $confirm}}data-confirm="{{$msg|T}}"{{end}} value="{{"Cancel event"|T}}" />
+                <input type="button" data-action="/events/cancel/{{.id}}" class="button tiny radius right right-1" {{if $confirm}}data-confirm="{{$msg|T}}"{{end}} value="{{"Cancel event"|T}}" />
+                {{if gt (len .list) 0}}
+                  <a href="/events/notify/{{.id}}" class="button tiny radius right right-1">{{"Send email"|T}}</a>
+                {{end}}
               {{end}}
             </div>
           </div>
         </form>
+      </div>
+    </div>
+    {{else if and (eq .self.Status 1) (eq .team.InstructorId .self.Id)}}
+    <div class="large-6 medium-6 columns">
+      <div class="panel" data-equalizer-watch>
+        <div class="row end">
+          <div class="columns">
+            <a href="/events/notify/{{.id}}" class="button tiny radius right">{{"Send email"|T}}</a>
+          </div>
+        </div>
       </div>
     </div>
     {{end}}
@@ -76,6 +89,7 @@
     {{template "events_assignments_list.tmpl" . }}
   {{end}}
 {{end}}
+
 {{define "events_update.tmpl"}}
   <div class="row">
     <div class="large-6 medium-8 columns">
@@ -92,6 +106,67 @@
               <a href="/events/view/{{.id}}" class="info button tiny radius right">{{"Back"|T}}</a>
             </div>
           </div>
+        </form>
+      </div>
+    </div>
+  </div>
+{{end}}
+
+{{define "events_notify.tmpl"}}
+  <div class="row">
+    <div class="columns">
+      <h4>{{"Send email to participants"|T}}</h4>
+    </div>
+  </div>
+  <div class="row end" data-equalizer>
+    <div class="large-6 medium-8 columns">
+      <div class="panel" data-equalizer-watch>
+        <form action="/events/notify/{{.id}}" method="POST">
+          <div class="row">
+            <div class="small-4 columns">
+              <label for="subject">{{"Subject"|T}}</label>
+            </div>
+            <div class="small-8 columns">
+              <input id="subject" name="subject" type="text" value="" />
+            </div>
+            <div class="small-12 columns description">
+              {{"The subject of an email"|T}}
+            </div>
+          </div>
+          <div class="row">
+            <div class="small-4 columns">
+              <label for="message">{{"Message"|T}}</label>
+            </div>
+            <div class="small-8 columns">
+              <textarea id="message" name="message" rows="5"></textarea>
+            </div>
+          </div>
+          <div class="row end">
+            <div class="columns">
+              <input type="submit" class="button tiny radius" value="{{"Save"|T}}" />
+              &nbsp;&nbsp;
+              <a href="/events/view/{{.id}}" class="info button tiny radius right">{{"Back"|T}}</a>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+    <div class="large-6 medium-6 columns">
+      <div class="panel" data-equalizer-watch>
+        <form>
+          <h5>{{.team.Name}} {{localDate .form.StartAt .lang}}</h5>
+          <p>
+            <small>
+              <b>{{"Time"|T}}</b>: {{printTime .form.StartAt}} &ndash; {{printTime .form.FinishAt}}<br/>
+              <b>{{"Instructor"|T}}</b>: {{userName .team.InstructorId}}<br/>
+              {{if gt .team.UsersMin 0}}
+              <b>{{"Min participants"|T}}</b>: {{.team.UsersMin}}<br/>
+              {{end}}
+              {{if gt .team.UsersMax 0}}
+              <b>{{"Max participants"|T}}</b>: {{.team.UsersMax}}<br/>
+              {{end}}
+            </small>
+          </p>
         </form>
       </div>
     </div>

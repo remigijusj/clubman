@@ -35,6 +35,7 @@ const (
   timeFormat = "15:04"
   dateFormat = "2006-01-02" // db
   panicError = "Critical error happened, please contact website admin"
+  permitError = "You are not authorized to view this page"
 
   reloadTmpl = true // DEBUG mode
 )
