@@ -6,3 +6,34 @@ meta.foundation-version {font-family:"/5.4.7/";}meta.foundation-mq-small {font-f
 .canceled a {
   text-decoration: line-through;
 }
+.day.today, .days.today {
+  background-color: #E8F7FF;
+}
+.day.today:hover, .days.today:hover {
+  background-color: #D7F1FF;
+}
+.weekly .day .inner a b {
+  line-height: 18px;
+}
+.weekly .day .inner a img {
+  vertical-align: text-bottom;
+}
+.monthly .day .inner a {
+  display: block;
+  line-height: 16px;
+}
+.monthly .day .inner a img {
+  vertical-align: text-top;
+}
+.under {
+  color: #006BD7;
+}
+.fits {
+  color: #008040;
+}
+.over {
+  color: #C10000;
+}
+.description p {
+  font-size: 1em;
+}

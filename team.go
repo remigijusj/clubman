@@ -11,6 +11,8 @@ type TeamRecord struct {
   Id       int
   Name     string
   UserName string
+  UsersMin int
+  UsersMax int
 }
 
 type TeamForm struct {
@@ -22,17 +24,6 @@ type TeamForm struct {
 
 func listTeamsByQuery(q url.Values) []TeamRecord {
   return listTeams(query["teams_all"].Query())
-}
-
-// NOTE: with more teams, we could pass event_ids to select
-func indexTeams() map[int]TeamRecord {
-  rows, err := query["teams_all"].Query()
-  list := listTeams(rows, err)
-  data := make(map[int]TeamRecord, len(list))
-  for _, team := range list {
-    data[team.Id] = team
-  }
-  return data
 }
 
 func listTeams(rows *sql.Rows, err error) (list []TeamRecord) {
@@ -49,13 +40,24 @@ func listTeams(rows *sql.Rows, err error) (list []TeamRecord) {
 
   for rows.Next() {
     var item TeamRecord
-    err = rows.Scan(&item.Id, &item.Name, &item.UserName)
+    err = rows.Scan(&item.Id, &item.Name, &item.UserName, &item.UsersMin, &item.UsersMax)
     if err != nil { return }
     list = append(list, item)
   }
   err = rows.Err()
 
   return
+}
+
+// NOTE: with more teams, we could pass event_ids to select
+func indexTeams() map[int]TeamRecord {
+  rows, err := query["teams_all"].Query()
+  list := listTeams(rows, err)
+  data := make(map[int]TeamRecord, len(list))
+  for _, team := range list {
+    data[team.Id] = team
+  }
+  return data
 }
 
 func fetchTeam(team_id int) (TeamForm, error) {

@@ -207,6 +207,17 @@ func collectEventIds(list []EventRecord) []int {
   return event_ids
 }
 
+func eventClass(team TeamRecord, count int) string {
+  switch {
+  case count < team.UsersMin:
+    return "under"
+  case count >= team.UsersMax && team.UsersMax > 0:
+    return "over"
+  default:
+    return "fits"
+  }
+}
+
 // NOTE: delayed, cron, events of tomorrow
 func autoCancelEvents() {
   date := today()

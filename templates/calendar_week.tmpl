@@ -3,7 +3,7 @@
       <h4>{{"Calendar"|T}}</h4>
 
       {{template "calendar_filter_form.tmpl" . }}
-      <ul class="calendar">
+      <ul class="calendar weekly">
         <li class="title">
           <div class="left">
             <a href="?date={{printDate .prev}}{{if ne .team_id 0}}&team_id={{.team_id}}{{end}}"><i><small>{{"Prev"|T}}</small></i></a>
@@ -65,10 +65,16 @@
           <div class="small-1 medium-1 large-1 day {{if eq $date.String $today.String}}today{{end}}">
             <div class="num"></div>
             {{range $list}}
+              {{$team := index $teams .TeamId}}
+              {{$part := index $assigned .Id}}
+              {{$count := index $counts .Id}}
+              {{$class := eventClass $team $count}}
             <div class="inner">
-              <a href="/events/view/{{.Id}}">
-                {{$team := (index $teams .TeamId)}}
-                <b>{{$team.Name}}</b><br/>
+              <a href="/events/view/{{.Id}}" class="{{$class}}">
+                {{if eq $part 1}}<img src="/img/star-gold-16.png" />{{end}}
+                {{if lt $part 0}}<img src="/img/star-gray-16.png" />{{end}}
+                <b>{{$team.Name}}</b>
+                <br/>
                 {{$team.UserName}}<br/>
                 {{printTime .StartAt}} &ndash; {{printTime .FinishAt}}
               </a>
@@ -80,7 +86,13 @@
         {{end}}
       </ul>
       <div class="description">
-        {{"To view more information about an event - click on it"|T}}
+        <p>
+          {{"To view more information about an event - click on it"|T}}.
+          <b>{{"Color coding"|T}}:</b><br/>
+          <span class="under">{{"Not enough participants yet"|T}}.</span>
+          <span class="fits">{{"Still has some place"|T}}.</span>
+          <span class="over">{{"Too many participants, waiting list"|T}}.</span>
+        </p>
       </div>
     </div>
   </div>

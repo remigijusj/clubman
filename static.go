@@ -73,7 +73,7 @@ var queries = map[string]string{
   "user_contact":       "SELECT email, mobile, language FROM users WHERE id=?",
   "users_of_event":     "SELECT email, mobile, language FROM assignments LEFT JOIN users ON user_id=users.id WHERE event_id=?",
 
-  "teams_all":          "SELECT teams.id, teams.name, users.name FROM teams LEFT JOIN users ON teams.instructor_id=users.id ORDER BY teams.name",
+  "teams_all":          "SELECT teams.id, teams.name, users.name, users_min, users_max FROM teams LEFT JOIN users ON teams.instructor_id=users.id ORDER BY teams.name",
   "team_names_all":     "SELECT id, name FROM teams ORDER BY name",
   "team_select":        "SELECT name, users_min, users_max, instructor_id FROM teams WHERE id=?",
   "team_users_max":     "SELECT users_max FROM events LEFT JOIN teams ON team_id=teams.id WHERE events.id=?",

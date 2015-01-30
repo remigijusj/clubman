@@ -22,6 +22,7 @@ var helpers = template.FuncMap{
   "listRecords":   listRecords,
   "statusTitle":   statusTitle,
   "statusList":    statusList,
+  "eventClass":    eventClass,
   "userName":      userName,
   "serverName":  func() string { return serverName },
   "defaultDate": func() string { return defaultDate },
