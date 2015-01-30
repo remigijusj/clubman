@@ -22,6 +22,9 @@
               {{$confirm := and $filled_up (eq .signed_up.Status 1)}}
               {{$msg := "Do you really want to cancel? Your space will be taken by another user"}}
             <input type="button" data-action="/assignments/delete/{{.id}}" class="button tiny radius right" {{if $confirm}}data-confirm="{{$msg|T}}"{{end}} value="{{"Cancel myself"|T}}" />
+              {{if eq .signed_up.Status -1}}
+              <a href="/assignments/confirm/{{.id}}" class="button tiny radius right right-1">{{"Confirm myself"|T}}</a>
+              {{end}}
             {{end}}
           {{end}}
           <small>
