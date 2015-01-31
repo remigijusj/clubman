@@ -116,6 +116,11 @@ func listUsers(rows *sql.Rows, err error) (list []UserRecord) {
   return
 }
 
+func listUsersOfEventTx(tx *sql.Tx, event_id int) ([]UserContact, error) {
+  rows, err := tx.Stmt(query["users_of_event"]).Query(event_id)
+  return listUsersContact(rows, err), err
+}
+
 func listUsersContact(rows *sql.Rows, err error) (list []UserContact) {
   list = []UserContact{}
 

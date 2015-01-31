@@ -139,6 +139,12 @@ func sendEventConfirmLinkSMS(mobile, lang string, event *EventInfo) {
   sendSMS(mobile, message)
 }
 
+func notifyEventCancel(event *EventInfo, users []UserContact) {
+  for _, user := range users {
+    notifyEventUserCancel(event, &user)
+  }
+}
+
 func notifyEventUserCancel(event *EventInfo, user *UserContact) {
   switch user.chooseMethod() {
   case contactEmail:

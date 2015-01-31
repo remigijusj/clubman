@@ -76,31 +76,28 @@ func listEvents(rows *sql.Rows, err error) (list []EventRecord) {
   return
 }
 
-func listEventsUnderLimit(date_from, date_till time.Time) []EventInfo {
+func listEventsUnderLimit(date_from, date_till time.Time) []int {
   rows, err := query["events_under"].Query(date_from.Format(dateFormat), date_till.Format(dateFormat))
-  return listEventsInfo(rows, err)
+  return listEventsIds(rows, err)
 }
 
 // NOTE: compare with listEvents
-func listEventsInfo(rows *sql.Rows, err error) (list []EventInfo) {
-  list = []EventInfo{}
+func listEventsIds(rows *sql.Rows, err error) (list []int) {
+  list = []int{}
   defer func() {
     if err != nil {
-      log.Printf("[APP] LIST-EVENTS-INFO error: %s\n", err)
+      log.Printf("[APP] LIST-EVENTS-IDS error: %s\n", err)
     }
   }()
   if err != nil { return }
 
   defer rows.Close()
 
+  var id int
   for rows.Next() {
-    var item EventInfo
-    err = rows.Scan(&item.Id, &item.Name, &item.StartAt, &item.Minutes, &item.Status)
+    err = rows.Scan(&id)
     if err != nil { return }
-    // WARNING: we interpret datetimes in DB literally as entered, but all data being UTC
-    //   time.Parse gives UTC already, but rows.Scan gives us local times (why?), so convert!
-    item.StartAt = item.StartAt.UTC()
-    list = append(list, item)
+    list = append(list, id)
   }
   err = rows.Err()
 
@@ -132,38 +129,72 @@ func fetchEventInfoTx(tx *sql.Tx, event_id int) (EventInfo, error) {
 
 func updateEvent(event_id int, form *EventForm, lang string) error {
   err := parseEventForm(form, lang)
-  if err != nil {
-    return err
-  }
-  _, err = query["event_update"].Exec(form.TeamId, form.StartAt, form.Minutes, form.Status, event_id)
-  if err != nil {
-    log.Printf("[APP] EVENT-UPDATE error: %s, %d\n", err, event_id)
-    return errors.New("Event could not be updated")
-  }
-  if form.Status == eventStatusCanceled {
-    clearAssignments(event_id)
-  }
-  return nil
+  if err != nil { return err }
+
+  clear := form.Status == eventStatusCanceled
+  return performEventAction(event_id, updateEventRecordTx, clear, form)
 }
 
 func cancelEvent(event_id int) error {
-  _, err := query["event_status"].Exec(eventStatusCanceled, event_id)
-  if err != nil {
-    log.Printf("[APP] EVENT-STATUS error: %s, %d\n", err, event_id)
-    return errors.New("Event could not be canceled")
-  }
-  clearAssignments(event_id)
-  return nil
+  return performEventAction(event_id, cancelEventRecordTx, true, nil)
 }
 
 func deleteEvent(event_id int) error {
+  return performEventAction(event_id, deleteEventRecordTx, true, nil)
+}
+
+func performEventAction(event_id int, action (func(*sql.Tx, int, *EventForm) error), clear bool, form *EventForm) (err error) {
+  defer func() {
+    if err != nil {
+      log.Printf("[APP] EVENT-ACTION error: %s, %d\n", err, event_id)
+    }
+  }()
+
+  tx, err := db.Begin()
+  if err != nil { return }
+
+  event, err := fetchEventInfoTx(tx, event_id)
+  if err != nil { tx.Rollback(); return }
+
+  users, err := listUsersOfEventTx(tx, event_id)
+  if err != nil { tx.Rollback(); return }
+
+  err = action(tx, event_id, form)
+  if err != nil { tx.Rollback(); return }
+
+  err = tx.Commit()
+  if err != nil { return }
+
+  if clear {
+    clearAssignments(event_id)
+    go notifyEventCancel(&event, users)
+  }
+
+  return
+}
+
+func updateEventRecordTx(tx *sql.Tx, event_id int, form *EventForm) error {
+  _, err := tx.Stmt(query["event_update"]).Exec(form.TeamId, form.StartAt, form.Minutes, form.Status, event_id)
+  if err != nil {
+    err = errors.New("Event could not be updated")
+  }
+  return err
+}
+
+func cancelEventRecordTx(tx *sql.Tx, event_id int, form *EventForm) error {
+  _, err := query["event_status"].Exec(eventStatusCanceled, event_id)
+  if err != nil {
+    err = errors.New("Event could not be canceled")
+  }
+  return err
+}
+
+func deleteEventRecordTx(tx *sql.Tx, event_id int, form *EventForm) error {
   _, err := query["event_delete"].Exec(event_id)
   if err != nil {
-    log.Printf("[APP] EVENT-DELETE error: %s, %d\n", err, event_id)
-    return errors.New("Event could not be deleted")
+    err = errors.New("Event could not be deleted")
   }
-  clearAssignments(event_id)
-  return nil
+  return err
 }
 
 func clearEvents(team_id int) error {
@@ -224,16 +255,9 @@ func autoCancelEvents() {
   from := date.AddDate(0, 0, 1)
   till := date.AddDate(0, 0, 2)
 
-  events := listEventsUnderLimit(from, till)
-  for _, event := range events {
-    rows, err := query["users_of_event"].Query(event.Id)
-    users := listUsersContact(rows, err)
-
-    cancelEvent(event.Id)
-
-    for _, user := range users {
-      notifyEventUserCancel(&event, &user)
-    }
+  list := listEventsUnderLimit(from, till)
+  for _, event_id := range list {
+    cancelEvent(event_id)
   }
 }
 
