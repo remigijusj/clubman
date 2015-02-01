@@ -70,7 +70,7 @@ func handleAssignmentDelete(c *gin.Context) {
   if ok := completeAssignmentAction(c, event_id, tx, message); ok {
     go func() {
       notifyAssignmentAction(event_id, user_id, 0)
-      afterAssignmentDelete(event_id)
+      afterAssignmentDelete(event_id, 0)
     }()
   }
 }

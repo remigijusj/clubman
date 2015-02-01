@@ -9,11 +9,11 @@ import (
 )
 
 // NOTE: delayed
-func afterAssignmentDelete(event_id int) {
+func afterAssignmentDelete(event_id, limit_id int) {
   tx, err := db.Begin()
   if err != nil { return }
 
-  user_id, err := firstWaitingUserTx(tx, event_id)
+  user_id, err := firstWaitingUserTx(tx, event_id, limit_id)
   if err != nil { tx.Rollback(); return }
 
   user, err := fetchUserContactTx(tx, user_id)
@@ -32,7 +32,7 @@ func afterAssignmentDelete(event_id int) {
   expireAfterGracePeriod(event_id, user_id) // sleeps
 }
 
-func firstWaitingUserTx(tx *sql.Tx, event_id int) (int, error) {
+func firstWaitingUserTx(tx *sql.Tx, event_id, limit_id int) (int, error) {
   max, err := maxTeamUsersTx(tx, event_id)
   if err != nil || max == 0 {
     return 0, err
@@ -48,7 +48,7 @@ func firstWaitingUserTx(tx *sql.Tx, event_id int) (int, error) {
   }
 
   var user_id int
-  err = tx.Stmt(query["assignments_first"]).QueryRow(event_id, assignmentStatusWaiting).Scan(&user_id)
+  err = tx.Stmt(query["assignments_first"]).QueryRow(event_id, assignmentStatusWaiting, limit_id).Scan(&user_id)
   if err != nil {
     log.Printf("[APP] ASSIGNMENTS-FIRST-WAITING: %d, %d\n", event_id, user_id)
   }
@@ -85,7 +85,7 @@ func confirmAssignmentTx(tx *sql.Tx, event_id, user_id int) (err error) {
     }
   }()
 
-  status, err := fetchAssignmentStatusTx(tx, event_id, user_id)
+  status, _, err := fetchAssignmentStatusTx(tx, event_id, user_id)
   if err != nil { return }
 
   err = checkAssignmentStatusNotified(status)
@@ -95,15 +95,16 @@ func confirmAssignmentTx(tx *sql.Tx, event_id, user_id int) (err error) {
   return
 }
 
+// NOTE: revert to waiting, repeat with next-in-line
 func expireAfterGracePeriod(event_id, user_id int) {
-  time.Sleep(gracePeriod) // <- IMPORTANT
+  time.Sleep(gracePeriod)
 
-  if ok := revertAssignmentToWaiting(event_id, user_id); ok {
-    // <<< TODO: again afterAssignmentDelete
+  if limit_id, ok := revertAssignmentToWaiting(event_id, user_id); ok {
+    afterAssignmentDelete(event_id, limit_id)
   }
 }
 
-func revertAssignmentToWaiting(event_id, user_id int) bool {
+func revertAssignmentToWaiting(event_id, user_id int) (int, bool) {
   var err error
   defer func() {
     if err != nil {
@@ -112,21 +113,21 @@ func revertAssignmentToWaiting(event_id, user_id int) bool {
   }()
 
   tx, err := db.Begin()
-  if err != nil { return false }
+  if err != nil { return 0, false }
 
-  status, err := fetchAssignmentStatusTx(tx, event_id, user_id)
-  if err != nil { tx.Rollback(); return false }
+  status, id, err := fetchAssignmentStatusTx(tx, event_id, user_id)
+  if err != nil { tx.Rollback(); return 0, false }
 
   err = checkAssignmentStatusNotified(status)
-  if err != nil { tx.Rollback(); return false }
+  if err != nil { tx.Rollback(); return 0, false }
 
   err = updateAssignmentStatusTx(tx, event_id, user_id, assignmentStatusWaiting)
-  if err != nil { tx.Rollback(); return false }
+  if err != nil { tx.Rollback(); return 0, false }
 
   err = tx.Commit()
-  if err != nil { return false }
+  if err != nil { return 0, false }
 
-  return true
+  return id, true
 }
 
 func checkAssignmentStatusNotified(status int) error {
