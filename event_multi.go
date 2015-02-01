@@ -112,12 +112,21 @@ func performEventsMultiAction(team_id int, form *TeamEventsForm, lang string, ac
   list := data.eventIds(team_id)
   if len(list) == 0 { return 0, nil }
 
+  users, err := listUsersOfEvents(list)
+  if err != nil { return 0, nil }
+
+  team, err := fetchTeam(team_id)
+  if err != nil { return 0, nil }
+
   res, err := action(list)
   if err != nil { return 0, nil }
 
   num, _ := res.RowsAffected()
   if num > 0 {
     clearAssignments(list...)
+    if !data.DateTill.Before(today()) {
+      go notifyEventMultiCancel(data, &team, users)
+    }
   }
   return int(num), nil
 }

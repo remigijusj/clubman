@@ -121,6 +121,11 @@ func listUsersOfEventTx(tx *sql.Tx, event_id int) ([]UserContact, error) {
   return listUsersContact(rows, err), err
 }
 
+func listUsersOfEvents(event_ids []int) ([]UserContact, error) {
+  rows, err := multiQuery("users_of_event", event_ids)
+  return listUsersContact(rows, err), err
+}
+
 func listUsersContact(rows *sql.Rows, err error) (list []UserContact) {
   list = []UserContact{}
 

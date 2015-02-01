@@ -45,6 +45,10 @@ func (self EventInfo) FinishAt() time.Time {
   return self.StartAt.Add(time.Duration(self.Minutes) * time.Minute)
 }
 
+func (self TeamEventsData) FinishAt() time.Time {
+  return self.StartAt.Add(time.Duration(self.Minutes) * time.Minute)
+}
+
 func (self EventInfo) IsPast() bool {
   return self.StartAt.Before(today())
 }
