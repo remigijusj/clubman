@@ -176,22 +176,25 @@ func performEventAction(event_id int, action (func(*sql.Tx, int, *EventForm) err
 func updateEventRecordTx(tx *sql.Tx, event_id int, form *EventForm) error {
   _, err := tx.Stmt(query["event_update"]).Exec(form.TeamId, form.StartAt, form.Minutes, form.Status, event_id)
   if err != nil {
+    log.Printf("[APP] EVENT-UPDATE-TX: error %v, %d, %v\n", err, event_id, *form)
     err = errors.New("Event could not be updated")
   }
   return err
 }
 
 func cancelEventRecordTx(tx *sql.Tx, event_id int, form *EventForm) error {
-  _, err := query["event_status"].Exec(eventStatusCanceled, event_id)
+  _, err := tx.Stmt(query["event_status"]).Exec(eventStatusCanceled, event_id)
   if err != nil {
+    log.Printf("[APP] EVENT-CANCEL-TX: error %v, %d\n", err, event_id)
     err = errors.New("Event could not be canceled")
   }
   return err
 }
 
 func deleteEventRecordTx(tx *sql.Tx, event_id int, form *EventForm) error {
-  _, err := query["event_delete"].Exec(event_id)
+  _, err := tx.Stmt(query["event_delete"]).Exec(event_id)
   if err != nil {
+    log.Printf("[APP] EVENT-DELETE-TX: error %v, %d\n", err, event_id)
     err = errors.New("Event could not be deleted")
   }
   return err

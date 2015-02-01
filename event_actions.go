@@ -99,7 +99,7 @@ func handleEventDelete(c *gin.Context) {
     err = deleteEvent(event_id)
   }
   if err != nil {
-    showError(c, err)
+    gotoWarning(c, eventsViewPath(event_id), err.Error())
   } else {
     gotoSuccess(c, defaultPage, "Event has been deleted")
   }
