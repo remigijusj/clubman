@@ -5,6 +5,7 @@ import (
   "errors"
   "fmt"
   "log"
+  "time"
 )
 
 // NOTE: delayed
@@ -15,19 +16,20 @@ func afterAssignmentDelete(event_id int) {
   user_id, err := firstWaitingUserTx(tx, event_id)
   if err != nil { tx.Rollback(); return }
 
-  err = updateAssignmentStatusTx(tx, event_id, user_id, assignmentStatusNotified)
-  if err != nil { tx.Rollback(); return }
-
   user, err := fetchUserContactTx(tx, user_id)
   if err != nil { tx.Rollback(); return }
 
   event, err := fetchEventInfoTx(tx, event_id)
   if err != nil { tx.Rollback(); return }
 
+  err = updateAssignmentStatusTx(tx, event_id, user_id, assignmentStatusNotified)
+  if err != nil { tx.Rollback(); return }
+
   err = tx.Commit()
   if err != nil { return }
 
   notifyEventConfirm(&event, &user)
+  expireAfterGracePeriod(event_id, user_id) // sleeps
 }
 
 func firstWaitingUserTx(tx *sql.Tx, event_id int) (int, error) {
@@ -83,15 +85,53 @@ func confirmAssignmentTx(tx *sql.Tx, event_id, user_id int) (err error) {
     }
   }()
 
-  var status int
-  err = tx.Stmt(query["assignments_status"]).QueryRow(event_id, user_id).Scan(&event_id, &status)
+  status, err := fetchAssignmentStatusTx(tx, event_id, user_id)
   if err != nil { return }
 
-  if status != assignmentStatusNotified {
-    err = errors.New(fmt.Sprintf("invalid status: %d", status))
-  }
+  err = checkAssignmentStatusNotified(status)
   if err != nil { return }
 
   err = updateAssignmentStatusTx(tx, event_id, user_id, assignmentStatusConfirmed)
   return
+}
+
+func expireAfterGracePeriod(event_id, user_id int) {
+  time.Sleep(gracePeriod) // <- IMPORTANT
+
+  if ok := revertAssignmentToWaiting(event_id, user_id); ok {
+    // <<< TODO: again afterAssignmentDelete
+  }
+}
+
+func revertAssignmentToWaiting(event_id, user_id int) bool {
+  var err error
+  defer func() {
+    if err != nil {
+      log.Printf("[APP] EXPIRE-AFTER-GRACE error: %s, %d, %d\n", err, event_id, user_id)
+    }
+  }()
+
+  tx, err := db.Begin()
+  if err != nil { return false }
+
+  status, err := fetchAssignmentStatusTx(tx, event_id, user_id)
+  if err != nil { tx.Rollback(); return false }
+
+  err = checkAssignmentStatusNotified(status)
+  if err != nil { tx.Rollback(); return false }
+
+  err = updateAssignmentStatusTx(tx, event_id, user_id, assignmentStatusWaiting)
+  if err != nil { tx.Rollback(); return false }
+
+  err = tx.Commit()
+  if err != nil { return false }
+
+  return true
+}
+
+func checkAssignmentStatusNotified(status int) error {
+  if status != assignmentStatusNotified {
+    return errors.New(fmt.Sprintf("invalid status: %d", status))
+  }
+  return nil
 }

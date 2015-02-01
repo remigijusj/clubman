@@ -89,6 +89,15 @@ func findAssignment(list []EventAssignment, user *AuthInfo) *EventAssignment {
   return nil
 }
 
+func fetchAssignmentStatusTx(tx *sql.Tx, event_id, user_id int) (int, error) {
+  var status int
+  err := tx.Stmt(query["assignments_status"]).QueryRow(event_id, user_id).Scan(&event_id, &status)
+  if err != nil {
+    log.Printf("[APP] ASSIGNMENT-STATUS error: %s, %d, %d\n", err, event_id, user_id)
+  }
+  return status, err
+}
+
 func createAssignmentTx(tx *sql.Tx, event_id, user_id, status int) error {
   res, err := tx.Stmt(query["assignment_insert"]).Exec(event_id, user_id, status)
   if err != nil {
