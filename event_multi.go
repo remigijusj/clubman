@@ -1,6 +1,7 @@
 package main
 
 import (
+  "database/sql"
   "errors"
   "log"
   "strconv"
@@ -97,19 +98,23 @@ func createEvents(team_id int, form *TeamEventsForm, lang string) (int, error) {
 }
 
 func cancelEvents(team_id int, form *TeamEventsForm, lang string) (int, error) {
+  return performEventsMultiAction(team_id, form, lang, cancelEventsRecords)
+}
+
+func removeEvents(team_id int, form *TeamEventsForm, lang string) (int, error) {
+  return performEventsMultiAction(team_id, form, lang, removeEventsRecords)
+}
+
+func performEventsMultiAction(team_id int, form *TeamEventsForm, lang string, action (func ([]int) (sql.Result, error))) (int, error) {
   data, err := parseEventsForm(form, false, lang)
-  if err != nil {
-    return 0, err
-  }
+  if err != nil { return 0, err }
+
   list := data.eventIds(team_id)
-  if len(list) == 0 {
-    return 0, nil
-  }
-  res, err := multiExec("event_status", eventStatusCanceled, list)
-  if err != nil {
-    log.Printf("[APP] EVENT-STATUS error: %s, %v\n", err, list)
-    return 0, nil
-  }
+  if len(list) == 0 { return 0, nil }
+
+  res, err := action(list)
+  if err != nil { return 0, nil }
+
   num, _ := res.RowsAffected()
   if num > 0 {
     clearAssignments(list...)
@@ -117,25 +122,20 @@ func cancelEvents(team_id int, form *TeamEventsForm, lang string) (int, error) {
   return int(num), nil
 }
 
-func removeEvents(team_id int, form *TeamEventsForm, lang string) (int, error) {
-  data, err := parseEventsForm(form, false, lang)
+func cancelEventsRecords(event_ids []int) (sql.Result, error) {
+  res, err := multiExec("event_status", eventStatusCanceled, event_ids)
   if err != nil {
-    return 0, err
+    log.Printf("[APP] EVENT-STATUS error: %s, %v\n", err, event_ids)
   }
-  list := data.eventIds(team_id)
-  if len(list) == 0 {
-    return 0, nil
-  }
-  res, err := multiExec("event_delete", list)
+  return res, err
+}
+
+func removeEventsRecords(event_ids []int) (sql.Result, error) {
+  res, err := multiExec("event_delete", event_ids)
   if err != nil {
-    log.Printf("[APP] EVENT-DELETE error: %s, %v\n", err, list)
-    return 0, nil
+    log.Printf("[APP] EVENT-DELETE error: %s, %v\n", err, event_ids)
   }
-  num, _ := res.RowsAffected()
-  if num > 0 {
-    clearAssignments(list...)
-  }
-  return int(num), nil
+  return res, err
 }
 
 func parseEventsForm(form *TeamEventsForm, need_time bool, lang string) (*TeamEventsData, error) {

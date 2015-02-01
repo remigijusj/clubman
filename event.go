@@ -45,6 +45,10 @@ func (self EventInfo) FinishAt() time.Time {
   return self.StartAt.Add(time.Duration(self.Minutes) * time.Minute)
 }
 
+func (self EventInfo) IsPast() bool {
+  return self.StartAt.Before(today())
+}
+
 func listTeamEvents(team_id int, date_from time.Time) []EventRecord {
   rows, err := query["events_team"].Query(team_id, date_from.Format(dateFormat))
   return listEvents(rows, err)
@@ -167,7 +171,9 @@ func performEventAction(event_id int, action (func(*sql.Tx, int, *EventForm) err
 
   if clear {
     clearAssignments(event_id)
-    go notifyEventCancel(&event, users)
+    if !event.IsPast() {
+      go notifyEventCancel(&event, users)
+    }
   }
 
   return
