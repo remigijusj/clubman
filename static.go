@@ -42,7 +42,7 @@ var queries = map[string]string{
   "event_select_info":  "SELECT events.id, name, start_at, minutes, events.status FROM events LEFT JOIN teams ON team_id=teams.id WHERE events.id=?",
   "event_select":       "SELECT team_id, start_at, minutes, status FROM events WHERE id=?",
   "event_insert":       "INSERT INTO events(team_id, start_at, minutes, status) VALUES (?, ?, ?, ?)",
-  "event_update":       "UPDATE events SET team_id=?, start_at=?, minutes=?, status=? WHERE id=?",
+  "event_update":       "UPDATE events SET team_id=?, start_at=?, minutes=?, status=? WHERE id IN (?)",
   "event_status":       "UPDATE events SET status=? WHERE id IN (?)",
   "event_delete":       "DELETE FROM events WHERE id IN (?)",
   "events_clear":       "DELETE FROM events WHERE team_id=?",

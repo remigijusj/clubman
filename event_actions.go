@@ -10,15 +10,15 @@ import (
 )
 
 func handleEventsCreate(c *gin.Context) {
-  handleEventsFormAction(c, createEvents, "%d events have been added")
+  handleEventsFormAction(c, createEvents, "%d events have been created")
 }
 
-func handleEventsCancel(c *gin.Context) {
-  handleEventsFormAction(c, cancelEvents, "%d events have been canceled")
+func handleEventsUpdate(c *gin.Context) {
+  handleEventsFormAction(c, updateEvents, "%d events have been updated")
 }
 
-func handleEventsRemove(c *gin.Context) {
-  handleEventsFormAction(c, removeEvents, "%d events have been removed")
+func handleEventsDelete(c *gin.Context) {
+  handleEventsFormAction(c, deleteEvents, "%d events have been deleted")
 }
 
 func getEventForm(c *gin.Context) {

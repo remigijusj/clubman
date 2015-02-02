@@ -64,3 +64,19 @@
       {{"How many minutes will the event last"|T}}
     </div>
   </div>
+  <div class="row">
+    <div class="small-4 columns">
+      <label for="status">{{"Status"|T}}</label>
+    </div>
+    <div class="small-8 columns">
+      <select id="status" name="status">
+        <option value="">{{"No change"|T}}</option>
+        {{range statusList "event"}}
+        <option value="{{.Status}}">{{.Title|T}}</option>
+        {{end}}
+      </select>
+    </div>
+    <div class="small-12 columns description">
+      {{"The status of the event"|T}}
+    </div>
+  </div>

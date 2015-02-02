@@ -10,6 +10,7 @@ const (
   userStatusInstructor = 1
   userStatusAdmin      = 2
   eventStatusCanceled    = -2
+  eventStatusActive      = 0
   assignmentStatusWaiting   = -2
   assignmentStatusNotified  = -1
   assignmentStatusConfirmed = 1

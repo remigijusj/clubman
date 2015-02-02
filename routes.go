@@ -70,7 +70,6 @@ func defineRoutesAdmin(a *gin.RouterGroup) {
 
     ad.GET("/teams/create",       newTeamForm, displayPage)
     ad.GET("/teams/update/:id",   getTeamForm, displayPage)
-    ad.GET("/teams/events/:id",   getTeamForm, getTeamEventsData, newTeamEventsForm, displayPage)
     ad.POST("/teams/create",      handleTeamCreate)
     ad.POST("/teams/update/:id",  handleTeamUpdate)
     ad.POST("/teams/delete/:id",  handleTeamDelete)
@@ -78,9 +77,11 @@ func defineRoutesAdmin(a *gin.RouterGroup) {
     ad.GET("/events/update/:id",  getEventForm, displayPage)
     ad.POST("/events/update/:id", handleEventUpdate)
     ad.POST("/events/delete/:id", handleEventDelete)
+
+    ad.GET("/teams/events/:id",   getTeamForm, getTeamEventsData, newTeamEventsForm, displayPage)
     ad.POST("/events/multi/create/:team_id", handleEventsCreate)
-    ad.POST("/events/multi/cancel/:team_id", handleEventsCancel)
-    ad.POST("/events/multi/remove/:team_id", handleEventsRemove)
+    ad.POST("/events/multi/update/:team_id", handleEventsUpdate)
+    ad.POST("/events/multi/delete/:team_id", handleEventsDelete)
 
     ad.POST("/assignments/confirm/:event_id", handleAssignmentConfirm)
 

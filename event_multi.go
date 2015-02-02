@@ -14,6 +14,7 @@ type TeamEventsForm struct {
   Weekdays []int  `form:"weekdays"`
   StartAt  string `form:"start_at"`
   Minutes  string `form:"minutes"`
+  Status   string `form:"status"`
 }
 
 type TeamEventsData struct {
@@ -22,6 +23,7 @@ type TeamEventsData struct {
   Weekdays []bool
   StartAt  time.Time
   Minutes  int
+  Status   int
 }
 
 func (self TeamEventsData) eachTime(callback func(time.Time) int) int {
@@ -97,15 +99,7 @@ func createEvents(team_id int, form *TeamEventsForm, lang string) (int, error) {
   return cnt, nil
 }
 
-func cancelEvents(team_id int, form *TeamEventsForm, lang string) (int, error) {
-  return performEventsMultiAction(team_id, form, lang, cancelEventsRecords)
-}
-
-func removeEvents(team_id int, form *TeamEventsForm, lang string) (int, error) {
-  return performEventsMultiAction(team_id, form, lang, removeEventsRecords)
-}
-
-func performEventsMultiAction(team_id int, form *TeamEventsForm, lang string, action (func ([]int) (sql.Result, error))) (int, error) {
+func updateEvents(team_id int, form *TeamEventsForm, lang string) (int, error) {
   data, err := parseEventsForm(form, false, lang)
   if err != nil { return 0, err }
 
@@ -118,7 +112,40 @@ func performEventsMultiAction(team_id int, form *TeamEventsForm, lang string, ac
   team, err := fetchTeam(team_id)
   if err != nil { return 0, nil }
 
-  res, err := action(list)
+  res, err := updateEventsRecords(list, data, team_id)
+  if err != nil { return 0, nil }
+
+  num, _ := res.RowsAffected()
+  if num > 0 {
+    if !data.DateTill.Before(today()) {
+      go notifyEventMultiUpdate(data, &team, users)
+    }
+  }
+  return int(num), nil
+}
+
+func updateEventsRecords(event_ids []int, data *TeamEventsData, team_id int) (sql.Result, error) {
+  res, err := multiExec("event_update", team_id, data.StartAt, data.Minutes, data.Status, event_ids)
+  if err != nil {
+    log.Printf("[APP] EVENT-UPDATE-MULTI error: %s, %v\n", err, event_ids)
+  }
+  return res, err
+}
+
+func deleteEvents(team_id int, form *TeamEventsForm, lang string) (int, error) {
+  data, err := parseEventsForm(form, false, lang)
+  if err != nil { return 0, err }
+
+  list := data.eventIds(team_id)
+  if len(list) == 0 { return 0, nil }
+
+  users, err := listUsersOfEvents(list)
+  if err != nil { return 0, nil }
+
+  team, err := fetchTeam(team_id)
+  if err != nil { return 0, nil }
+
+  res, err := deleteEventsRecords(list)
   if err != nil { return 0, nil }
 
   num, _ := res.RowsAffected()
@@ -131,18 +158,10 @@ func performEventsMultiAction(team_id int, form *TeamEventsForm, lang string, ac
   return int(num), nil
 }
 
-func cancelEventsRecords(event_ids []int) (sql.Result, error) {
-  res, err := multiExec("event_status", eventStatusCanceled, event_ids)
-  if err != nil {
-    log.Printf("[APP] EVENT-STATUS error: %s, %v\n", err, event_ids)
-  }
-  return res, err
-}
-
-func removeEventsRecords(event_ids []int) (sql.Result, error) {
+func deleteEventsRecords(event_ids []int) (sql.Result, error) {
   res, err := multiExec("event_delete", event_ids)
   if err != nil {
-    log.Printf("[APP] EVENT-DELETE error: %s, %v\n", err, event_ids)
+    log.Printf("[APP] EVENT-DELETE-MULTI error: %s, %v\n", err, event_ids)
   }
   return res, err
 }
@@ -181,6 +200,11 @@ func parseEventsForm(form *TeamEventsForm, need_time bool, lang string) (*TeamEv
   data.Minutes, _ = strconv.Atoi(form.Minutes)
   if need_time && !minutesValid(data.Minutes) {
     return nil, errors.New("Duration must be a positive number, not too big")
+  }
+
+  data.Status, _ = strconv.Atoi(form.Status)
+  if data.Status != eventStatusActive && data.Status != eventStatusCanceled {
+    return nil, errors.New("Status is invalid")
   }
 
   return &data, nil

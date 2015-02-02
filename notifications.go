@@ -211,6 +211,30 @@ func sendEventCancelSMS(mobile, lang string, event *EventInfo) {
   sendSMS(mobile, message)
 }
 
+func notifyEventMultiUpdate(data *TeamEventsData, team *TeamForm, users []UserContact) {
+  for _, user := range users {
+    notifyEventUserMultiUpdate(data, team, &user)
+  }
+}
+
+func notifyEventUserMultiUpdate(data *TeamEventsData, team *TeamForm, user *UserContact) {
+  sendEventMultiUpdateEmail(user.Email, user.Language, data, team)
+}
+
+func sendEventMultiUpdateEmail(email, lang string, data *TeamEventsData, team *TeamForm) {
+  subject := T(lang, "Multiple %s events updated", team.Name)
+  subject = fmt.Sprintf("[%s] %s", serverName, subject)
+
+  obj := map[string]interface{}{
+    "lang": lang,
+    "data": *data,
+    "team": *team,
+  }
+  message := compileMessage("event_update_multi_email", lang, obj)
+
+  sendEmail(email, subject, message)
+}
+
 func notifyEventMultiCancel(data *TeamEventsData, team *TeamForm, users []UserContact) {
   for _, user := range users {
     notifyEventUserMultiCancel(data, team, &user)

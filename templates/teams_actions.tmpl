@@ -69,18 +69,52 @@
     <div class="large-6 medium-8 columns">
       <h4>{{.team.Name}}: {{"Events"|T}}</h4>
 
-      <div class="panel">
-        <form action="/events/multi/create/{{.id}}" method="POST">
-          {{template "teams_events_form.tmpl" . }}
-          <div class="row end">
-            <div class="columns">
-              <input type="submit" class="button tiny radius" value="{{"Add events"|T}}" />
-              <input type="button" class="button tiny radius" value="{{"Cancel events"|T}}" data-action="/events/multi/cancel/{{.id}}" />
-              <input type="button" class="button tiny radius" value="{{"Remove events"|T}}" data-action="/events/multi/remove/{{.id}}" />
-              <a href="/teams" class="info button tiny radius right">{{"Back"|T}}</a>
-            </div>
+      <ul class="tabs" data-tab>
+        <li class="tab-title active"><a href="#create">{{"Create"|T}}</a></li>
+        <li class="tab-title"><a href="#update">{{"Update"|T}}</a></li>
+        <li class="tab-title"><a href="#delete">{{"Delete"|T}}</a></li>
+      </ul>
+
+      <div class="tabs-content">
+        <div class="content active" id="create">
+          <div class="panel">
+            <form action="/events/multi/create/{{.id}}" method="POST">
+              {{template "teams_events_form.tmpl" . }}
+              <div class="row end">
+                <div class="columns">
+                  <input type="submit" class="button tiny radius" value="{{"Create events"|T}}" />
+                  <a href="/teams" class="info button tiny radius right">{{"Back"|T}}</a>
+                </div>
+              </div>
+            </form>
           </div>
-        </form>
+        </div>
+        <div class="content" id="update">
+          <div class="panel">
+            <form action="/events/multi/update/{{.id}}" method="POST">
+              {{template "teams_events_form.tmpl" . }}
+              <div class="row end">
+                <div class="columns">
+                  <input type="submit" class="button tiny radius" value="{{"Update events"|T}}" />
+                  <a href="/teams" class="info button tiny radius right">{{"Back"|T}}</a>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+        <div class="content" id="delete">
+          <div class="panel">
+            <form action="/events/multi/delete/{{.id}}" method="POST">
+              {{template "teams_events_form.tmpl" . }}
+              <div class="row end">
+                <div class="columns">
+                  <input type="button" class="button tiny radius" value="{{"Delete events"|T}}" />
+                  <a href="/teams" class="info button tiny radius right">{{"Back"|T}}</a>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
       </div>
     </div>
   </div>
