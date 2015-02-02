@@ -29,7 +29,7 @@ const (
   workdayFrom = "08:00" // contact email/sms
   workdayTill = "16:00"
   cancelHours = "0 0 18 * * *"
-  gracePeriod = 2 * time.Hour
+  gracePeriod = 5 * time.Minute // <<< 2 * time.Hour
 
   sessionKey = "session"
   bcryptCost = 10

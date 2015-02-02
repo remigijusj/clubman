@@ -8,6 +8,8 @@
         <a href="/users?status=-2">{{"Inactive"|T}}</a>
       </p>
 
+      {{$self := .self}}
+
       <table class="list">
         <thead>
           <tr>
@@ -18,7 +20,6 @@
           </tr>
         </thead>
         <tbody>
-          {{ $selfId := .self.Id }}
           {{range .list}}
           <tr>
             <td>
@@ -31,7 +32,7 @@
               {{statusTitle "user" .Status|T}}
             </td>
             <td>
-              {{if ne .Id $selfId }}
+              {{if ne .Id $self.Id }}
               <a href="/users/update/{{.Id}}">{{"Edit"|T}}</a>
               {{end}}
             </td>
