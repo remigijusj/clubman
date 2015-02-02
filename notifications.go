@@ -105,7 +105,7 @@ func sendResetLinkEmail(email, lang, token string) {
   sendEmail(email, subject, message)
 }
 
-func notifyEventConfirm(event *EventInfo, user *UserContact) {
+func notifyEventToConfirm(event *EventInfo, user *UserContact) {
   switch user.chooseMethod() {
   case contactEmail:
     sendEventConfirmLinkEmail(user.Email, user.Language, event)
@@ -135,6 +135,40 @@ func sendEventConfirmLinkSMS(mobile, lang string, event *EventInfo) {
     "host": serverHost,
   }
   message := compileMessage("event_confirm_sms", lang, obj)
+
+  sendSMS(mobile, message)
+}
+
+func notifyEventConfirmed(event *EventInfo, user *UserContact) {
+  switch user.chooseMethod() {
+  case contactEmail:
+    sendEventConfirmedEmail(user.Email, user.Language, event)
+  case contactSMS:
+    sendEventConfirmedSMS(user.Mobile, user.Language, event)
+  }
+}
+
+func sendEventConfirmedEmail(email, lang string, event *EventInfo) {
+  subject := T(lang, "Subscription for %s confirmed", event.Name)
+  subject = fmt.Sprintf("[%s] %s", serverName, subject)
+
+  obj := map[string]interface{}{
+    "lang": lang,
+    "event": event,
+    "url":  fmt.Sprintf("%s/assignments/delete/%d", serverRoot, event.Id),
+  }
+  message := compileMessage("event_confirmed_email", lang, obj)
+
+  sendEmail(email, subject, message)
+}
+
+func sendEventConfirmedSMS(mobile, lang string, event *EventInfo) {
+  obj := map[string]interface{}{
+    "lang": lang,
+    "event": event,
+    "host": serverHost,
+  }
+  message := compileMessage("event_confirmed_sms", lang, obj)
 
   sendSMS(mobile, message)
 }

@@ -29,7 +29,8 @@ const (
   workdayFrom = "08:00" // contact email/sms
   workdayTill = "16:00"
   cancelHours = "0 0 18 * * *" // <<< OBSOLETE
-  gracePeriod = 10 * time.Minute // <<< 2 * time.Hour, OBSOLETE
+  autoConfirm = true
+  gracePeriod = 2 * time.Hour // when not autoConfirm
 
   sessionKey  = "session"
   bcryptCost  = 10

@@ -50,6 +50,7 @@ func defineRoutesInternal(r *gin.Engine) {
     a.GET("/calendar/month",  getMonthData,                    displayPage)
 
     a.GET("/assignments/confirm/:event_id", handleAssignmentConfirm) // external link
+    a.GET("/assignments/delete/:event_id",  handleAssignmentDelete)  // external link
     a.POST("/assignments/create/:event_id", handleAssignmentCreate)
     a.POST("/assignments/delete/:event_id", handleAssignmentDelete)
 
@@ -85,7 +86,7 @@ func defineRoutesAdmin(a *gin.RouterGroup) {
 
     ad.GET("/logs",               getLogList, displayPage)
 
-    // <<< DEBUG
+    // <<< DEBUG, external link
     ad.GET("/events/auto_cancel", func(c *gin.Context) { autoCancelEvents() }, redirectCalendar)
   }
 }

@@ -8,7 +8,7 @@ import (
   "time"
 )
 
-// NOTE: delayed
+// NOTE: delayed, 2 modes based on autoConfirm
 func afterAssignmentDelete(event_id, limit_id int) {
   tx, err := db.Begin()
   if err != nil { return }
@@ -22,14 +22,26 @@ func afterAssignmentDelete(event_id, limit_id int) {
   event, err := fetchEventInfoTx(tx, event_id)
   if err != nil { tx.Rollback(); return }
 
-  err = updateAssignmentStatusTx(tx, event_id, user_id, assignmentStatusNotified)
+  err = updateAssignmentStatusTx(tx, event_id, user_id, assigmentStatusChange())
   if err != nil { tx.Rollback(); return }
 
   err = tx.Commit()
   if err != nil { return }
 
-  notifyEventConfirm(&event, &user)
-  expireAfterGracePeriod(event_id, user_id) // sleeps
+  if autoConfirm {
+    notifyEventConfirmed(&event, &user)
+  } else {
+    notifyEventToConfirm(&event, &user)
+    expireAfterGracePeriod(event_id, user_id) // sleeps
+  }
+}
+
+func assigmentStatusChange() int {
+  if autoConfirm {
+    return assignmentStatusConfirmed
+  } else {
+    return assignmentStatusNotified
+  }
 }
 
 func firstWaitingUserTx(tx *sql.Tx, event_id, limit_id int) (int, error) {

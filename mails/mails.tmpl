@@ -22,6 +22,21 @@
 {{T "Another user has unsubscribed from %s" .event.Name}}, {{localDate .event.StartAt .lang}}. {{T "Please login to %s and confirm" .host}}
 {{end}}
 
+{{define "event_confirmed_email"}}
+<p>
+  {{T "You are subscribed to %s" .event.Name}}. {{"You can participate"|T}}.<br/>
+  {{localDate .event.StartAt .lang}},
+  {{printTime .event.StartAt}} &ndash; {{printTime .event.FinishAt}}
+  <br/><br/>
+  {{"If you do not wish to participate, please click the link and cancel your subscription"|T}}:
+</p>
+<p><a href="{{.url}}">{{.url}}</a></p>
+{{end}}
+
+{{define "event_confirmed_sms"}}
+{{T "You are subscribed to %s" .event.Name}}, {{localDate .event.StartAt .lang}}, {{printTime .event.StartAt}}. {{T "If you do not wish to participate, please login to %s and cancel" .host}}
+{{end}}
+
 {{define "event_cancel_email"}}
 <p>
   {{T "%s was canceled" .event.Name}}.<br/>
