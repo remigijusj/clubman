@@ -3,7 +3,7 @@ set -e
 
 replaces ()
 {
-  local name="static.go"
+  local name="config.go"
   local pass="$1"
   local reload="$2"
 
