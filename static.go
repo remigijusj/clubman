@@ -111,4 +111,6 @@ var queries = map[string]string{
   "assignment_update":  "UPDATE assignments SET status=? WHERE event_id=? AND user_id=?",
   "assignment_delete":  "DELETE FROM assignments WHERE event_id=? AND user_id=?",
   "assignments_clear":  "DELETE FROM assignments WHERE event_id IN (?)",
+
+  "logs_all":           "SELECT id, created_at FROM logs WHERE created_at >= ?",
 }

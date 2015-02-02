@@ -1,0 +1,43 @@
+  <div class="row">
+    <div class="columns">
+      <h4>{{"Activity logs"|T}}</h4>
+
+      {{$lang := .lang}}
+
+      <form method="POST">
+        <table class="list">
+          <thead>
+            <tr>
+              <td>{{"Text"|T}}</td>
+              <td>{{"Date"|T}}</td>
+              <td>{{"Time"|T}}</td>
+            </tr>
+          </thead>
+          <tbody>
+            {{range .list}}
+            <tr>
+              <td>
+                {{.ID}}
+              </td>
+              <td>
+                {{localDate .CreatedAt $lang}}
+              </td>
+              <td>
+                {{printTime .CreatedAt}}
+              </td>
+            </tr>
+            {{end}}
+          </tbody>
+        </table>
+      </form>
+
+      <p>
+        {{if .full}}
+        <a href="?">{{"Show current"|T}}</a>
+        {{else}}
+        <a href="?date={{defaultDate}}">{{"Show all"|T}}</a>
+        {{end}}
+      </p>
+
+    </div>
+  </div>

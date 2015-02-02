@@ -23,7 +23,7 @@
           <a href="#">{{"Administrator"|T}}</a>
           <ul class="dropdown">
             <li><a href="/users">{{"Users list"|T}}</a></li>
-            <li><a href="#">{{"Activity logs"|T}}</a></li>
+            <li><a href="/logs">{{"Activity logs"|T}}</a></li>
           </ul>
         </li>
         {{end}}
@@ -118,6 +118,9 @@
 
         {{else if eq .page "assignments"}}
           {{template "assignments.tmpl" . }}
+
+        {{else if eq .page "logs"}}
+          {{template "logs.tmpl" . }}
 
         {{else if eq .page "calendar_week"}}
           {{template "calendar_week.tmpl" . }}
