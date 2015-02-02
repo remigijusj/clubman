@@ -89,7 +89,7 @@ func handleEventCancel(c *gin.Context) {
   if err != nil {
     gotoWarning(c, eventsViewPath(event_id), err.Error())
   } else {
-    gotoSuccess(c, eventsViewPath(event_id), "Event has been deleted")
+    gotoSuccess(c, eventsViewPath(event_id), "Event has been canceled")
   }
 }
 
@@ -105,7 +105,7 @@ func handleEventDelete(c *gin.Context) {
   }
 }
 
-func permitNotify(c *gin.Context) {
+func checkEventPerm(c *gin.Context) {
   if self := currentUser(c); self != nil {
     if self.IsAdmin() {
       return

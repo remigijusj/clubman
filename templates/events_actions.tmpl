@@ -76,14 +76,21 @@
         </form>
       </div>
     </div>
-    {{else if and (eq .self.Status 1) (eq .team.InstructorId .self.Id)}}
+    {{else if and (eq .self.Status 1) (eq .team.InstructorId .self.Id) (eq .form.Status 0)}}
     <div class="large-6 medium-6 columns">
       <div class="panel" data-equalizer-watch>
-        <div class="row end">
-          <div class="columns">
-            <a href="/events/notify/{{.id}}" class="button tiny radius right">{{"Send email"|T}}</a>
+        <form method="POST">
+          <div class="row end">
+            <div class="columns">
+              {{$confirm := gt (len .list) 0}}
+              {{$msg := "Are you sure? Event subscriptions will be deleted"}}
+              <input type="button" data-action="/events/cancel/{{.id}}" class="button tiny radius right right-1" {{if $confirm}}data-confirm="{{$msg|T}}"{{end}} value="{{"Cancel event"|T}}" />
+              {{if gt (len .list) 0}}
+                <a href="/events/notify/{{.id}}" class="button tiny radius right right-1">{{"Send email"|T}}</a>
+              {{end}}
+            </div>
           </div>
-        </div>
+        </form>
       </div>
     </div>
     {{end}}

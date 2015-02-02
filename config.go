@@ -28,21 +28,21 @@ const (
 
   workdayFrom = "08:00" // contact email/sms
   workdayTill = "16:00"
-  cancelHours = "0 0 18 * * *"
-  gracePeriod = 5 * time.Minute // <<< 2 * time.Hour
+  cancelHours = "0 0 18 * * *" // <<< OBSOLETE
+  gracePeriod = 10 * time.Minute // <<< 2 * time.Hour, OBSOLETE
 
-  sessionKey = "session"
-  bcryptCost = 10
-  minPassLen = 6
+  sessionKey  = "session"
+  bcryptCost  = 10
+  minPassLen  = 6
   defaultLang = "da"
   defaultPage = "/calendar/week" // not "/"
   defaultDate = "2015-01-01"
-  timeFormat = "15:04"
-  dateFormat = "2006-01-02" // db
-  panicError = "Critical error happened, please contact website admin"
+  timeFormat  = "15:04"
+  dateFormat  = "2006-01-02" // db
+  panicError  = "Critical error happened, please contact website admin"
   permitError = "You are not authorized to view this page"
 
-  reloadTmpl = true // DEBUG mode
+  reloadTmpl  = true // DEBUG mode
 )
 
 var languages = []string{"da", "en"}
