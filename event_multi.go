@@ -3,8 +3,10 @@ package main
 import (
   "database/sql"
   "errors"
+  "fmt"
   "log"
   "strconv"
+  "strings"
   "time"
 )
 
@@ -12,6 +14,7 @@ type TeamEventsForm struct {
   DateFrom string `form:"date_from" binding:"required"`
   DateTill string `form:"date_till" binding:"required"`
   Weekdays []int  `form:"weekdays"`
+  OnlyAt   string `form:"only_at"`
   StartAt  string `form:"start_at"`
   Minutes  string `form:"minutes"`
   Status   string `form:"status"`
@@ -21,6 +24,7 @@ type TeamEventsData struct {
   DateFrom time.Time
   DateTill time.Time
   Weekdays []bool
+  OnlyAt   time.Time
   StartAt  time.Time
   Minutes  int
   Status   int
@@ -74,7 +78,7 @@ func (self TeamEventsData) matchTime(t time.Time) bool {
   if !self.Weekdays[wday] {
     return false
   }
-  s := self.StartAt
+  s := self.OnlyAt
   if s.IsZero() {
     return true
   } else {
@@ -88,7 +92,7 @@ func createEvents(team_id int, form *TeamEventsForm, lang string) (int, error) {
     return 0, err
   }
   cnt := data.eachTime(func(date time.Time) int {
-    res, err := query["event_insert"].Exec(team_id, date, data.Minutes, 0)
+    res, err := query["event_insert"].Exec(team_id, date, data.Minutes, eventStatusActive)
     if err != nil {
       log.Printf("[APP] EVENT-INSERT error: %s, %d, %s, %d\n", err, team_id, date, data.Minutes)
       return 0
@@ -112,7 +116,7 @@ func updateEvents(team_id int, form *TeamEventsForm, lang string) (int, error) {
   team, err := fetchTeam(team_id)
   if err != nil { return 0, nil }
 
-  res, err := updateEventsRecords(list, data, team_id)
+  res, err := updateEventsRecords(list, data)
   if err != nil { return 0, nil }
 
   num, _ := res.RowsAffected()
@@ -124,10 +128,30 @@ func updateEvents(team_id int, form *TeamEventsForm, lang string) (int, error) {
   return int(num), nil
 }
 
-func updateEventsRecords(event_ids []int, data *TeamEventsData, team_id int) (sql.Result, error) {
-  res, err := multiExec("event_update", team_id, data.StartAt, data.Minutes, data.Status, event_ids)
+// NOTE: building the query in-place
+func updateEventsRecords(event_ids []int, data *TeamEventsData) (sql.Result, error) {
+  cond := make([]string, 0, 3)
+
+  if !data.OnlyAt.IsZero() && !data.StartAt.IsZero() {
+    part := fmt.Sprintf("start_at=datetime(start_at, 'start of day', '%d hours', '%d minutes')", data.StartAt.Hour(), data.StartAt.Minute())
+    cond = append(cond, part)
+  }
+
+  if data.Minutes > 0 {
+    part := fmt.Sprintf("minutes=%d", data.Minutes)
+    cond = append(cond, part)
+  }
+
+  if true {
+    part := fmt.Sprintf("status=%d", data.Status)
+    cond = append(cond, part)
+  }
+
+  qry := fmt.Sprintf("UPDATE events SET %s WHERE id IN (?)", strings.Join(cond, ", "))
+  qry, list := multi(qry, event_ids)
+  res, err := db.Exec(qry, list...)
   if err != nil {
-    log.Printf("[APP] EVENT-UPDATE-MULTI error: %s, %v\n", err, event_ids)
+    log.Printf("[APP] EVENT-UPDATE-MULTI error: %s, %v, %v\n", err, data, event_ids)
   }
   return res, err
 }
@@ -166,7 +190,7 @@ func deleteEventsRecords(event_ids []int) (sql.Result, error) {
   return res, err
 }
 
-func parseEventsForm(form *TeamEventsForm, need_time bool, lang string) (*TeamEventsData, error) {
+func parseEventsForm(form *TeamEventsForm, create bool, lang string) (*TeamEventsData, error) {
   var data TeamEventsData
 
   var err1, err2 error
@@ -189,16 +213,18 @@ func parseEventsForm(form *TeamEventsForm, need_time bool, lang string) (*TeamEv
     }
   }
 
-  if need_time && form.StartAt == "" {
+  data.OnlyAt, _ = time.Parse(timeFormat, form.OnlyAt)
+
+  if create && form.StartAt == "" {
     return nil, errors.New("Please enter start time")
   }
   data.StartAt, err1 = time.Parse(timeFormat, form.StartAt)
-  if need_time && err1 != nil {
+  if create && err1 != nil {
     return nil, errors.New("Start time has invalid format")
   }
 
   data.Minutes, _ = strconv.Atoi(form.Minutes)
-  if need_time && !minutesValid(data.Minutes) {
+  if create && !minutesValid(data.Minutes) {
     return nil, errors.New("Duration must be a positive number, not too big")
   }
 

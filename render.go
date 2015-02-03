@@ -24,13 +24,14 @@ var helpers = template.FuncMap{
   "statusList":    statusList,
   "eventClass":    eventClass,
   "userName":      userName,
+  "dict":          dict,
   "serverName":  func() string { return serverName },
   "defaultDate": func() string { return defaultDate },
-  "printTime":  func(t time.Time) string { return t.Format(timeFormat) },
-  "printDate":  func(t time.Time) string { return t.Format(dateFormat) },
-  "localDate":  func(t time.Time, lang string) string { return t.Format(dateFormats[lang]) },
-  "truncate":   func(i int, s string) string { return s[0:i] },
-  "T": func(key string) string { return key },
+  "printTime":   func(t time.Time) string { return t.Format(timeFormat) },
+  "printDate":   func(t time.Time) string { return t.Format(dateFormat) },
+  "localDate":   func(t time.Time, lang string) string { return t.Format(dateFormats[lang]) },
+  "truncate":    func(i int, s string) string { return s[0:i] },
+  "T":           func(key string) string { return key },
 }
 
 func loadHtmlTemplates(pattern string, engine *gin.Engine) {

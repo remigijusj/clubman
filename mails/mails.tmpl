@@ -62,8 +62,14 @@
     {{if index .data.Weekdays 6}}{{"Saturday"|T}}, {{end}}
     {{if index .data.Weekdays 0}}{{"Sunday"|T}}, {{end}}
   <br/>
+  {{if not (.data.OnlyAt.IsZero)}}
+  {{"Filter time"|T}}: {{printTime .data.OnlyAt}}<br/>
+  {{end}}
   {{if not (.data.StartAt.IsZero)}}
-  {{"Time"|T}}: {{printTime .data.StartAt}} &ndash; {{printTime .data.FinishAt}}
+  {{"Updated time"|T}}: {{printTime .data.StartAt}} &ndash; {{printTime .data.FinishAt}}<br/>
+  {{end}}
+  {{if ne .data.Status 0}}
+  {{"Status"|T}}: {{statusTitle "event" .data.Status}}
   {{end}}
 </p>
 {{end}}

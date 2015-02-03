@@ -139,19 +139,18 @@ func getLang(c *gin.Context) string {
 }
 
 func multiQuery(name string, args ...interface{}) (*sql.Rows, error) {
-  qry, list := multi(name, args...)
+  qry, list := multi(queries[name], args...)
   return db.Query(qry, list...)
 }
 
 func multiExec(name string, args ...interface{}) (sql.Result, error) {
-  qry, list := multi(name, args...)
+  qry, list := multi(queries[name], args...)
   return db.Exec(qry, list...)
 }
 
 // expands int slice arguments for IN-queries
 // WARNING: caller is reponsible for ensuring non-empty slices
-func multi(name string, args ...interface{}) (string, []interface{}) {
-  qry := queries[name]
+func multi(qry string, args ...interface{}) (string, []interface{}) {
   list := []interface{}{}
   for _, item := range args {
     if ints, ok := item.([]int); ok {

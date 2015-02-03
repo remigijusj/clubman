@@ -1,6 +1,6 @@
   <div class="row">
     <div class="small-4 columns">
-      <label for="date_from">{{"Date from"|T}}</label>
+      <label for="date_from">{{"Date from"|T}} *</label>
     </div>
     <div class="small-8 columns">
       <input id="date_from" name="date_from" type="text" value="{{or .form.DateFrom .date_from}}" placeholder="{{.date_from}}" class="date" />
@@ -11,7 +11,7 @@
   </div>
   <div class="row">
     <div class="small-4 columns">
-      <label for="date_till">{{"Date till"|T}}</label>
+      <label for="date_till">{{"Date till"|T}} *</label>
     </div>
     <div class="small-8 columns">
       <input id="date_till" name="date_till" type="text" value="{{or .form.DateTill .date_till}}" placeholder="{{.date_till}}" class="date" />
@@ -39,12 +39,27 @@
       {{"Only add or remove events on the listed weekdays"|T}}
     </div>
   </div>
+  {{if or (eq .action "update") (eq .action "delete")}}
   <div class="row">
     <div class="small-4 columns">
-      <label for="start_at">{{"Start time"|T}}</label>
+      <label for="only_at">{{"Filter time"|T}}</label>
     </div>
     <div class="small-2 columns">
-      <input id="start_at" name="start_at" type="text" value="{{.form.StartAt}}" size="5" placeholder="06:40" />
+      <input id="only_at" name="only_at" type="text" value="{{.form.OnlyAt}}" size="5" placeholder="06:40" />
+    </div>
+    <div class="small-12 columns description">
+      {{"Filter only events at the specified time"|T}}
+    </div>
+  </div>
+  {{end}}
+  {{if or (eq .action "update") (eq .action "create")}}
+  <hr/>
+  <div class="row">
+    <div class="small-4 columns">
+      <label for="start_at">{{"Start time"|T}} {{if eq .action "create"}}*{{end}}</label>
+    </div>
+    <div class="small-2 columns">
+      <input id="start_at" name="start_at" type="text" value="{{.form.StartAt}}" size="5" placeholder="08:30" />
     </div>
     <div class="small-12 columns description">
       {{"At what time the events will start each specified day"|T}}
@@ -52,10 +67,10 @@
   </div>
   <div class="row">
     <div class="small-4 columns">
-      <label for="minutes">{{"Duration"|T}}</label>
+      <label for="minutes">{{"Duration"|T}} {{if eq .action "create"}}*{{end}}</label>
     </div>
     <div class="small-2 columns">
-      <input id="minutes" name="minutes" type="text" value="{{or .form.Minutes "60"}}" size="2" placeholder="60" />
+      <input id="minutes" name="minutes" type="text" value="{{if eq .action "create"}}{{or .form.Minutes "60"}}{{end}}" size="2" placeholder="60" />
     </div>
     <div class="small-6 columns">
       min
@@ -64,15 +79,16 @@
       {{"How many minutes will the event last"|T}}
     </div>
   </div>
+  {{end}}
+  {{if eq .action "update"}}
   <div class="row">
     <div class="small-4 columns">
       <label for="status">{{"Status"|T}}</label>
     </div>
     <div class="small-8 columns">
       <select id="status" name="status">
-        <option value="">{{"No change"|T}}</option>
         {{range statusList "event"}}
-        <option value="{{.Status}}">{{.Title|T}}</option>
+        <option value="{{.Status}}" {{if eq .Status 0}}selected{{end}}>{{.Title|T}}</option>
         {{end}}
       </select>
     </div>
@@ -80,3 +96,4 @@
       {{"The status of the event"|T}}
     </div>
   </div>
+  {{end}}

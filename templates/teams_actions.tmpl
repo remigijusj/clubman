@@ -69,7 +69,7 @@
     <div class="large-6 medium-8 columns">
       <h4>{{.team.Name}}: {{"Events"|T}}</h4>
 
-      <ul class="tabs" data-tab>
+      <ul class="tabs radius" data-tab>
         <li class="tab-title active"><a href="#create">{{"Create"|T}}</a></li>
         <li class="tab-title"><a href="#update">{{"Update"|T}}</a></li>
         <li class="tab-title"><a href="#delete">{{"Delete"|T}}</a></li>
@@ -79,7 +79,7 @@
         <div class="content active" id="create">
           <div class="panel">
             <form action="/events/multi/create/{{.id}}" method="POST">
-              {{template "teams_events_form.tmpl" . }}
+              {{template "teams_events_form.tmpl" dict "form" .form "action" "create" }}
               <div class="row end">
                 <div class="columns">
                   <input type="submit" class="button tiny radius" value="{{"Create events"|T}}" />
@@ -92,7 +92,7 @@
         <div class="content" id="update">
           <div class="panel">
             <form action="/events/multi/update/{{.id}}" method="POST">
-              {{template "teams_events_form.tmpl" . }}
+              {{template "teams_events_form.tmpl" dict "form" .form "action" "update" }}
               <div class="row end">
                 <div class="columns">
                   <input type="submit" class="button tiny radius" value="{{"Update events"|T}}" />
@@ -105,7 +105,7 @@
         <div class="content" id="delete">
           <div class="panel">
             <form action="/events/multi/delete/{{.id}}" method="POST">
-              {{template "teams_events_form.tmpl" . }}
+              {{template "teams_events_form.tmpl" dict "form" .form "action" "delete" }}
               <div class="row end">
                 <div class="columns">
                   <input type="button" class="button tiny radius" value="{{"Delete events"|T}}" />

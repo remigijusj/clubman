@@ -6,6 +6,10 @@ meta.foundation-version {font-family:"/5.4.7/";}meta.foundation-mq-small {font-f
 .canceled a {
   text-decoration: line-through;
 }
+.description p {
+  font-size: 1em;
+}
+
 .day.today, .days.today {
   background-color: #E8F7FF;
 }
@@ -25,6 +29,7 @@ meta.foundation-version {font-family:"/5.4.7/";}meta.foundation-mq-small {font-f
 .monthly .day .inner a img {
   vertical-align: text-top;
 }
+
 .under {
   color: #006BD7;
 }
@@ -34,9 +39,7 @@ meta.foundation-version {font-family:"/5.4.7/";}meta.foundation-mq-small {font-f
 .over {
   color: #C10000;
 }
-.description p {
-  font-size: 1em;
-}
+
 .tabs .tab-title {
   width: 120px;
   text-align: center;
@@ -46,4 +49,7 @@ meta.foundation-version {font-family:"/5.4.7/";}meta.foundation-mq-small {font-f
 }
 .tabs .tab-title.active>a {
   background-color: #B0D8FF;
+}
+.tabs-content {
+  margin-bottom: 0;
 }
