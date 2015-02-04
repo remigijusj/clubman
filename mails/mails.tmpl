@@ -51,7 +51,7 @@
 
 {{define "event_update_multi_email"}}
 <p>
-  {{T "Multiple %s events updated" .team.Name}}. {{"You have been subscribed for some of them"}}.<br/>
+  {{T "Multiple %s events updated" .team.Name}}. {{"You have been subscribed for some of them"|T}}.<br/>
   {{"Period"|T}}: {{localDate .data.DateFrom .lang}} &ndash; {{localDate .data.DateTill .lang}},<br/>
   {{"Weekdays"|T}}: 
     {{if index .data.Weekdays 1}}{{"Monday"|T}}, {{end}}
@@ -76,7 +76,7 @@
 
 {{define "event_cancel_multi_email"}}
 <p>
-  {{T "Multiple %s events canceled" .team.Name}}. {{"You have been subscribed for some of them"}}.<br/>
+  {{T "Multiple %s events canceled" .team.Name}}. {{"You have been subscribed for some of them"|T}}.<br/>
   {{"Period"|T}}: {{localDate .data.DateFrom .lang}} &ndash; {{localDate .data.DateTill .lang}},<br/>
   {{"Weekdays"|T}}: 
     {{if index .data.Weekdays 1}}{{"Monday"|T}}, {{end}}

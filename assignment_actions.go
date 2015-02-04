@@ -81,7 +81,7 @@ func handleAssignmentConfirm(c *gin.Context) {
 
   err := confirmAssignmentTx(tx, event_id, user_id)
   if err != nil {
-    failAssignmentAction(c, event_id, tx, "Action failed, perhaps the subscription is already confrmed or canceled")
+    failAssignmentAction(c, event_id, tx, "Action failed, perhaps the subscription is already confirmed or canceled")
     return
   }
 

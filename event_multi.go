@@ -222,6 +222,9 @@ func parseEventsForm(form *TeamEventsForm, create bool, lang string) (*TeamEvent
   if create && err1 != nil {
     return nil, errors.New("Start time has invalid format")
   }
+  if !create && data.OnlyAt.IsZero() && !data.StartAt.IsZero() {
+    return nil, errors.New("To update Start time, you must also enter Filter time")
+  }
 
   data.Minutes, _ = strconv.Atoi(form.Minutes)
   if create && !minutesValid(data.Minutes) {

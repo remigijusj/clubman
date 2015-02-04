@@ -23,6 +23,8 @@ $(function(){
   // select
   $.extend($.fn.select2.defaults, $.fn.select2.locales[language]);
   $('.select2').select2();
+  // misc
+  activateTab();
 });
 
 function dateFormat() {
@@ -41,4 +43,16 @@ function performAction(el) {
     form.prop('action', action);
   }
   form.submit();
+}
+
+// a hack for buggy foundation tabs
+function activateTab() {
+  if (location.hash) {
+    $('.tabs li a').each(function(){
+      var hash = '#' + $(this).attr('href').split('#')[1];
+      if (hash == location.hash) {
+        $(this).click();
+      }
+    });
+  }
 }

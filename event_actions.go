@@ -10,15 +10,15 @@ import (
 )
 
 func handleEventsCreate(c *gin.Context) {
-  handleEventsFormAction(c, createEvents, "%d events have been created")
+  handleEventsFormAction(c, createEvents, "%d events have been created", "create")
 }
 
 func handleEventsUpdate(c *gin.Context) {
-  handleEventsFormAction(c, updateEvents, "%d events have been updated")
+  handleEventsFormAction(c, updateEvents, "%d events have been updated", "update")
 }
 
 func handleEventsDelete(c *gin.Context) {
-  handleEventsFormAction(c, deleteEvents, "%d events have been deleted")
+  handleEventsFormAction(c, deleteEvents, "%d events have been deleted", "delete")
 }
 
 func getEventForm(c *gin.Context) {
@@ -144,28 +144,28 @@ func handleEventNotify(c *gin.Context) {
 
 // --- local helpers ---
 
-func handleEventsFormAction(c *gin.Context, action (func(int, *TeamEventsForm, string) (int, error)), message string) {
+func handleEventsFormAction(c *gin.Context, action (func(int, *TeamEventsForm, string) (int, error)), message, tab string) {
   var cnt int
   team_id, err := getIntParam(c, "team_id")
   if err != nil {
-    showError(c, err, nil, teamsEventsPath(team_id))
+    showError(c, err, nil, teamsEventsPath(team_id, tab))
     return
   }
   var form TeamEventsForm
   if ok := c.BindWith(&form, binding.Form); !ok {
-    showError(c, errors.New("Please provide all details"), &form, teamsEventsPath(team_id))
+    showError(c, errors.New("Please provide all details"), &form, teamsEventsPath(team_id, tab))
     return
   }
   cnt, err = action(team_id, &form, getLang(c))
   if err != nil {
-    showError(c, err, &form, teamsEventsPath(team_id))
+    showError(c, err, &form, teamsEventsPath(team_id, tab))
   } else {
-    gotoSuccess(c, teamsEventsPath(team_id), message, cnt)
+    gotoSuccess(c, teamsEventsPath(team_id, tab), message, cnt)
   }
 }
 
-func teamsEventsPath(team_id int) string {
-  return fmt.Sprintf("/teams/events/%d", team_id)
+func teamsEventsPath(team_id int, tab string) string {
+  return fmt.Sprintf("/teams/events/%d#%s", team_id, tab)
 }
 
 // NOTE: this is needed for event update page only
