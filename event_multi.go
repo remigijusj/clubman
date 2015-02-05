@@ -44,7 +44,7 @@ func (self TeamEventsData) eachTime(callback func(time.Time) int) int {
   return cnt
 }
 
-func (self TeamEventsData) eventIds(team_id int) (list []int) {
+func (self TeamEventsData) eventIds(team_id int) (list []int, near bool) {
   list = []int{}
 
   var err error
@@ -64,8 +64,10 @@ func (self TeamEventsData) eventIds(team_id int) (list []int) {
     err := rows.Scan(&event_id, &start_at)
     if err != nil { return }
     // WARNING: see the comment in listEvents
-    if self.matchTime(start_at.UTC()) {
+    start_at = start_at.UTC()
+    if self.matchTime(start_at) {
       list = append(list, event_id)
+      near = near || isNear(start_at) // at least 1 event near enough for sms
     }
   }
   err = rows.Err()
@@ -107,7 +109,7 @@ func updateEvents(team_id int, form *TeamEventsForm, lang string) (int, error) {
   data, err := parseEventsForm(form, false, lang)
   if err != nil { return 0, err }
 
-  list := data.eventIds(team_id)
+  list, near := data.eventIds(team_id)
   if len(list) == 0 { return 0, nil }
 
   users, err := listUsersOfEvents(list)
@@ -121,8 +123,12 @@ func updateEvents(team_id int, form *TeamEventsForm, lang string) (int, error) {
 
   num, _ := res.RowsAffected()
   if num > 0 {
-    if !data.DateTill.Before(today()) {
-      go notifyEventMultiUpdate(data, &team, users)
+    if !data.isPast() {
+      if data.Status == eventStatusCanceled {
+        go data.eachUser(users, notifyEventMultiCancel, &team, near)
+      } else {
+        go data.eachUser(users, notifyEventMultiUpdate, &team, near)
+      }
     }
   }
   return int(num), nil
@@ -160,7 +166,7 @@ func deleteEvents(team_id int, form *TeamEventsForm, lang string) (int, error) {
   data, err := parseEventsForm(form, false, lang)
   if err != nil { return 0, err }
 
-  list := data.eventIds(team_id)
+  list, near := data.eventIds(team_id)
   if len(list) == 0 { return 0, nil }
 
   users, err := listUsersOfEvents(list)
@@ -175,8 +181,8 @@ func deleteEvents(team_id int, form *TeamEventsForm, lang string) (int, error) {
   num, _ := res.RowsAffected()
   if num > 0 {
     clearAssignments(list...)
-    if !data.DateTill.Before(today()) {
-      go notifyEventMultiCancel(data, &team, users)
+    if !data.isPast() {
+      go data.eachUser(users, notifyEventMultiCancel, &team, near)
     }
   }
   return int(num), nil

@@ -37,6 +37,18 @@
 {{T "You are subscribed to %s" .event.Name}}, {{localDate .event.StartAt .lang}}, {{printTime .event.StartAt}}. {{T "If you do not wish to participate, please login to %s and cancel" .host}}
 {{end}}
 
+{{define "event_update_email"}}
+<p>
+  {{T "%s was updated" .event.Name}}.<br/>
+  {{localDate .event.StartAt .lang}},
+  {{printTime .event.StartAt}} &ndash; {{printTime .event.FinishAt}}
+</p>
+{{end}}
+
+{{define "event_update_sms"}}
+{{T "%s was updated" .event.Name}}. {{localDate .event.StartAt .lang}}, {{printTime .event.StartAt}}
+{{end}}
+
 {{define "event_cancel_email"}}
 <p>
   {{T "%s was canceled" .event.Name}}.<br/>
@@ -74,6 +86,10 @@
 </p>
 {{end}}
 
+{{define "event_update_multi_sms"}}
+{{T "Multiple %s events updated" .team.Name}}. {{"You have been subscribed for some of them"|T}}. {{"Please check your email for details"|T}}
+{{end}}
+
 {{define "event_cancel_multi_email"}}
 <p>
   {{T "Multiple %s events canceled" .team.Name}}. {{"You have been subscribed for some of them"|T}}.<br/>
@@ -91,6 +107,10 @@
   {{"Time"|T}}: {{printTime .data.StartAt}} &ndash; {{printTime .data.FinishAt}}
   {{end}}
 </p>
+{{end}}
+
+{{define "event_cancel_multi_sms"}}
+{{T "Multiple %s events canceled" .team.Name}}. {{"You have been subscribed for some of them"|T}}. {{"Please check your email for details"|T}}
 {{end}}
 
 {{define "assignment_create_email"}}

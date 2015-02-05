@@ -33,26 +33,6 @@ type EventInfo struct {
   Status   int
 }
 
-func (self EventRecord) FinishAt() time.Time {
-  return self.StartAt.Add(time.Duration(self.Minutes) * time.Minute)
-}
-
-func (self EventForm) FinishAt() time.Time {
-  return self.StartAt.Add(time.Duration(self.Minutes) * time.Minute)
-}
-
-func (self EventInfo) FinishAt() time.Time {
-  return self.StartAt.Add(time.Duration(self.Minutes) * time.Minute)
-}
-
-func (self TeamEventsData) FinishAt() time.Time {
-  return self.StartAt.Add(time.Duration(self.Minutes) * time.Minute)
-}
-
-func (self EventInfo) IsPast() bool {
-  return self.StartAt.Before(today())
-}
-
 func listTeamEvents(team_id int, date_from time.Time) []EventRecord {
   rows, err := query["events_team"].Query(team_id, date_from.Format(dateFormat))
   return listEvents(rows, err)
@@ -173,10 +153,15 @@ func performEventAction(event_id int, action (func(*sql.Tx, int, *EventForm) err
   err = tx.Commit()
   if err != nil { return }
 
+  // after-callbacks
   if clear {
     clearAssignments(event_id)
-    if !event.IsPast() {
-      go notifyEventCancel(&event, users)
+  }
+  if !event.isPast() {
+    if clear {
+      go event.eachUser(users, notifyEventCancel)
+    } else if form != nil { // also: !form.StartAt.Equal(event.StartAt)
+      go event.eachUser(users, notifyEventUpdate)
     }
   }
 
@@ -243,25 +228,6 @@ func minutesValid(minutes int) bool {
   return minutes > 0 && minutes < 6 * 60
 }
 
-func collectEventIds(list []EventRecord) []int {
-  event_ids := make([]int, len(list))
-  for i, item := range list {
-    event_ids[i] = item.Id
-  }
-  return event_ids
-}
-
-func eventClass(team TeamRecord, count int) string {
-  switch {
-  case count < team.UsersMin:
-    return "under"
-  case count >= team.UsersMax && team.UsersMax > 0:
-    return "over"
-  default:
-    return "fits"
-  }
-}
-
 // NOTE: delayed, cron, events of tomorrow
 func autoCancelEvents() {
   when := time.Now() // WARNING: need localtime, really
@@ -274,6 +240,7 @@ func autoCancelEvents() {
   }
 }
 
+// NOTE: should be in notifications.go
 func notifyEventParticipants(event_id int, subject, message string) int {
   var count int
   rows, err := query["users_of_event"].Query(event_id)

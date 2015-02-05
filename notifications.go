@@ -1,96 +1,9 @@
 package main
 
 import (
-  "bytes"
   "fmt"
-  "html/template"
-  "io/ioutil"
-  "log"
-  "net/http"
   "net/url"
-  "time"
-
-  "gopkg.in/gomail.v1"
 )
-
-const (
-  contactEmail = 1
-  contactSMS   = 2
-)
-
-var mails *template.Template
-
-func (self UserContact) chooseMethod(when time.Time) int {
-  diff := when.Sub(time.Now())
-  if diff >= 0 && diff < smsInPeriod {
-    return contactSMS
-  } else {
-    return contactEmail
-  }
-}
-
-func loadMailTemplates(pattern string) {
-  mails = template.Must(template.New("").Funcs(helpers).ParseGlob("mails/*"))
-}
-
-func sendEmail(to, subject, body string) bool {
-  msg := gomail.NewMessage()
-  msg.SetHeader("From", emailsFrom)
-  msg.SetHeader("To", to)
-  msg.SetHeader("Subject", subject)
-  msg.SetBody("text/html", body)
-
-  mailer := gomail.NewMailer(emailsHost, emailsUser, emailsPass, emailsPort)
-  err := mailer.Send(msg)
-  if err != nil {
-    log.Printf("[APP] EMAIL error: %v, %s, %s\n", err, to, subject)
-  }
-  return err == nil
-}
-
-func sendSMS(mobile, message string) bool {
-  v := url.Values{}
-
-  v.Set("username",   smsUser)
-  v.Set("password",   smsPass)
-  v.Set("from",       smsFrom)
-  v.Set("to",         mobile)
-  v.Set("message",    message)
-  v.Set("charset",    "utf-8")
-  v.Set("resulttype", "urlencoded")
-
-  uri := smsHost + "?" + v.Encode()
-
-  resp, err := http.Get(uri)
-  if err != nil {
-    log.Printf("[APP] SMS error: sending %s\n", err)
-    return false
-  }
-  defer resp.Body.Close()
-
-  body, err := ioutil.ReadAll(resp.Body)
-  if err != nil {
-    log.Printf("[APP] SMS error: response %s\n", err)
-    return false
-  }
-  val, err := url.ParseQuery(string(body))
-  if err != nil {
-    log.Printf("[APP] SMS error: response body %s (%s)\n", err, body)
-    return false
-  }
-  status := val.Get("status")
-  if status != "success" {
-    log.Printf("[APP] SMS error: response status %s\n", status)
-  }
-
-  return true
-}
-
-func compileMessage(name, lang string, data interface{}) string {
-  var buf bytes.Buffer
-  mails.Lookup(name).Funcs(transHelpers[lang]).Execute(&buf, data)
-  return string(bytes.TrimSpace(buf.Bytes()))
-}
 
 // NOTE: delayed
 func sendResetLinkEmail(email, lang, token string) {
@@ -173,13 +86,7 @@ func sendEventConfirmedSMS(mobile, lang string, event *EventInfo) {
   sendSMS(mobile, message)
 }
 
-func notifyEventCancel(event *EventInfo, users []UserContact) {
-  for _, user := range users {
-    notifyEventUserCancel(event, &user)
-  }
-}
-
-func notifyEventUserCancel(event *EventInfo, user *UserContact) {
+func notifyEventCancel(event *EventInfo, user *UserContact) {
   switch user.chooseMethod(event.StartAt) {
   case contactEmail:
     sendEventCancelEmail(user.Email, user.Language, event)
@@ -211,14 +118,43 @@ func sendEventCancelSMS(mobile, lang string, event *EventInfo) {
   sendSMS(mobile, message)
 }
 
-func notifyEventMultiUpdate(data *TeamEventsData, team *TeamForm, users []UserContact) {
-  for _, user := range users {
-    notifyEventUserMultiUpdate(data, team, &user)
+func notifyEventUpdate(event *EventInfo, user *UserContact) {
+  switch user.chooseMethod(event.StartAt) {
+  case contactEmail:
+    sendEventUpdateEmail(user.Email, user.Language, event)
+  case contactSMS:
+    sendEventUpdateSMS(user.Mobile, user.Language, event)
   }
 }
 
-func notifyEventUserMultiUpdate(data *TeamEventsData, team *TeamForm, user *UserContact) {
+func sendEventUpdateEmail(email, lang string, event *EventInfo) {
+  subject := T(lang, "%s is updated", event.Name)
+  subject = fmt.Sprintf("[%s] %s", serverName, subject)
+
+  obj := map[string]interface{}{
+    "lang": lang,
+    "event": event,
+  }
+  message := compileMessage("event_update_email", lang, obj)
+
+  sendEmail(email, subject, message)
+}
+
+func sendEventUpdateSMS(mobile, lang string, event *EventInfo) {
+  obj := map[string]interface{}{
+    "lang": lang,
+    "event": event,
+  }
+  message := compileMessage("event_update_sms", lang, obj)
+
+  sendSMS(mobile, message)
+}
+
+func notifyEventMultiUpdate(data *TeamEventsData, user *UserContact, team *TeamForm, near bool) {
   sendEventMultiUpdateEmail(user.Email, user.Language, data, team)
+  if near {
+    sendEventMultiUpdateSMS(user.Email, user.Language, data, team)
+  }
 }
 
 func sendEventMultiUpdateEmail(email, lang string, data *TeamEventsData, team *TeamForm) {
@@ -235,14 +171,22 @@ func sendEventMultiUpdateEmail(email, lang string, data *TeamEventsData, team *T
   sendEmail(email, subject, message)
 }
 
-func notifyEventMultiCancel(data *TeamEventsData, team *TeamForm, users []UserContact) {
-  for _, user := range users {
-    notifyEventUserMultiCancel(data, team, &user)
+func notifyEventMultiCancel(data *TeamEventsData, user *UserContact, team *TeamForm, near bool) {
+  sendEventMultiCancelEmail(user.Email, user.Language, data, team)
+  if near {
+    sendEventMultiCancelSMS(user.Email, user.Language, data, team)
   }
 }
 
-func notifyEventUserMultiCancel(data *TeamEventsData, team *TeamForm, user *UserContact) {
-  sendEventMultiCancelEmail(user.Email, user.Language, data, team)
+func sendEventMultiUpdateSMS(mobile, lang string, data *TeamEventsData, team *TeamForm) {
+  obj := map[string]interface{}{
+    "lang": lang,
+    "data": *data,
+    "team": *team,
+  }
+  message := compileMessage("event_update_multi_sms", lang, obj)
+
+  sendSMS(mobile, message)
 }
 
 func sendEventMultiCancelEmail(email, lang string, data *TeamEventsData, team *TeamForm) {
@@ -257,6 +201,17 @@ func sendEventMultiCancelEmail(email, lang string, data *TeamEventsData, team *T
   message := compileMessage("event_cancel_multi_email", lang, obj)
 
   sendEmail(email, subject, message)
+}
+
+func sendEventMultiCancelSMS(mobile, lang string, data *TeamEventsData, team *TeamForm) {
+  obj := map[string]interface{}{
+    "lang": lang,
+    "data": *data,
+    "team": *team,
+  }
+  message := compileMessage("event_cancel_multi_sms", lang, obj)
+
+  sendSMS(mobile, message)
 }
 
 func sendAssignmentCreatedEmail(email, lang string, event *EventInfo, confirmed bool) {
@@ -285,4 +240,3 @@ func sendAssignmentDeletedEmail(email, lang string, event *EventInfo) {
 
   sendEmail(email, subject, message)
 }
-
