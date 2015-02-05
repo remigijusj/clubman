@@ -20,9 +20,9 @@ const (
 
 var mails *template.Template
 
-func (self UserContact) chooseMethod() int {
-  now := time.Now().Format(timeFormat)
-  if now < workdayFrom || now >= workdayTill {
+func (self UserContact) chooseMethod(when time.Time) int {
+  diff := when.Sub(time.Now())
+  if diff >= 0 && diff < smsInPeriod {
     return contactSMS
   } else {
     return contactEmail
@@ -106,7 +106,7 @@ func sendResetLinkEmail(email, lang, token string) {
 }
 
 func notifyEventToConfirm(event *EventInfo, user *UserContact) {
-  switch user.chooseMethod() {
+  switch user.chooseMethod(event.StartAt) {
   case contactEmail:
     sendEventConfirmLinkEmail(user.Email, user.Language, event)
   case contactSMS:
@@ -140,7 +140,7 @@ func sendEventConfirmLinkSMS(mobile, lang string, event *EventInfo) {
 }
 
 func notifyEventConfirmed(event *EventInfo, user *UserContact) {
-  switch user.chooseMethod() {
+  switch user.chooseMethod(event.StartAt) {
   case contactEmail:
     sendEventConfirmedEmail(user.Email, user.Language, event)
   case contactSMS:
@@ -180,7 +180,7 @@ func notifyEventCancel(event *EventInfo, users []UserContact) {
 }
 
 func notifyEventUserCancel(event *EventInfo, user *UserContact) {
-  switch user.chooseMethod() {
+  switch user.chooseMethod(event.StartAt) {
   case contactEmail:
     sendEventCancelEmail(user.Email, user.Language, event)
   case contactSMS:

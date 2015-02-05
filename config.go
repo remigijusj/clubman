@@ -26,12 +26,11 @@ const (
   smsPass    = ""
   smsFrom    = ""
 
-  workdayFrom = "08:00" // contact email/sms
-  workdayTill = "16:00"
   cancelCheck = "0 5 * * * *"
   cancelAhead = 5 * time.Hour // in 5-6 hours
   autoConfirm = true
   gracePeriod = 2 * time.Hour // if not autoConfirm
+  smsInPeriod = 24 * time.Hour
 
   sessionKey  = "session"
   bcryptCost  = 10
