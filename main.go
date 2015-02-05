@@ -74,7 +74,7 @@ func prepareCookies() {
 
 func startCronService() {
   clock = cron.New()
-  clock.AddFunc(cancelHours, autoCancelEvents)
+  clock.AddFunc(cancelCheck, autoCancelEvents)
   clock.Start()
 }
 

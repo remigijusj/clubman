@@ -98,5 +98,5 @@ func hourDuration(when time.Time) time.Duration {
 }
 
 func today() time.Time {
-  return time.Now().UTC().Truncate(24 * time.Hour)
+  return time.Now().Truncate(24 * time.Hour)
 }

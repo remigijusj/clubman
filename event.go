@@ -84,8 +84,8 @@ func listEvents(rows *sql.Rows, err error) (list []EventRecord) {
   return
 }
 
-func listEventsUnderLimit(date_from, date_till time.Time) []int {
-  rows, err := query["events_under"].Query(date_from.Format(dateFormat), date_till.Format(dateFormat))
+func listEventsUnderLimit(time_from, time_till time.Time) []int {
+  rows, err := query["events_under"].Query(time_from.Format(fullFormat), time_till.Format(fullFormat))
   return listEventsIds(rows, err)
 }
 
@@ -264,9 +264,9 @@ func eventClass(team TeamRecord, count int) string {
 
 // NOTE: delayed, cron, events of tomorrow
 func autoCancelEvents() {
-  date := today()
-  from := date.AddDate(0, 0, 1)
-  till := date.AddDate(0, 0, 2)
+  when := time.Now() // WARNING: need localtime, really
+  from := when.Add(cancelAhead)
+  till := from.Add(1 * time.Hour)
 
   list := listEventsUnderLimit(from, till)
   for _, event_id := range list {

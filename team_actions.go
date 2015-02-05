@@ -2,7 +2,6 @@ package main
 
 import (
   "errors"
-  "time"
 
   "github.com/gin-gonic/gin"
   "github.com/gin-gonic/gin/binding"
@@ -107,7 +106,7 @@ func newTeamEventsForm(c *gin.Context) {
   c.Set("form", form)
   // placeholders
   lang := getLang(c)
-  c.Set("date_from", time.Now().UTC().Format(dateFormats[lang]))
-  // WAS: time.Date(time.Now().UTC().Year()+1, 1, 0, 0, 0, 0, 0, time.UTC).Format(dateFormats[lang])
+  c.Set("date_from", today().Format(dateFormats[lang]))
+  // WAS: time.Date(today().Year()+1, 1, 0, 0, 0, 0, 0, time.UTC).Format(dateFormats[lang])
   c.Set("date_till", "")
 }

@@ -28,9 +28,10 @@ const (
 
   workdayFrom = "08:00" // contact email/sms
   workdayTill = "16:00"
-  cancelHours = "0 0 18 * * *" // <<< OBSOLETE
+  cancelCheck = "0 5 * * * *"
+  cancelAhead = 5 * time.Hour // in 5-6 hours
   autoConfirm = true
-  gracePeriod = 2 * time.Hour // when not autoConfirm
+  gracePeriod = 2 * time.Hour // if not autoConfirm
 
   sessionKey  = "session"
   bcryptCost  = 10
@@ -40,6 +41,7 @@ const (
   defaultDate = "2015-01-01"
   timeFormat  = "15:04"
   dateFormat  = "2006-01-02" // db
+  fullFormat  = "2006-01-02 15:04:05" // db
   panicError  = "Critical error happened, please contact website admin"
   permitError = "You are not authorized to view this page"
 
