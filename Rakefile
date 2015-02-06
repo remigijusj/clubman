@@ -72,9 +72,24 @@ task :import do
   end 
 end
 
-desc "Chack encoding in strings.csv"
+desc "Check encoding in strings.csv"
 task :check do
   read_strings.each do |lang, key, value|
     puts '%s: %s' % [value.encoding, value] unless value.nil? or value.empty?
   end
+end
+
+desc "Clear (recreate) the database"
+task :truncate_db do
+  require 'sqlite3'
+  db = SQLite3::Database.new("main.db")
+  db.execute "DELETE FROM assignments"
+  db.execute "DELETE FROM events"
+  db.execute "DELETE FROM logs"
+  db.execute "DELETE FROM teams"
+  db.execute "DELETE FROM translations"
+  db.execute "DELETE FROM users WHERE id > 1"
+  db.execute "DELETE FROM sqlite_sequence WHERE name != 'users'"
+  db.execute "UPDATE sqlite_sequence SET seq=1 WHERE name = 'users'"
+  db.execute "VACUUM"
 end
