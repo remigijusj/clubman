@@ -17,7 +17,7 @@
       <input id="email" name="email" type="text" value="{{.form.Email}}" placeholder="{{"my@email.com"|T}}" />
     </div>
     <div class="small-12 columns description">
-      {{"The email of the user which will be used to log in and for sending emails"|T}}
+      {{T "%s information will be sent to this email" serverName}}
     </div>
   </div>
   <div class="row">
@@ -29,7 +29,7 @@
       <input id="password" name="password" type="password" placeholder="" />
     </div>
     <div class="small-12 columns description">
-      {{"The password which the user will have to use to identify himself/herself"|T}}
+      {{T "The password should be used when logging in to %s" serverName}}
     </div>
   </div>
   <div class="row">
@@ -53,14 +53,11 @@
         <option value="en" {{if eq .form.Language "en"}}selected{{end}}>English</option>
       </select>
     </div>
-    <div class="small-12 columns description">
-      {{"The language you prefer to view the site in"|T}}
-    </div>
   </div>
   {{if and (.self.IsAdmin) (ne .page "profile")}}
   <div class="row">
     <div class="small-4 columns">
-      <label for="status">{{"Status"|T}}</label>
+      <label for="status">{{"User rights"|T}}</label>
     </div>
     <div class="small-8 columns">
       <select id="status" name="status">
@@ -69,9 +66,6 @@
         <option value="{{.Status}}" {{if eq $status .Status}}selected{{end}}>{{.Title|T}}</option>
         {{end}}
       </select>
-    </div>
-    <div class="small-12 columns description">
-      {{"The type of the user controls which things in the system the user has access to"|T}}
     </div>
   </div>
   {{end}}
