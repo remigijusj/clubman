@@ -24,7 +24,7 @@ var queries = map[string]string{
   "user_update":        "UPDATE users SET name=?, email=?, mobile=?, password=?, language=?, status=? WHERE id=?",
   "user_delete":        "DELETE FROM users WHERE id=?",
   "user_name":          "SELECT name FROM users WHERE id=?",
-  "user_contact":       "SELECT email, mobile, language FROM users WHERE id=?",
+  "user_contact":       "SELECT email, mobile, language FROM users WHERE id IN (?)",
   "users_of_event":     "SELECT DISTINCT email, mobile, language FROM assignments LEFT JOIN users ON user_id=users.id WHERE event_id IN (?)",
 
   "teams_all":          "SELECT teams.id, teams.name, users.name, users_min, users_max FROM teams LEFT JOIN users ON teams.instructor_id=users.id ORDER BY teams.name",
@@ -53,7 +53,7 @@ var queries = map[string]string{
   "assignments_counts": "SELECT event_id, count(id) FROM assignments WHERE event_id IN (?) GROUP BY event_id",
   "assignments_count":  "SELECT count(id) FROM assignments WHERE event_id=?",
   "assignments_check":  "SELECT count(id) FROM assignments WHERE event_id=? AND status IN (?, ?)",
-  "assignments_first":  "SELECT user_id FROM assignments WHERE event_id=? AND status=? AND id > ? ORDER BY id LIMIT 1",
+  "assignments_queue":  "SELECT user_id FROM assignments WHERE event_id=? AND status=? AND id > ? ORDER BY id",
   "assignment_status":  "SELECT id, status FROM assignments WHERE event_id=? AND user_id=?",
   "assignment_insert":  "INSERT INTO assignments(event_id, user_id, status) VALUES (?, ?, ?)",
   "assignment_update":  "UPDATE assignments SET status=? WHERE event_id=? AND user_id=?",

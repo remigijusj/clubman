@@ -13,26 +13,32 @@ func afterAssignmentDelete(event_id, limit_id int) {
   tx, err := db.Begin()
   if err != nil { return }
 
-  user_id, err := firstWaitingUserTx(tx, event_id, limit_id)
+  err = checkParticipantsLimit(tx, event_id)
   if err != nil { tx.Rollback(); return }
 
-  user, err := fetchUserContactTx(tx, user_id)
+  user_ids, err := listWaitingUsersTx(tx, event_id, limit_id)
+  if err != nil { tx.Rollback(); return }
+
+  if len(user_ids) == 0 { tx.Rollback(); return }
+
+  err = updateAssignmentStatusTx(tx, event_id, user_ids[0], assigmentStatusChange())
   if err != nil { tx.Rollback(); return }
 
   event, err := fetchEventInfoTx(tx, event_id)
   if err != nil { tx.Rollback(); return }
 
-  err = updateAssignmentStatusTx(tx, event_id, user_id, assigmentStatusChange())
+  users, err := listUsersByIdTx(tx, user_ids)
   if err != nil { tx.Rollback(); return }
 
   err = tx.Commit()
   if err != nil { return }
 
   if autoConfirm {
-    notifyEventConfirmed(&event, &user)
+    notifyEventConfirmed(&event, &users[0])
+    event.eachUser(users[1:], notifyEventWaitingUp)
   } else {
-    notifyEventToConfirm(&event, &user)
-    expireAfterGracePeriod(event_id, user_id) // sleeps
+    notifyEventToConfirm(&event, &users[0])
+    expireAfterGracePeriod(event_id, user_ids[0]) // sleeps
   }
 }
 
@@ -44,27 +50,45 @@ func assigmentStatusChange() int {
   }
 }
 
-func firstWaitingUserTx(tx *sql.Tx, event_id, limit_id int) (int, error) {
+func checkParticipantsLimit(tx *sql.Tx, event_id int) error {
   max, err := maxTeamUsersTx(tx, event_id)
   if err != nil || max == 0 {
-    return 0, err
+    return errors.New("no maximum")
   }
 
   cnt, err := countNonWaitingUsersTx(tx, event_id)
   if err != nil {
-    return 0, err
+    return err
   }
   if cnt >= max {
-    log.Printf("[APP] ASSIGNMENTS-FIRST-WAITING: %d, %d >= %d\n", event_id, cnt, max)
-    return 0, errors.New("")
+    log.Printf("[APP] CHECK-PARTICIPANTS-LIMIT: %d, %d >= %d\n", event_id, cnt, max)
+    return errors.New("event full")
   }
+  return nil
+}
+
+func listWaitingUsersTx(tx *sql.Tx, event_id, limit_id int) (list []int, err error) {
+  list = []int{}
+
+  defer func() {
+    if err != nil {
+      log.Printf("[APP] ASSIGNMENTS-QUEUE: %v, %d, %d\n", err, event_id, limit_id)
+    }
+  }()
+
+  rows, err := tx.Stmt(query["assignments_queue"]).Query(event_id, assignmentStatusWaiting, limit_id)
+  if err != nil { return }
+  defer rows.Close()
 
   var user_id int
-  err = tx.Stmt(query["assignments_first"]).QueryRow(event_id, assignmentStatusWaiting, limit_id).Scan(&user_id)
-  if err != nil {
-    log.Printf("[APP] ASSIGNMENTS-FIRST-WAITING: %d, %d\n", event_id, user_id)
+  for rows.Next() {
+    err = rows.Scan(&user_id)
+    if err != nil { return }
+    list = append(list, user_id)
   }
-  return user_id, err
+  err = rows.Err()
+
+  return
 }
 
 // NOTE: count status IN (-1, 1)

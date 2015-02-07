@@ -86,6 +86,26 @@ func sendEventConfirmedSMS(mobile, lang string, event *EventInfo) {
   sendSMS(mobile, message)
 }
 
+func notifyEventWaitingUp(event *EventInfo, user *UserContact) {
+  num := 1 // <<< pass from outside
+  sendEventWaitingUp(user.Email, user.Language, event, num)
+}
+
+func sendEventWaitingUp(email, lang string, event *EventInfo, num int) {
+  subject := T(lang, "Up in waiting list for %s", event.Name)
+  subject = fmt.Sprintf("[%s] %s", serverName, subject)
+
+  obj := map[string]interface{}{
+    "lang": lang,
+    "event": event,
+    "num":  num,
+    "url":  fmt.Sprintf("%s/assignments/delete/%d", serverRoot, event.Id),
+  }
+  message := compileMessage("event_waiting_up_email", lang, obj)
+
+  sendEmail(email, subject, message)
+}
+
 func notifyEventCancel(event *EventInfo, user *UserContact) {
   switch user.chooseMethod(event.StartAt) {
   case contactEmail:

@@ -37,6 +37,17 @@
 {{T "You are subscribed to %s" .event.Name}}, {{localDate .event.StartAt .lang}}, {{printTime .event.StartAt}}. {{T "If you do not wish to participate, please login to %s and cancel" .host}}
 {{end}}
 
+{{define "event_waiting_up_email"}}
+<p>
+  {{T "You are subscribed to %s" .event.Name}}. {{T "You have moved to #%d on the waiting list" .num}}.<br/>
+  {{localDate .event.StartAt .lang}},
+  {{printTime .event.StartAt}} &ndash; {{printTime .event.FinishAt}}
+  <br/><br/>
+  {{"If you do not wish to participate, please click the link and cancel your subscription"|T}}:
+</p>
+<p><a href="{{.url}}">{{.url}}</a></p>
+{{end}}
+
 {{define "event_update_email"}}
 <p>
   {{T "%s was updated" .event.Name}}.<br/>
