@@ -58,6 +58,8 @@ func getEventAssignments(c *gin.Context) {
   } else {
     list := listEventAssignments(event_id)
     c.Set("list", list)
+    waiting := calcWaitingPosition(list)
+    c.Set("waiting", waiting)
     signed_up := findAssignment(list, currentUser(c))
     c.Set("signed_up", signed_up)
   }

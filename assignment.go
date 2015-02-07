@@ -218,3 +218,15 @@ func notifyAssignmentAction(event_id, user_id, status int) {
     sendAssignmentDeletedEmail(user.Email, user.Language, &event)
   }
 }
+
+func calcWaitingPosition(list []EventAssignment) []int {
+  waiting := make([]int, len(list))
+  position := 0
+  for i, item := range list {
+    if item.Status == assignmentStatusWaiting {
+      position++
+      waiting[i] = position
+    }
+  }
+  return waiting
+}

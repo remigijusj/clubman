@@ -2,6 +2,7 @@
     <div class="columns">
 
       {{$event_id := .id}}
+      {{$waiting := .waiting}}
       {{$actions := and .self.IsAdmin (eq .form.Status 0)}}
 
       <form method="POST">
@@ -16,19 +17,20 @@
             </tr>
           </thead>
           <tbody>
-            {{range .list}}
+            {{range $i, $a := .list}}
             <tr>
               <td>
-                <a href="/users/view/{{.UserId}}">{{.UserName}}</a>
+                <a href="/users/view/{{$a.UserId}}">{{$a.UserName}}</a>
               </td>
               <td>
-                {{statusTitle "assignment" .Status|T}}
+                {{statusTitle "assignment" $a.Status|T}}
+                {{with (index $waiting $i)}}({{.}}){{end}}
               </td>
               {{if $actions}}
               <td>
-                <a href="/assignments/delete/{{$event_id}}?user_id={{.UserId}}" data-action>{{"Cancel"|T}}</a>
-                {{if eq .Status -1}}
-                <a href="/assignments/confirm/{{$event_id}}?user_id={{.UserId}}" data-action>{{"Confirm"|T}}</a>
+                <a href="/assignments/delete/{{$event_id}}?user_id={{$a.UserId}}" data-action>{{"Cancel"|T}}</a>
+                {{if eq $a.Status -1}}
+                <a href="/assignments/confirm/{{$event_id}}?user_id={{$a.UserId}}" data-action>{{"Confirm"|T}}</a>
                 {{end}}
               </td>
               {{end}}
