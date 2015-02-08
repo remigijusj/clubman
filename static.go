@@ -52,11 +52,10 @@ var queries = map[string]string{
   "assignments_status": "SELECT event_id, status FROM assignments WHERE event_id IN (?) AND user_id=?",
   "assignments_counts": "SELECT event_id, count(id) FROM assignments WHERE event_id IN (?) GROUP BY event_id",
   "assignments_count":  "SELECT count(id) FROM assignments WHERE event_id=?",
-  "assignments_check":  "SELECT count(id) FROM assignments WHERE event_id=? AND status IN (?, ?)",
-  "assignments_queue":  "SELECT user_id FROM assignments WHERE event_id=? AND status=? AND id > ? ORDER BY id",
+  "assignments_queue":  "SELECT id, user_id, status FROM assignments WHERE event_id=? ORDER BY status DESC, id",
   "assignment_status":  "SELECT id, status FROM assignments WHERE event_id=? AND user_id=?",
   "assignment_insert":  "INSERT INTO assignments(event_id, user_id, status) VALUES (?, ?, ?)",
-  "assignment_update":  "UPDATE assignments SET status=? WHERE event_id=? AND user_id=?",
+  "assignment_update":  "UPDATE assignments SET status=? WHERE event_id=? AND user_id IN (?)",
   "assignment_delete":  "DELETE FROM assignments WHERE event_id=? AND user_id=?",
   "assignments_clear":  "DELETE FROM assignments WHERE event_id IN (?)",
 

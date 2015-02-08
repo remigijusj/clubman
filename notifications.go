@@ -86,8 +86,7 @@ func sendEventConfirmedSMS(mobile, lang string, event *EventInfo) {
   sendSMS(mobile, message)
 }
 
-func notifyEventWaitingUp(event *EventInfo, user *UserContact) {
-  num := 1 // <<< pass from outside
+func notifyEventWaitingUp(event *EventInfo, user *UserContact, num int) {
   sendEventWaitingUp(user.Email, user.Language, event, num)
 }
 
