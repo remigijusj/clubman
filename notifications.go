@@ -91,7 +91,7 @@ func notifyEventWaitingUp(event *EventInfo, user *UserContact, num int) {
 }
 
 func sendEventWaitingUp(email, lang string, event *EventInfo, num int) {
-  subject := T(lang, "Up in waiting list for %s", event.Name)
+  subject := T(lang, "Up in the waiting list for %s", event.Name)
   subject = fmt.Sprintf("[%s] %s", serverName, subject)
 
   obj := map[string]interface{}{

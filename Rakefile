@@ -10,7 +10,7 @@ def collect_strings
   end
 
   Dir.glob('{mails/*,templates/*}').each do |file|
-    File.read(file).scan(/(?:\{\{|T )"(.+?)"/) do |(it)|
+    File.read(file).scan(/(?:\{\{|T |:= )"(.+?)"/) do |(it)|
       strings[it] = true
     end
   end
