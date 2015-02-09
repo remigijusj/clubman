@@ -126,8 +126,10 @@ func listUsersOfEvents(event_ids []int) ([]UserContact, error) {
   return listUsersContact(rows, err), err
 }
 
+// NOTE: record order matches given ids order
 func listUsersByIdTx(tx *sql.Tx, user_ids []int) ([]UserContact, error) {
   qry, list := multi(queries["user_contact"], user_ids)
+  qry += sqlOrderById(user_ids)
   rows, err := tx.Query(qry, list...)
   return listUsersContact(rows, err), err
 }

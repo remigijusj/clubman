@@ -1,6 +1,7 @@
 package main
 
 import (
+  "bytes"
   "crypto/rand"
   "errors"
   "fmt"
@@ -293,4 +294,14 @@ func dict(values ...interface{}) (map[string]interface{}, error) {
     hash[key] = values[i+1]
   }
   return hash, nil
+}
+
+func sqlOrderById(list []int) string {
+  buf := bytes.NewBufferString(" ORDER BY case id")
+  buf.Grow(len(list) * 15 + 4)
+  for i, id := range list {
+    buf.WriteString(fmt.Sprintf(" when %d then %d", id, i))
+  }
+  buf.WriteString(" end")
+  return buf.String()
 }

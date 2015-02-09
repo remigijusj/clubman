@@ -43,6 +43,7 @@ func afterAssignmentDelete(event_id, limit_id int) {
   if autoConfirm {
     notifyWaitingList(&event, users, lucky_cnt)
   } else {
+    // WARNING: only 1 will be notified
     notifyEventToConfirm(&event, &users[0])
     expireAfterGracePeriod(event_id, user_ids[0]) // sleeps
   }
@@ -81,7 +82,33 @@ func listEventQueueItemsTx(tx *sql.Tx, event_id int) (list []EventQueueItem, err
 }
 
 func shiftWaitingUsers(list []EventQueueItem, max, limit_id int) ([]int, int) {
-  return nil, 0 // <<< TODO, if autoConfirm: [user_id], 1
+  // fast-forward to waiting
+  c := 0
+  for c < len(list) && list[c].Status != assignmentStatusWaiting { c++ }
+  list = list[c:]
+
+  // limited mode, find first
+  if !autoConfirm {
+    for _, item := range list {
+      if item.Id > limit_id {
+        return []int{item.UserId}, 1
+      }
+    }
+    return nil, 0
+  }
+
+  // lucky cnt logic
+  cnt := 0
+  if c < max { cnt = max - c  }
+  if cnt > len(list) { cnt = len(list) }
+
+  // map user ids
+  uids := make([]int, len(list))
+  for i, item := range list {
+    uids[i] = item.UserId
+  }
+
+  return uids, cnt
 }
 
 func updateAssignmentStatusTx(tx *sql.Tx, event_id, status int, user_ids ...int) error {
