@@ -3,9 +3,11 @@ package main
 import (
   "database/sql"
   "errors"
+  "fmt"
   "log"
   "net/url"
   "strings"
+  "time"
 )
 
 type LoginForm struct {
@@ -57,18 +59,15 @@ func loginUserByForm(form *LoginForm) (*AuthInfo, error) {
 
 // NOTE: we don't reveal if email is missing or another problem occured
 func generatePasswordReset(form *ForgotForm, lang string) bool {
-  token := generateToken(16)
-  res, err := query["password_forgot"].Exec(token, form.Email)
+  var password string
+  err := query["password_forgot"].QueryRow(form.Email).Scan(&password)
   if err != nil {
-    log.Printf("[APP] RESET-FORM failure 1: %s, %s, %s\n", err, token, form.Email)
+    log.Printf("[APP] PASSWORD-FORGOT error: %s, %d\n", err, form.Email)
     return false
   }
-  num, err := res.RowsAffected()
-  if num == 0 || err != nil {
-    log.Printf("[APP] RESET-FORM failure 2: %s, %s, %s\n", err, token, form.Email)
-    return false
-  }
-  go sendResetLinkEmail(form.Email, lang, token)
+  expire := fmt.Sprintf("%d", time.Now().UTC().Add(expireLink).Unix())
+  token := computeHMAC(form.Email, expire, password)
+  go sendResetLinkEmail(form.Email, lang, expire, token)
   return true
 }
 
@@ -207,6 +206,7 @@ func deleteUser(user_id int) error {
   return nil
 }
 
+// NOTE: either hash given, or take existing (if blank)
 func checkFormPassword(form *UserForm, user_id int) bool {
   if form.Password != "" {
     form.Password = hashPassword(form.Password)

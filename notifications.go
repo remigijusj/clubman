@@ -6,12 +6,12 @@ import (
 )
 
 // NOTE: delayed
-func sendResetLinkEmail(email, lang, token string) {
+func sendResetLinkEmail(email, lang, expire, token string) {
   subject := T(lang, "Password reset for %s", serverHost)
 
   obj := map[string]string{
     "host": serverHost,
-    "url":  fmt.Sprintf("%s/resets?email=%s&token=%s", serverRoot, url.QueryEscape(email), token),
+    "url":  fmt.Sprintf("%s/resets?email=%s&expire=%s&token=%s", serverRoot, url.QueryEscape(email), expire, token),
   }
   message := compileMessage("password_reset_email", lang, obj)
 

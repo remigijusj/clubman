@@ -2,7 +2,9 @@ package main
 
 import (
   "bytes"
-  "crypto/rand"
+  "crypto/hmac"
+  "crypto/sha256"
+  "encoding/base64"
   "errors"
   "fmt"
   "log"
@@ -230,10 +232,14 @@ func comparePassword(stored, given string) bool {
   return err == nil
 }
 
-func generateToken(size int) string {
-  b := make([]byte, size)
-  rand.Read(b)
-  return fmt.Sprintf("%x", b)
+func computeHMAC(parts ...string) string {
+  key := []byte(siteSecret)
+  h := hmac.New(sha256.New, key)
+  for _, part := range parts {
+    h.Write([]byte(part))
+    h.Write([]byte{0})
+  }
+  return base64.URLEncoding.EncodeToString(h.Sum(nil))
 }
 
 // --- error helpers ---

@@ -32,9 +32,11 @@ const (
   gracePeriod = 2 * time.Hour // if not autoConfirm
   smsInPeriod = 24 * time.Hour
 
+  siteSecret  = ""
   sessionKey  = "session"
   bcryptCost  = 10
   minPassLen  = 6
+  expireLink  = 2 * time.Hour
   defaultLang = "da"
   defaultPage = "/calendar/week" // not "/"
   defaultDate = "2015-01-01"
