@@ -49,6 +49,7 @@ func handleReset(c *gin.Context) {
     gotoWarning(c, "/login", "Password reset request is invalid or expired")
   } else {
     setSessionAuthInfo(c, auth)
+    getSavedPath(c) // to avoid early redirect
     gotoSuccess(c, "/profile", "Please enter new password and click Save")
   }
 }
