@@ -74,7 +74,7 @@ func generatePasswordReset(form *ForgotForm, lang string) bool {
 
 func loginUserByToken(token, email string) (*AuthInfo, error) {
   var auth AuthInfo
-  err := query["password_resets"].QueryRow(token, email).Scan(&auth.Id, &auth.Name, &auth.Status)
+  err := query["password_resets"].QueryRow(token, email).Scan(&auth.Id, &auth.Name, &auth.Status, &auth.Language)
   if err == nil {
     _, err = query["password_forgot"].Exec("", email)
   }

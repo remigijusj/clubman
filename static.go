@@ -12,7 +12,7 @@ var queries = map[string]string{
   "credentials_get":    "SELECT password, id, name, status, language FROM users WHERE email=? AND status>=0",
   "password_select":    "SELECT password FROM users WHERE id=?",
   "password_forgot":    "UPDATE users SET reset_token=? WHERE email=? AND status>=0",
-  "password_resets":    "SELECT id, name, status FROM users WHERE reset_token=? AND email=? AND status>=0",
+  "password_resets":    "SELECT id, name, status, language FROM users WHERE reset_token=? AND email=? AND status>=0",
 
   "users_active":       "SELECT id, name, email, status FROM users WHERE status>=0 ORDER BY name",
   "users_by_status":    "SELECT id, name, email, status FROM users WHERE status=? ORDER BY name",
