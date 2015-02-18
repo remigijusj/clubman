@@ -84,6 +84,8 @@
           {{template "login.tmpl" . }}
         {{else if eq .page "forgot"}}
           {{template "forgot.tmpl" . }}
+        {{else if eq .page "reset"}}
+          {{template "reset.tmpl" . }}
         {{else if eq .page "signup"}}
           {{template "signup.tmpl" . }}
         {{else if eq .page "profile"}}

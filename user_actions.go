@@ -42,15 +42,32 @@ func handleForgot(c *gin.Context) {
   }
 }
 
+// <<<
+func getResetInfo(c *gin.Context) {
+  q := c.Request.URL.Query()
+  ok := verifyPasswordReset(q.Get("email"), q.Get("expire"), q.Get("token"))
+  if !ok {
+    gotoWarning(c, "/login", "Password reset request is invalid or expired")
+    c.Abort(0)
+  } else {
+    c.Set("query", q)
+    // c.Set("form", form)
+  }
+}
+
+// <<<
 func handleReset(c *gin.Context) {
   q := c.Request.URL.Query()
-  auth, err := loginUserByToken(q.Get("token"), q.Get("email"))
-  if err != nil {
+  ok := verifyPasswordReset(q.Get("email"), q.Get("expire"), q.Get("token"))
+  if ok {
+    // ok = updatePassword(q.Get("email"), q.Get("password"))
+  }
+  if !ok {
     gotoWarning(c, "/login", "Password reset request is invalid or expired")
   } else {
-    setSessionAuthInfo(c, auth)
-    getSavedPath(c) // to avoid early redirect
-    gotoSuccess(c, "/profile", "Please enter new password and click Save")
+    // setSessionAuthInfo(c, auth)
+    // getSavedPath(c) // to avoid early redirect
+    gotoSuccess(c, defaultPage, "")
   }
 }
 

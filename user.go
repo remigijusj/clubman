@@ -65,22 +65,21 @@ func generatePasswordReset(form *ForgotForm, lang string) bool {
     log.Printf("[APP] PASSWORD-FORGOT error: %s, %d\n", err, form.Email)
     return false
   }
-  expire := fmt.Sprintf("%d", time.Now().UTC().Add(expireLink).Unix())
+  expire := fmt.Sprintf("%d", time.Now().UTC().Add(expireLink).Unix()) // <<<
   token := computeHMAC(form.Email, expire, password)
   go sendResetLinkEmail(form.Email, lang, expire, token)
   return true
 }
 
-func loginUserByToken(token, email string) (*AuthInfo, error) {
-  var auth AuthInfo
-  err := query["password_resets"].QueryRow(token, email).Scan(&auth.Id, &auth.Name, &auth.Status, &auth.Language)
-  if err == nil {
-    _, err = query["password_forgot"].Exec("", email)
-  }
+// <<< TODO: check expire
+func verifyPasswordReset(email, expire, token string) bool {
+  var password string
+  err := query["password_forgot"].QueryRow(email).Scan(&password)
   if err != nil {
-    log.Printf("[APP] LOGIN-TOKEN error: %s, token=%s, email=%s\n", err, token, email)
+    log.Printf("[APP] PASSWORD-FORGOT error: %s, %d\n", err, email)
+    return false
   }
-  return &auth, err
+  return verifyHMAC(token, email, expire, password)
 }
 
 func listUsersByQuery(q url.Values) []UserRecord {

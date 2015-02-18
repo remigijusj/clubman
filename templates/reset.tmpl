@@ -1,0 +1,32 @@
+  <div class="row">
+    <div class="large-6 medium-8 columns">
+      <h4>{{"Forgot password"|T}}</h4>
+
+      <p class="form-description">
+        {{"Please enter new password and click Save"|T}}.
+      </p>
+      <div class="panel">
+        <form action="/forgot" method="POST">
+          <div class="row">
+            <div class="small-4 columns">
+              <label for="password">{{"New password"|T}}</label>
+            </div>
+            <div class="small-8 columns">
+              <input id="password" name="password" type="password" />
+            </div>
+            <div class="small-12 columns description">
+              {{T "The password should be used when logging in to %s" serverName}}
+            </div>
+          </div>
+          <div class="row end">
+            <div class="columns">
+              <input type="hidden" name="email" value="{{.query.Get "email"}}" />
+              <input type="hidden" name="expire" value="{{.query.Get "expire"}}" />
+              <input type="hidden" name="token" value="{{.query.Get "token"}}" />
+              <input type="submit" class="button tiny radius" value="{{"Save"|T}}" />
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>

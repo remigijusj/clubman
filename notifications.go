@@ -11,7 +11,7 @@ func sendResetLinkEmail(email, lang, expire, token string) {
 
   obj := map[string]string{
     "host": serverHost,
-    "url":  fmt.Sprintf("%s/resets?email=%s&expire=%s&token=%s", serverRoot, url.QueryEscape(email), expire, token),
+    "url":  fmt.Sprintf("%s/reset?email=%s&expire=%s&token=%s", serverRoot, url.QueryEscape(email), expire, token),
   }
   message := compileMessage("password_reset_email", lang, obj)
 

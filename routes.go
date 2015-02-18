@@ -19,10 +19,11 @@ func defineRoutes(r *gin.Engine) {
 func defineRoutesExternal(r *gin.Engine) {
   r.GET("/login",  displayPage)
   r.GET("/forgot", displayPage)
-  //r.GET("/signup", displayPage)
-  r.GET("/resets",  handleReset) // external link
+  r.GET("/reset",  getResetInfo, displayPage)
   r.POST("/login",  handleLogin)
   r.POST("/forgot", handleForgot)
+  r.POST("/reset",  handleReset)
+  //r.GET("/signup", displayPage)
   //r.POST("/signup", handleUserCreate)
 }
 

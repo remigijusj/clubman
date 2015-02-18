@@ -242,6 +242,17 @@ func computeHMAC(parts ...string) string {
   return base64.URLEncoding.EncodeToString(h.Sum(nil))
 }
 
+func verifyHMAC(token string, parts ...string) bool {
+  key := []byte(siteSecret)
+  h := hmac.New(sha256.New, key)
+  for _, part := range parts {
+    h.Write([]byte(part))
+    h.Write([]byte{0})
+  }
+  decoded, err := base64.URLEncoding.DecodeString(token)
+  return err == nil && hmac.Equal(h.Sum(nil), decoded)
+}
+
 // --- error helpers ---
 
 // NOTE: fmt.Sprintf no fit because we use reuslt for i18n
