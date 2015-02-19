@@ -42,31 +42,30 @@ func handleForgot(c *gin.Context) {
   }
 }
 
-// <<<
 func getResetInfo(c *gin.Context) {
   q := c.Request.URL.Query()
-  ok := verifyPasswordReset(q.Get("email"), q.Get("expire"), q.Get("token"))
-  if !ok {
+  auth, err := verifyPasswordReset(q.Get("email"), q.Get("expire"), q.Get("token"))
+  if err != nil {
     gotoWarning(c, "/login", "Password reset request is invalid or expired")
     c.Abort(0)
   } else {
-    c.Set("query", q)
-    // c.Set("form", form)
+    c.Set("path", c.Request.URL.String())
+    c.Set("form", auth)
   }
 }
 
-// <<<
 func handleReset(c *gin.Context) {
-  q := c.Request.URL.Query()
-  ok := verifyPasswordReset(q.Get("email"), q.Get("expire"), q.Get("token"))
-  if ok {
-    // ok = updatePassword(q.Get("email"), q.Get("password"))
-  }
-  if !ok {
+  auth, err := verifyPasswordReset(c.Request.FormValue("email"), c.Request.FormValue("expire"), c.Request.FormValue("token"))
+  if err != nil {
     gotoWarning(c, "/login", "Password reset request is invalid or expired")
+    return
+  }
+  err = updatePassword(c.Request.FormValue("email"), c.Request.FormValue("password"))
+  if err != nil {
+    showError(c, err)
   } else {
-    // setSessionAuthInfo(c, auth)
-    // getSavedPath(c) // to avoid early redirect
+    setSessionAuthInfo(c, auth)
+    getSavedPath(c) // to avoid early redirect
     gotoSuccess(c, defaultPage, "")
   }
 }

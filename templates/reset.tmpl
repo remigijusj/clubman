@@ -1,12 +1,12 @@
   <div class="row">
     <div class="large-6 medium-8 columns">
-      <h4>{{"Forgot password"|T}}</h4>
+      <h4>{{"Forgot password"|T}}: {{.form.Name}}</h4>
 
       <p class="form-description">
         {{"Please enter new password and click Save"|T}}.
       </p>
       <div class="panel">
-        <form action="/forgot" method="POST">
+        <form action="{{.path}}" method="POST">
           <div class="row">
             <div class="small-4 columns">
               <label for="password">{{"New password"|T}}</label>
@@ -20,9 +20,6 @@
           </div>
           <div class="row end">
             <div class="columns">
-              <input type="hidden" name="email" value="{{.query.Get "email"}}" />
-              <input type="hidden" name="expire" value="{{.query.Get "expire"}}" />
-              <input type="hidden" name="token" value="{{.query.Get "token"}}" />
               <input type="submit" class="button tiny radius" value="{{"Save"|T}}" />
             </div>
           </div>

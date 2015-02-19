@@ -69,7 +69,7 @@ func showError(c *gin.Context, err error, extra ...interface{}) {
   if len(extra) > 1 {
     route = extra[1].(string)
   } else {
-    route = c.Request.URL.Path
+    route = c.Request.URL.RequestURI()
   }
   c.Redirect(302, route)
 }

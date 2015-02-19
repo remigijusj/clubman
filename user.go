@@ -3,9 +3,9 @@ package main
 import (
   "database/sql"
   "errors"
-  "fmt"
   "log"
   "net/url"
+  "strconv"
   "strings"
   "time"
 )
@@ -59,27 +59,47 @@ func loginUserByForm(form *LoginForm) (*AuthInfo, error) {
 
 // NOTE: we don't reveal if email is missing or another problem occured
 func generatePasswordReset(form *ForgotForm, lang string) bool {
-  var password string
-  err := query["password_forgot"].QueryRow(form.Email).Scan(&password)
-  if err != nil {
-    log.Printf("[APP] PASSWORD-FORGOT error: %s, %d\n", err, form.Email)
-    return false
-  }
-  expire := fmt.Sprintf("%d", time.Now().UTC().Add(expireLink).Unix()) // <<<
+  password, _, err := fetchUserPassword(form.Email)
+  if err != nil { return false }
+  exp_unix := time.Now().Add(expireLink).Unix()
+  expire := strconv.FormatInt(exp_unix, 10)
   token := computeHMAC(form.Email, expire, password)
   go sendResetLinkEmail(form.Email, lang, expire, token)
   return true
 }
 
-// <<< TODO: check expire
-func verifyPasswordReset(email, expire, token string) bool {
-  var password string
-  err := query["password_forgot"].QueryRow(email).Scan(&password)
-  if err != nil {
-    log.Printf("[APP] PASSWORD-FORGOT error: %s, %d\n", err, email)
-    return false
+func verifyPasswordReset(email, expire, token string) (*AuthInfo, error) {
+  password, auth, err := fetchUserPassword(email)
+  if err != nil { return nil, err }
+  now_unix := time.Now().Unix()
+  exp_unix, err := strconv.ParseInt(expire, 10, 64)
+  if err != nil { return nil, err }
+  if valid := verifyHMAC(token, email, expire, password); !valid || now_unix >= exp_unix {
+    err = errors.New("invalid hmac or expired")
   }
-  return verifyHMAC(token, email, expire, password)
+  return auth, err
+}
+
+func fetchUserPassword(email string) (string, *AuthInfo, error) {
+  var auth AuthInfo
+  var user_password string
+  err := query["credentials_get"].QueryRow(email).Scan(&user_password, &auth.Id, &auth.Name, &auth.Status, &auth.Language)
+  if err != nil {
+    log.Printf("[APP] PASSWORD-FORGOT error: %s, %s, %s\n", err, email, user_password)
+  }
+  return user_password, &auth, err
+}
+
+func updatePassword(email, password string) error {
+  if len(password) < minPassLen {
+    return errorWithA("Password must have at least %d characters", minPassLen)
+  }
+  _, err := query["password_update"].Exec(hashPassword(password), email)
+  if err != nil {
+    log.Printf("[APP] PASSWORD-UPDATE error: %s, %s", err, email)
+    return errors.New("User could not be updated")
+  }
+  return nil
 }
 
 func listUsersByQuery(q url.Values) []UserRecord {
