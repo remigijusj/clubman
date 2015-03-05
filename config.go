@@ -22,9 +22,9 @@ const (
   emailsFrom = ""
 
   smsHost    = "http://sms.coolsmsc.dk:8080/sendsms.php"
-  smsUser    = ""
+  smsUser    = "sms"
   smsPass    = ""
-  smsFrom    = ""
+  smsFrom    = "NK Fitness"
 
   cancelCheck = "0 5 * * * *"
   cancelAhead = 5 * time.Hour // in 5-6 hours

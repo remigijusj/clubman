@@ -84,7 +84,7 @@ func sendSMS(mobile, message string) bool {
   }
   status := val.Get("status")
   if status != "success" {
-    log.Printf("[APP] SMS error: response status %s\n", status)
+    log.Printf("[APP] SMS error: response status %s (%s)\n", status, body)
   }
 
   return true
