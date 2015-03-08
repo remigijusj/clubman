@@ -26,6 +26,7 @@ var helpers = template.FuncMap{
   "userName":      userName,
   "dict":          dict,
   "serverName":  func() string { return serverName },
+  "adminEmail":  func() string { return adminEmail },
   "defaultDate": func() string { return defaultDate },
   "printTime":   func(t time.Time) string { return t.Format(timeFormat) },
   "printDate":   func(t time.Time) string { return t.Format(dateFormat) },
@@ -35,7 +36,7 @@ var helpers = template.FuncMap{
 }
 
 func loadHtmlTemplates(pattern string, engine *gin.Engine) {
-  if reloadTmpl {
+  if debugMode {
     engine.HTMLRender = DevRender{
       Glob: pattern,
     }

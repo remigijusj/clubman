@@ -6,13 +6,14 @@ import (
 
 const (
   serverName = "Nykredit Fitness"
-  serverHost = "demo.nk-fitness.dk"
-  serverRoot = "http://demo.nk-fitness.dk"
+  serverHost = "nk-fitness.dk"
+  serverRoot = "http://nk-fitness.dk"
   serverPort = ":8001"
+  adminEmail = "fitness.glaskuben@nykredit.dk" 
 
   cookieHost = ""
-  cookieAuth = "nk-fitness#nk-fitness#nk-fitness" // 32 bytes
-  cookieEncr = "nk-fitness$nk-fitness$nk-fitness" // 32 bytes
+  cookieAuth = "nk-fitness$$" // 32 bytes
+  cookieEncr = "nk-fitness$$" // 32 bytes
   cookieLife = 3600 * 1 // 1 hours
 
   emailsHost = "smtp.gmail.com"
@@ -32,7 +33,7 @@ const (
   gracePeriod = 2 * time.Hour // if not autoConfirm
   smsInPeriod = 24 * time.Hour
 
-  siteSecret  = ""
+  siteSecret  = "nk-fitness$$" // 32 bytes
   sessionKey  = "session"
   bcryptCost  = 10
   minPassLen  = 6
@@ -45,8 +46,6 @@ const (
   fullFormat  = "2006-01-02 15:04:05" // db
   panicError  = "Critical error happened, please contact website admin"
   permitError = "You are not authorized to view this page"
-
-  reloadTmpl  = true // DEBUG mode
 )
 
 var languages = []string{"da", "en"}

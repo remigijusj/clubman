@@ -2,8 +2,12 @@
     <div class="large-6 medium-8 columns">
       <h4>{{"Log in"|T}}</h4>
 
+      <p>
+        {{T "Welcome to %s registration system" serverName}}.
+      </p>
       <p class="form-description">
-        {{T "Welcome to %s registration system. If you are a registered user, you can log in with your username and password." serverName}}
+        {{T "If you are a registered user, you can log in with your username and password"}}.
+        {{T "If you are a new user, you can send an email to %s and ask for an account" adminEmail}}.
       </p>
       <div class="panel">
         <form action="/login" method="POST">

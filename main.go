@@ -4,6 +4,7 @@ import (
   "database/sql"
   "encoding/gob"
   "log"
+  "os"
   "regexp"
   "strings"
 
@@ -29,7 +30,13 @@ func init() {
   gob.Register(&EventForm{})
 }
 
+var debugMode = false
+
 func main() {
+  if len(os.Args) > 1 && os.Args[1] == "debug" {
+    debugMode = true
+  }
+
   prepareQueries()
   prepareRegexes()
   prepareCookies()
@@ -87,7 +94,9 @@ func displayPage(c *gin.Context) {
     obj["form"] = form
   }
   obj["lang"] = getLang(c)
-  log.Printf("=> BINDING\n   %#v\n", obj) // <<< DEBUG
+  if debugMode {
+    log.Printf("=> BINDING\n   %#v\n", obj)
+  }
 
   c.HTML(200, "page.tmpl", obj)
 }

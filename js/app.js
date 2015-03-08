@@ -25,6 +25,7 @@ $(function(){
   $('.select2').select2();
   // misc
   activateTab();
+  activateLinks();
 });
 
 function dateFormat() {
@@ -55,4 +56,10 @@ function activateTab() {
       }
     });
   }
+}
+
+function activateLinks() {
+  var exp = /(\b[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\b)/ig;
+  var t = $('.form-description').text().replace(exp, '<a href="mailto:$1">$1</a>');
+  $('.form-description').html(t);
 }

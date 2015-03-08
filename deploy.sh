@@ -3,19 +3,16 @@ set -e
 
 replaces ()
 {
-  local name="config.go"
-  local pass="$1"
-  local reload="$2"
-
-  echo "SUBST $name WITH reload=$reload"
-  sed -i -e "s/emailsPass = \".*\"/emailsPass = \"$pass\"/g" -e "s/reloadTmpl = [a-z]*/reloadTmpl = $reload/g" "$name"
+  sed -i -e "s/emailsPass = \".*\"/emailsPass = \"$1\"/g" "config.go"
 }
 
 git pull
 
 read -e -s -p "Enter the password: " password
-replaces $password "false"
+patch < secrets.diff
+replaces $password
 go build
-replaces "" "true"
+replaces ""
+patch -R < secrets.diff
 
 ./nk-fitness
