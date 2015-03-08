@@ -1,6 +1,7 @@
 *.db
 *.db-journal
-*.exe
 .*
 *.csv
 *.diff
+*.exe
+*.log

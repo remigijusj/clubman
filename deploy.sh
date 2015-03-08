@@ -15,4 +15,4 @@ go build
 replaces ""
 patch -R < secrets.diff
 
-./nk-fitness
+./nk-fitness 2>&1 | tee -a ./nk-fitness.log
