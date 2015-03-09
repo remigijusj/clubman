@@ -63,7 +63,7 @@
                 {{$count := index $counts .Id}}
                 {{$class := eventClass $team $count}}
               <a href="/events/view/{{.Id}}" title="{{printTime .StartAt}} &ndash; {{printTime .FinishAt}}" class="{{$class}}">
-                {{$team.Name}}
+                {{$team.Name|taketill " -"}}
                 {{if eq $part 1}}<img src="/img/star-gold-12.png" />{{end}}
                 {{if lt $part 0}}<img src="/img/star-gray-12.png" />{{end}}
               </a>

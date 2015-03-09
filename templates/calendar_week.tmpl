@@ -72,7 +72,7 @@
               <a href="/events/view/{{.Id}}" class="{{$class}}">
                 {{if eq $part 1}}<img src="/img/star-gold-16.png" />{{end}}
                 {{if lt $part 0}}<img src="/img/star-gray-16.png" />{{end}}
-                <b>{{$team.Name}}</b>
+                <b>{{$team.Name|taketill " -"}}</b>
                 <br/>
                 {{$team.UserName}}<br/>
                 {{printTime .StartAt}} &ndash; {{printTime .FinishAt}}
