@@ -26,7 +26,7 @@ func afterAssignmentDelete(event_id, limit_id int) {
   if err != nil { tx.Rollback(); return }
 
   user_ids, lucky_cnt := shiftWaitingUsers(list, max, limit_id)
-  if len(user_ids) == 0 { tx.Rollback(); return }
+  if len(user_ids) == 0 || lucky_cnt == 0 { tx.Rollback(); return }
 
   err = updateAssignmentStatusTx(tx, event_id, assigmentStatusChange(), user_ids[0:lucky_cnt]...)
   if err != nil { tx.Rollback(); return }
