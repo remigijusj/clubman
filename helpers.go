@@ -41,7 +41,11 @@ type SimpleRecord struct {
 // --- controller helpers ---
 
 func bindForm(c *gin.Context, obj interface{}) bool {
-  return c.BindWith(obj, binding.Form)
+  ok := c.BindWith(obj, binding.Form)
+  if it, is := obj.(EmailFixer); is {
+    it.fixEmail()
+  }
+  return ok
 }
 
 func setPage(c *gin.Context) {

@@ -307,3 +307,15 @@ func mapUserNames(user_ids []int) (data map[int]string) {
 
   return
 }
+
+// --- lowercase incoming email ---
+
+func (form *LoginForm) fixEmail() { form.Email = strings.ToLower(form.Email) }
+
+func (form *ForgotForm) fixEmail() { form.Email = strings.ToLower(form.Email) }
+
+func (form *UserForm) fixEmail() { form.Email = strings.ToLower(form.Email) }
+
+type EmailFixer interface {
+  fixEmail()
+}
