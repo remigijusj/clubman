@@ -5,7 +5,6 @@ import (
   "fmt"
 
   "github.com/gin-gonic/gin"
-  "github.com/gin-gonic/gin/binding"
 )
 
 func handleEventsCreate(c *gin.Context) {
@@ -67,7 +66,7 @@ func getEventAssignments(c *gin.Context) {
 
 func handleEventUpdate(c *gin.Context) {
   var form EventForm
-  if ok := c.BindWith(&form, binding.Form); !ok {
+  if ok := bindForm(c, &form); !ok {
     showError(c, errors.New("Please provide all details"), &form)
     return
   }
@@ -153,7 +152,7 @@ func handleEventsFormAction(c *gin.Context, action (func(int, *TeamEventsForm, s
     return
   }
   var form TeamEventsForm
-  if ok := c.BindWith(&form, binding.Form); !ok {
+  if ok := bindForm(c, &form); !ok {
     showError(c, errors.New("Please provide all details"), &form, teamsEventsPath(team_id, tab))
     return
   }

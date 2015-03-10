@@ -4,7 +4,6 @@ import (
   "errors"
 
   "github.com/gin-gonic/gin"
-  "github.com/gin-gonic/gin/binding"
 )
 
 func getTeamList(c *gin.Context) {
@@ -58,7 +57,7 @@ func getTeamForm(c *gin.Context) {
 
 func handleTeamCreate(c *gin.Context) {
   var form TeamForm
-  if ok := c.BindWith(&form, binding.Form); !ok {
+  if ok := bindForm(c, &form); !ok {
     showError(c, errors.New("Please provide all details"), &form)
     return
   }
@@ -72,7 +71,7 @@ func handleTeamCreate(c *gin.Context) {
 
 func handleTeamUpdate(c *gin.Context) {
   var form TeamForm
-  if ok := c.BindWith(&form, binding.Form); !ok {
+  if ok := bindForm(c, &form); !ok {
     showError(c, errors.New("Please provide all details"), &form)
     return
   }

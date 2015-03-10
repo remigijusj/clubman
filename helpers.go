@@ -14,6 +14,7 @@ import (
 
   "code.google.com/p/go.crypto/bcrypt"
   "github.com/gin-gonic/gin"
+  "github.com/gin-gonic/gin/binding"
 )
 
 type Alert struct {
@@ -38,6 +39,10 @@ type SimpleRecord struct {
 }
 
 // --- controller helpers ---
+
+func bindForm(c *gin.Context, obj interface{}) bool {
+  return c.BindWith(obj, binding.Form)
+}
 
 func setPage(c *gin.Context) {
   if _, err := c.Get("page"); err == nil {

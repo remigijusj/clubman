@@ -5,12 +5,11 @@ import (
   "strconv"
 
   "github.com/gin-gonic/gin"
-  "github.com/gin-gonic/gin/binding"
 )
 
 func handleLogin(c *gin.Context) {
   var form LoginForm
-  if ok := c.BindWith(&form, binding.Form); !ok {
+  if ok := bindForm(c, &form); !ok {
     showError(c, errors.New("Please enter email and password"))
     return
   }
@@ -30,7 +29,7 @@ func handleLogout(c *gin.Context) {
 
 func handleForgot(c *gin.Context) {
   var form ForgotForm
-  if ok := c.BindWith(&form, binding.Form); !ok {
+  if ok := bindForm(c, &form); !ok {
     showError(c, errors.New("Please enter your email"))
     return
   }
@@ -90,7 +89,7 @@ func getProfile(c *gin.Context) {
 // NOTE: similar to handleUserUpdate
 func handleProfile(c *gin.Context) {
   var form UserForm
-  if ok := c.BindWith(&form, binding.Form); !ok {
+  if ok := bindForm(c, &form); !ok {
     showError(c, errors.New("Please provide all details"), &form)
     return
   }
@@ -148,7 +147,7 @@ func getUserForm(c *gin.Context) {
 // NOTE: serves both signup and create by admin
 func handleUserCreate(c *gin.Context) {
   var form UserForm
-  if ok := c.BindWith(&form, binding.Form); !ok || form.Password == "" {
+  if ok := bindForm(c, &form); !ok || form.Password == "" {
     showError(c, errors.New("Please provide all details"), &form)
     return
   }
@@ -171,7 +170,7 @@ func handleUserCreate(c *gin.Context) {
 // NOTE: similar to handleProfile
 func handleUserUpdate(c *gin.Context) {
   var form UserForm
-  if ok := c.BindWith(&form, binding.Form); !ok {
+  if ok := bindForm(c, &form); !ok {
     showError(c, errors.New("Please provide all details"), &form)
     return
   }
