@@ -1,7 +1,8 @@
 *.db
 *.db-journal
-.*
 *.csv
 *.diff
 *.exe
 *.log
+.*
+nk-fitness

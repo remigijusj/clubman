@@ -241,12 +241,16 @@ func autoCancelEvents() {
 }
 
 // NOTE: should be in notifications.go
-func notifyEventParticipants(event_id int, subject, message string) int {
+func notifyEventParticipants(sender_id, event_id int, subject, message string) int {
   var count int
   rows, err := query["users_of_event"].Query(event_id)
   users := listUsersContact(rows, err)
+  var from string
+  if sender, err := fetchUserProfile(sender_id); err == nil {
+    from = sender.Email
+  }
   for _, user := range users {
-    if ok := sendEmail(user.Email, subject, message); ok {
+    if ok := sendEmail(user.Email, subject, message, from); ok {
       count++
     }
   }

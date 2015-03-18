@@ -37,10 +37,13 @@ func loadMailTemplates(pattern string) {
   mails = template.Must(template.New("").Funcs(helpers).ParseGlob("mails/*"))
 }
 
-func sendEmail(to, subject, body string) bool {
+func sendEmail(to, subject, body string, args ...string) bool {
   msg := gomail.NewMessage()
   msg.SetHeader("From", emailsFrom)
   msg.SetHeader("To", to)
+  if len(args) > 0 && args[0] != "" {
+    msg.SetHeader("Reply-To", args[0])
+  }
   msg.SetHeader("Subject", subject)
   msg.SetBody("text/html", body)
 

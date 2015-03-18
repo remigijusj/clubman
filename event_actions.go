@@ -132,8 +132,9 @@ func handleEventNotify(c *gin.Context) {
   }
   var count int
   event_id, err := getIntParam(c, "id")
-  if err == nil {
-    count = notifyEventParticipants(event_id, subject, message)
+  self := currentUser(c)
+  if err == nil && self != nil {
+    count = notifyEventParticipants(self.Id, event_id, subject, message)
   }
   if err != nil {
     showError(c, err)
