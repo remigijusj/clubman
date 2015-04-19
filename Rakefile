@@ -4,7 +4,7 @@ def collect_strings
   Dir.glob('*.go').each do |file|
     next if file == 'config.go' or file == 'static.go'
     File.read(file).scan(/"([A-Z].*?|%\w .*?)"/m) do |(it)|
-      next if it =~ /^github|^code\.google|^gopkg|\.tmpl|^T$|^UPDATE|^Content-Type$/
+      next if it =~ /^github|^code\.google|^gopkg|\.tmpl|^T$|^POST|^UPDATE|^Content-Type$/
       strings[it] = true
     end
   end
