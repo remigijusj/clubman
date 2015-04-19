@@ -16,11 +16,10 @@ const (
   cookieEncr = "nk-fitness$$" // 32 bytes
   cookieLife = 3600 * 1 // 1 hours
 
-  emailsHost = "smtp.gmail.com"
-  emailsUser = ""
+  emailsRoot = "https://api.mailgun.net/v3/nk-fitness.dk/messages"
+  emailsUser = "api"
   emailsPass = ""
-  emailsPort = 587
-  emailsFrom = ""
+  emailsFrom = "info@nk-fitness.dk"
 
   smsHost    = "http://sms.coolsmsc.dk:8080/sendsms.php"
   smsUser    = "sms"

@@ -7,9 +7,8 @@ import (
   "log"
   "net/http"
   "net/url"
+  "strings"
   "time"
-
-  "gopkg.in/gomail.v1"
 )
 
 const (
@@ -38,21 +37,36 @@ func loadMailTemplates(pattern string) {
 }
 
 func sendEmail(to, subject, body string, args ...string) bool {
-  msg := gomail.NewMessage()
-  msg.SetHeader("From", emailsFrom)
-  msg.SetHeader("To", to)
+  data := url.Values{}
+  data.Add("from",    emailsFrom)
+  data.Add("to",      to)
+  data.Add("subject", subject)
+  data.Add("html",    body)
   if len(args) > 0 && args[0] != "" {
-    msg.SetHeader("Reply-To", args[0])
+    data.Add("h:Reply-To", args[0])
   }
-  msg.SetHeader("Subject", subject)
-  msg.SetBody("text/html", body)
 
-  mailer := gomail.NewMailer(emailsHost, emailsUser, emailsPass, emailsPort)
-  err := mailer.Send(msg)
+  req, err := http.NewRequest("POST", emailsRoot, strings.NewReader(data.Encode()))
   if err != nil {
-    log.Printf("[APP] EMAIL error: %v, %s, %s\n", err, to, subject)
+    log.Printf("[APP] EMAIL request error: %v, %s, %s\n", err, to, subject)
+  }
+  req.SetBasicAuth(emailsUser, emailsPass)
+  req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+  client := &http.Client{}
+  resp, err := client.Do(req)
+  _ = resp
+
+  if err != nil {
+    log.Printf("[APP] EMAIL sending error: %v, %s, %s\n", err, to, subject)
   }
   return err == nil
+/*
+  defer resp.Body.Close()
+  b, err := ioutil.ReadAll(resp.Body)
+  if err != nil {
+    log.Printf("[APP] EMAIL error: %v, %s, %s, [%s]\n", err, to, subject, b)
+  }
+*/
 }
 
 func sendSMS(mobile, message string) bool {
