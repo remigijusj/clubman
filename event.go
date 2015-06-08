@@ -235,6 +235,7 @@ func autoCancelEvents() {
   till := from.Add(1 * time.Hour)
 
   list := listEventsUnderLimit(from, till)
+  log.Printf("[APP] AUTOCANCEL-EVENT-INFO: %s, %s, %v\n", from.Format(fullFormat), till.Format(fullFormat), list)
   for _, event_id := range list {
     cancelEvent(event_id)
   }
