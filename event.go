@@ -144,7 +144,7 @@ func performEventAction(event_id int, action (func(*sql.Tx, int, *EventForm) err
   event, err := fetchEventInfoTx(tx, event_id)
   if err != nil { tx.Rollback(); return }
 
-  users, err := listUsersOfEventTx(tx, event_id)
+  users, err := listUsersOfEventTx(tx, event_id, clear)
   if err != nil { tx.Rollback(); return }
 
   err = action(tx, event_id, form)

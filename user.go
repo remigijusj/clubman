@@ -134,13 +134,26 @@ func listUsers(rows *sql.Rows, err error) (list []UserRecord) {
   return
 }
 
-func listUsersOfEventTx(tx *sql.Tx, event_id int) ([]UserContact, error) {
-  rows, err := tx.Stmt(query["users_of_event"]).Query(event_id)
+// WARNING: manual UNION-query building here, perhaps find nicer way?
+func listUsersOfEventTx(tx *sql.Tx, event_id int, canceled bool) ([]UserContact, error) {
+  qry, list := queries["users_of_event"], []interface{}{event_id}
+  if canceled { // also notify instructor
+    qry = qry + " UNION " + queries["instructor_of_event"]
+    list = append(list, interface{}(event_id))
+  }
+  rows, err := tx.Query(qry, list...)
+
   return listUsersContact(rows, err), err
 }
 
-func listUsersOfEvents(event_ids []int) ([]UserContact, error) {
-  rows, err := multiQuery("users_of_event", event_ids)
+func listUsersOfEvents(event_ids []int, team_id int, canceled bool) ([]UserContact, error) {
+  qry, list := multi(queries["users_of_event"], event_ids)
+  if canceled { // also notify instructor
+    qry = qry + " UNION " + queries["instructor_of_team"]
+    list = append(list, interface{}(team_id))
+  }
+  rows, err := db.Query(qry, list...)
+
   return listUsersContact(rows, err), err
 }
 

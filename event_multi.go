@@ -112,7 +112,9 @@ func updateEvents(team_id int, form *TeamEventsForm, lang string) (int, error) {
   list, near := data.eventIds(team_id)
   if len(list) == 0 { return 0, nil }
 
-  users, err := listUsersOfEvents(list)
+  clear := data.Status == eventStatusCanceled
+
+  users, err := listUsersOfEvents(list, team_id, clear)
   if err != nil { return 0, nil }
 
   team, err := fetchTeam(team_id)
@@ -124,7 +126,7 @@ func updateEvents(team_id int, form *TeamEventsForm, lang string) (int, error) {
   num, _ := res.RowsAffected()
   if num > 0 {
     if !data.isPast() {
-      if data.Status == eventStatusCanceled {
+      if clear {
         go data.eachUser(users, notifyEventMultiCancel, &team, near)
       } else {
         go data.eachUser(users, notifyEventMultiUpdate, &team, near)
@@ -169,7 +171,7 @@ func deleteEvents(team_id int, form *TeamEventsForm, lang string) (int, error) {
   list, near := data.eventIds(team_id)
   if len(list) == 0 { return 0, nil }
 
-  users, err := listUsersOfEvents(list)
+  users, err := listUsersOfEvents(list, team_id, true)
   if err != nil { return 0, nil }
 
   team, err := fetchTeam(team_id)
