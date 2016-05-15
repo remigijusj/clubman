@@ -16,7 +16,7 @@ func getTeamEventsData(c *gin.Context) {
   team_id, err := getIntParam(c, "id")
   if err != nil {
     gotoWarning(c, "/teams", err.Error())
-    c.Abort(0)
+    c.Abort()
     return
   }
   date, full := getDateQuery(c, "date")
@@ -48,7 +48,7 @@ func getTeamForm(c *gin.Context) {
   }
   if err != nil {
     gotoWarning(c, "/teams", err.Error())
-    c.Abort(0)
+    c.Abort()
   } else {
     c.Set("id", team_id)
     c.Set("form", form)

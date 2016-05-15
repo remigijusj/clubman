@@ -46,7 +46,7 @@ func getResetInfo(c *gin.Context) {
   auth, err := verifyPasswordReset(q.Get("email"), q.Get("expire"), q.Get("token"))
   if err != nil {
     gotoWarning(c, "/login", "Password reset request is invalid or expired")
-    c.Abort(0)
+    c.Abort()
   } else {
     c.Set("path", c.Request.URL.String())
     c.Set("form", auth)
@@ -80,7 +80,7 @@ func getProfile(c *gin.Context) {
   }
   if err != nil {
     gotoWarning(c, defaultPage, panicError)
-    c.Abort(0)
+    c.Abort()
   } else {
     c.Set("form", form)
   }
@@ -137,7 +137,7 @@ func getUserForm(c *gin.Context) {
   }
   if err != nil {
     gotoWarning(c, "/users", err.Error())
-    c.Abort(0)
+    c.Abort()
   } else {
     c.Set("id", user_id)
     c.Set("form", form)

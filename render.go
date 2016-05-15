@@ -7,15 +7,21 @@ import (
   "time"
 
   "github.com/gin-gonic/gin"
+  "github.com/gin-gonic/gin/render"
 )
 
-type DevRender struct {
-  Glob string
+type PageTemplate struct {
+  TemplateGlob string
+  templates    *template.Template
 }
 
-type ProRender struct {
+type PageRender struct {
   Template *template.Template
+  Data     interface{}
+  Name     string
 }
+
+var htmlContentType = []string{"text/html; charset=utf-8"}
 
 var helpers = template.FuncMap{
   "calcMonthDate": calcMonthDate,
@@ -38,51 +44,55 @@ var helpers = template.FuncMap{
 }
 
 func loadHtmlTemplates(pattern string, engine *gin.Engine) {
+  tmpl := PageTemplate{pattern, nil}
+  tmpl.loadTemplates()
+  engine.HTMLRender = tmpl
+}
+
+func (r *PageTemplate) loadTemplates() error {
+  tmpl, err := template.New("").Funcs(helpers).ParseGlob(r.TemplateGlob)
+  r.templates = tmpl
+  return err
+}
+
+func (r PageTemplate) Instance(name string, data interface{}) render.Render {
   if debugMode {
-    engine.HTMLRender = DevRender{
-      Glob: pattern,
-    }
+    r.loadTemplates()
+  }
+  return PageRender{
+    Template: r.templates,
+    Name:     name,
+    Data:     data,
+  }
+}
+
+func (r PageRender) Render(w http.ResponseWriter) error {
+  writeContentType(w, htmlContentType)
+
+  setTranslations(r.Template, r.Data)
+
+  if len(r.Name) > 0 {
+    r.Template.ExecuteTemplate(w, r.Name, r.Data)
   } else {
-    tmpl, _ := template.New("").Funcs(helpers).ParseGlob(pattern)
-    engine.HTMLRender = ProRender{
-      Template: tmpl,
-    }
+    r.Template.Execute(w, r.Data)
   }
+
+  return nil
 }
 
-func (r ProRender) Render(w http.ResponseWriter, code int, data ...interface{}) error {
-  writeHeader(w, code, "text/html")
-  file := data[0].(string)
-  obj := data[1].(gin.H)
-
-  addTranslations(r.Template, obj)
-
-  return r.Template.ExecuteTemplate(w, file, obj)
-}
-
-func (r DevRender) Render(w http.ResponseWriter, code int, data ...interface{}) error {
-  writeHeader(w, code, "text/html")
-  file := data[0].(string)
-  obj := data[1].(gin.H)
-
-  t := template.New("").Funcs(helpers)
-  if _, err := t.ParseGlob(r.Glob); err != nil {
-    return err
-  }
-  addTranslations(t, obj)
-
-  return t.ExecuteTemplate(w, file, obj)
-}
-
-func writeHeader(w http.ResponseWriter, code int, contentType string) {
-  w.Header().Set("Content-Type", contentType)
-  w.WriteHeader(code)
-}
-
-func addTranslations(t *template.Template, obj gin.H) {
+func setTranslations(t *template.Template, data interface{}) {
   trans := transHelpers[defaultLang]
-  if lang, ok := obj["lang"].(string); ok {
-    trans = transHelpers[lang]
+  if obj, ok := data.(gin.H); ok {
+    if lang, ok := obj["lang"].(string); ok {
+      trans = transHelpers[lang]
+    }
   }
   t.Funcs(trans)
+}
+
+func writeContentType(w http.ResponseWriter, value []string) {
+  header := w.Header()
+  if val := header["Content-Type"]; len(val) == 0 {
+    header["Content-Type"] = value
+  }
 }

@@ -12,7 +12,7 @@ import (
   "strings"
   "time"
 
-  "code.google.com/p/go.crypto/bcrypt"
+  "golang.org/x/crypto/bcrypt"
   "github.com/gin-gonic/gin"
   "github.com/gin-gonic/gin/binding"
 )
@@ -41,15 +41,15 @@ type SimpleRecord struct {
 // --- controller helpers ---
 
 func bindForm(c *gin.Context, obj interface{}) bool {
-  ok := c.BindWith(obj, binding.Form)
+  err := c.BindWith(obj, binding.Form)
   if it, is := obj.(EmailFixer); is {
     it.fixEmail()
   }
-  return ok
+  return err == nil
 }
 
 func setPage(c *gin.Context) {
-  if _, err := c.Get("page"); err == nil {
+  if _, exists := c.Get("page"); exists {
     return
   }
   tokens := strings.Split(c.Request.URL.Path[1:], "/")
@@ -207,8 +207,8 @@ func currentUser(c *gin.Context) *AuthInfo {
 }
 
 func isAuthenticated(c *gin.Context) bool {
-  _, err := c.Get("self")
-  return err == nil
+  _, exists := c.Get("self")
+  return exists
 }
 
 func isAdmin(c *gin.Context) bool {

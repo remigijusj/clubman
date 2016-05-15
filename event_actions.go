@@ -27,7 +27,7 @@ func getEventForm(c *gin.Context) {
   }
   if err != nil {
     gotoWarning(c, defaultPage, err.Error())
-    c.Abort(0)
+    c.Abort()
   } else {
     setEventUpdateExtras(c, &form)
     c.Set("id", event_id)
@@ -37,13 +37,14 @@ func getEventForm(c *gin.Context) {
 
 func getEventTeam(c *gin.Context) {
   var team TeamForm
-  form, err := c.Get("form")
+  var err error
+  form, exists := c.Get("form")
   if event, ok := form.(EventForm); ok {
     team, err = fetchTeam(event.TeamId)
   }
-  if err != nil {
+  if !exists || err != nil {
     gotoWarning(c, defaultPage, panicError)
-    c.Abort(0)
+    c.Abort()
   } else {
     c.Set("team", team)
   }
@@ -53,7 +54,7 @@ func getEventAssignments(c *gin.Context) {
   event_id, err := getIntParam(c, "id")
   if err != nil {
     gotoWarning(c, defaultPage, err.Error())
-    c.Abort(0)
+    c.Abort()
   } else {
     list := listEventAssignments(event_id)
     c.Set("list", list)
@@ -120,7 +121,7 @@ func checkEventPerm(c *gin.Context) {
     }
   }
   gotoWarning(c, defaultPage, permitError)
-  c.Abort(0)
+  c.Abort()
 }
 
 func handleEventNotify(c *gin.Context) {

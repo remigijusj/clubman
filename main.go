@@ -107,7 +107,7 @@ func authRequired() gin.HandlerFunc {
       c.Set("self", *auth)
       if path, ok := getSavedPath(c).(string); ok {
         c.Redirect(302, path)
-        c.Abort(0)
+        c.Abort()
       }
     } else {
       if c.Request.URL.Path != "/" {
@@ -115,7 +115,7 @@ func authRequired() gin.HandlerFunc {
       }
       setSavedPath(c, c.Request.URL.Path)
       c.Redirect(302, "/login")
-      c.Abort(0)
+      c.Abort()
     }
   }
 }
@@ -129,7 +129,7 @@ func adminRequired() gin.HandlerFunc {
       setSessionAlert(c, &Alert{"warning", TC(c, permitError)})
     }
     c.Redirect(302, defaultPage)
-    c.Abort(0)
+    c.Abort()
   }
 }
 
