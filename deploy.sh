@@ -1,12 +1,17 @@
 #!/bin/bash
 set -e
 
-if [ "$1" != "run" ]; then
+NAME="$1"
+MODE="$2"
+
+if [ "$MODE" != "run" ]; then
   git pull
 fi
 
-patch < secrets.diff
-go build
-patch -R < secrets.diff
+patch -p1 < secrets.diff
+go build -o "$NAME" ./src
+patch -p1 -R < secrets.diff
 
-./nk-fitness 2>&1 | tee -a ./nk-fitness.log
+if [ "$MODE" == "run" ]; then
+  "./$NAME" 2>&1 | tee -a "./$NAME.log"
+fi
