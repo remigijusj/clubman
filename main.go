@@ -30,12 +30,8 @@ func init() {
   gob.Register(&EventForm{})
 }
 
-var debugMode = false
-
 func main() {
-  if len(os.Args) > 1 && os.Args[1] == "debug" {
-    debugMode = true
-  }
+  setGinMode()
 
   prepareQueries()
   prepareRegexes()
@@ -51,6 +47,16 @@ func main() {
 
   defineRoutes(r)
   r.Run(serverPort)
+}
+
+func setGinMode() {
+  if mode := os.Getenv(gin.ENV_GIN_MODE); mode == "" {
+    gin.SetMode(gin.ReleaseMode)
+  }
+}
+
+func debugMode() bool {
+  return gin.Mode() == gin.DebugMode
 }
 
 func prepareQueries() {
@@ -94,7 +100,7 @@ func displayPage(c *gin.Context) {
     obj["form"] = form
   }
   obj["lang"] = getLang(c)
-  if debugMode {
+  if debugMode() {
     log.Printf("=> BINDING\n   %#v\n", obj)
   }
 

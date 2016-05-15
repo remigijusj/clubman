@@ -136,7 +136,7 @@ func setSessionAuthInfo(c *gin.Context, auth *AuthInfo) {
 
 func getSessionAuthInfo(c *gin.Context) *AuthInfo {
   session, _ := cookie.Get(c.Request, sessionKey)
-  if debugMode {
+  if debugMode() {
     log.Printf("=> SESSION\n   %#v, %#v\n", session.Values, session.Options)
   }
   if auth, ok := session.Values["auth"].(*AuthInfo); ok {

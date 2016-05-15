@@ -88,7 +88,7 @@ func defineRoutesAdmin(a *gin.RouterGroup) {
 
     ad.GET("/logs",               getLogList, displayPage)
 
-    if debugMode {
+    if debugMode() {
       ad.GET("/events/auto_cancel", func(c *gin.Context) { autoCancelEvents() }, redirectCalendar)
     }
   }

@@ -37,6 +37,11 @@ func loadMailTemplates(pattern string) {
 }
 
 func sendEmail(to, subject, body string, args ...string) bool {
+  if debugMode() {
+    log.Printf("[APP] DEBUG EMAIL to %s: %s\n", to, subject)
+    return true
+  }
+
   data := url.Values{}
   data.Add("from",    emailsFrom)
   data.Add("to",      to)
@@ -70,6 +75,11 @@ func sendEmail(to, subject, body string, args ...string) bool {
 }
 
 func sendSMS(mobile, message string) bool {
+  if debugMode() {
+    log.Printf("[APP] DEBUG SMS to %s: %s\n", mobile, message)
+    return true
+  }
+
   v := url.Values{}
 
   v.Set("username",   smsUser)
