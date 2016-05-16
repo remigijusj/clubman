@@ -17,7 +17,7 @@
       <input id="email" name="email" type="text" value="{{.form.Email}}" placeholder="{{"my@email.com"|T}}" />
     </div>
     <div class="small-12 columns description">
-      {{T "%s information will be sent to this email" serverName}}
+      {{T "%s information will be sent to this email" conf.ServerName}}
     </div>
   </div>
   <div class="row">
@@ -29,7 +29,7 @@
       <input id="password" name="password" type="password" placeholder="" />
     </div>
     <div class="small-12 columns description">
-      {{T "The password should be used when logging in to %s" serverName}}
+      {{T "The password should be used when logging in to %s" conf.ServerName}}
     </div>
   </div>
   <div class="row">

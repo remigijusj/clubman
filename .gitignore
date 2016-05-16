@@ -1,8 +1,8 @@
 *.db
 *.db-journal
 *.csv
-*.diff
 *.exe
 *.log
 *.toml
 .*
+img/logo.gif

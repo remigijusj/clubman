@@ -3,7 +3,8 @@ ServerName = "My App"
 ServerHost = "my-app.io"
 ServerRoot = "http://my-app.io"
 ServerPort = ":8001"
-AdminEmail = "admin@my-app.io" 
+AdminEmail = "admin@my-app.io"
+LogoImgUrl = "" # f.ex: /img/logo.gif, place your file
 
 CookieHost = ""
 CookieAuth = "0000000000000000000000000000" # 32 bytes, random

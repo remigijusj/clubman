@@ -20,8 +20,9 @@ type Conf struct {
   ServerName  string
   ServerHost  string
   ServerRoot  string
-  ServerPort  string // ":8080"
+  ServerPort  string
   AdminEmail  string
+  LogoImgUrl  string
 
   CookieHost  string
   CookieAuth  string
@@ -79,5 +80,7 @@ func prepareConfig() {
 
 func validateConfig() {
   // TODO: implement
-  log.Printf("CONFIG: %#v\n\n", *conf)
+  if debugMode() {
+    log.Printf("CONFIG: %#v\n\n", *conf)
+  }
 }
