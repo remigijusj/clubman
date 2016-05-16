@@ -173,8 +173,8 @@ func teamsEventsPath(team_id int, tab string) string {
 // NOTE: this is needed for event update page only
 func setEventUpdateExtras(c *gin.Context, form *EventForm) {
   lang := getLang(c)
-  c.Set("date", today().Format(dateFormats[lang]))
+  c.Set("date", today().Format(locales[lang].Date))
 
-  form.Date = form.StartAt.Format(dateFormats[lang])
+  form.Date = form.StartAt.Format(locales[lang].Date)
   form.Time = form.StartAt.Format(timeFormat)
 }

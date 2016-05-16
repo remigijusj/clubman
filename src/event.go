@@ -204,7 +204,7 @@ func clearEvents(team_id int) error {
 }
 
 func parseEventForm(form *EventForm, lang string) error {
-  date, err := time.Parse(dateFormats[lang], form.Date)
+  date, err := time.Parse(locales[lang].Date, form.Date)
   if err != nil {
     return errors.New("Date must be valid")
   }

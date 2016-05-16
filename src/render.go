@@ -38,7 +38,7 @@ var helpers = template.FuncMap{
   "defaultDate": func() string { return defaultDate },
   "printTime":   func(t time.Time) string { return t.Format(timeFormat) },
   "printDate":   func(t time.Time) string { return t.Format(dateFormat) },
-  "localDate":   func(t time.Time, lang string) string { return t.Format(dateFormats[lang]) },
+  "localDate":   func(t time.Time, lang string) string { return t.Format(locales[lang].Date) },
   "truncate":    func(i int, s string) string { return s[:i] },
   "taketill":    func(delim, s string) string { i := strings.Index(s, delim); if i < 0 { i = len(s) }; return s[:i] },
   "T":           func(key string) string { return key },

@@ -79,7 +79,7 @@ func prepareCookies() {
   cookie.Options = &sessions.Options{
     Domain:   cookieHost,
     Path:     "/",
-    MaxAge:   cookieLife,
+    MaxAge:   int(cookieLife.Seconds()),
     HttpOnly: false,
     Secure:   false,
   }
