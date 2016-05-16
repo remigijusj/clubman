@@ -26,7 +26,7 @@ func getEventForm(c *gin.Context) {
     form, err = fetchEvent(event_id)
   }
   if err != nil {
-    gotoWarning(c, defaultPage, err.Error())
+    gotoWarning(c, conf.DefaultPage, err.Error())
     c.Abort()
   } else {
     setEventUpdateExtras(c, &form)
@@ -43,7 +43,7 @@ func getEventTeam(c *gin.Context) {
     team, err = fetchTeam(event.TeamId)
   }
   if !exists || err != nil {
-    gotoWarning(c, defaultPage, panicError)
+    gotoWarning(c, conf.DefaultPage, panicError)
     c.Abort()
   } else {
     c.Set("team", team)
@@ -53,7 +53,7 @@ func getEventTeam(c *gin.Context) {
 func getEventAssignments(c *gin.Context) {
   event_id, err := getIntParam(c, "id")
   if err != nil {
-    gotoWarning(c, defaultPage, err.Error())
+    gotoWarning(c, conf.DefaultPage, err.Error())
     c.Abort()
   } else {
     list := listEventAssignments(event_id)
@@ -102,7 +102,7 @@ func handleEventDelete(c *gin.Context) {
   if err != nil {
     gotoWarning(c, eventsViewPath(event_id), err.Error())
   } else {
-    gotoSuccess(c, defaultPage, "Event has been deleted")
+    gotoSuccess(c, conf.DefaultPage, "Event has been deleted")
   }
 }
 
@@ -120,7 +120,7 @@ func checkEventPerm(c *gin.Context) {
       }
     }
   }
-  gotoWarning(c, defaultPage, permitError)
+  gotoWarning(c, conf.DefaultPage, permitError)
   c.Abort()
 }
 
@@ -173,8 +173,8 @@ func teamsEventsPath(team_id int, tab string) string {
 // NOTE: this is needed for event update page only
 func setEventUpdateExtras(c *gin.Context, form *EventForm) {
   lang := getLang(c)
-  c.Set("date", today().Format(locales[lang].Date))
+  c.Set("date", today().Format(localeDate(lang)))
 
-  form.Date = form.StartAt.Format(locales[lang].Date)
+  form.Date = form.StartAt.Format(localeDate(lang))
   form.Time = form.StartAt.Format(timeFormat)
 }

@@ -1,5 +1,14 @@
 package main
 
+const (
+  panicError  = "Critical error happened, please contact website admin"
+  permitError = "You are not authorized to view this page"
+
+  timeFormat  = "15:04"
+  dateFormat  = "2006-01-02" // db
+  fullFormat  = "2006-01-02 15:04:05" // db
+)
+
 var regexes = map[string]string{
   "name_validate":   `\pL\s+\pL`,
   "email_validate":  `^\w[-._\w]*\w@\w[-._\w]*\w\.\w{2,3}$`,

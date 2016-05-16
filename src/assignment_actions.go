@@ -11,7 +11,7 @@ import (
 func getSelfAssignmentsList(c *gin.Context) {
   self := currentUser(c)
   if self == nil {
-    gotoWarning(c, defaultPage, panicError)
+    gotoWarning(c, conf.DefaultPage, panicError)
     return
   }
   date, full := getDateQuery(c, "date")
@@ -23,7 +23,7 @@ func getSelfAssignmentsList(c *gin.Context) {
 func getUserAssignmentsList(c *gin.Context) {
   user_id, err := getIntParam(c, "id")
   if err != nil {
-    gotoWarning(c, defaultPage, err.Error())
+    gotoWarning(c, conf.DefaultPage, err.Error())
     return
   }
   date, full := getDateQuery(c, "date")
@@ -95,7 +95,7 @@ func prepareAssignmentAction(c *gin.Context) (int, int, *sql.Tx) {
   event_id, err := getIntParam(c, "event_id")
   self := currentUser(c)
   if err != nil || self == nil {
-    gotoWarning(c, defaultPage, err.Error())
+    gotoWarning(c, conf.DefaultPage, err.Error())
     return 0, 0, nil
   }
   user_id, err := extractUserId(c, self)

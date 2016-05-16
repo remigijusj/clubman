@@ -40,7 +40,7 @@ func afterAssignmentDelete(event_id, limit_id int) {
   err = tx.Commit()
   if err != nil { return }
 
-  if autoConfirm {
+  if conf.AutoConfirm {
     notifyWaitingList(&event, users, lucky_cnt)
   } else {
     // WARNING: only 1 will be notified
@@ -50,7 +50,7 @@ func afterAssignmentDelete(event_id, limit_id int) {
 }
 
 func assigmentStatusChange() int {
-  if autoConfirm {
+  if conf.AutoConfirm {
     return assignmentStatusConfirmed
   } else {
     return assignmentStatusNotified
@@ -88,7 +88,7 @@ func shiftWaitingUsers(list []EventQueueItem, max, limit_id int) ([]int, int) {
   list = list[c:]
 
   // limited mode, find first
-  if !autoConfirm {
+  if !conf.AutoConfirm {
     for _, item := range list {
       if item.Id > limit_id {
         return []int{item.UserId}, 1
@@ -154,7 +154,7 @@ func confirmAssignmentTx(tx *sql.Tx, event_id, user_id int) (err error) {
 
 // NOTE: revert to waiting, repeat with next-in-line
 func expireAfterGracePeriod(event_id, user_id int) {
-  time.Sleep(gracePeriod)
+  time.Sleep(conf.GracePeriod.Duration)
 
   if limit_id, ok := revertAssignmentToWaiting(event_id, user_id); ok {
     afterAssignmentDelete(event_id, limit_id)

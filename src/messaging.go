@@ -27,7 +27,7 @@ func (self UserContact) chooseMethod(when time.Time) int {
 
 func isNear(when time.Time) bool {
   diff := when.Sub(time.Now())
-  return diff >= 0 && diff < smsInPeriod
+  return diff >= 0 && diff < conf.SmsInPeriod.Duration
 }
 
 var mails *template.Template
@@ -43,7 +43,7 @@ func sendEmail(to, subject, body string, args ...string) bool {
   }
 
   data := url.Values{}
-  data.Add("from",    emailsFrom)
+  data.Add("from",    conf.EmailsFrom)
   data.Add("to",      to)
   data.Add("subject", subject)
   data.Add("html",    body)
@@ -51,11 +51,11 @@ func sendEmail(to, subject, body string, args ...string) bool {
     data.Add("h:Reply-To", args[0])
   }
 
-  req, err := http.NewRequest("POST", emailsRoot, strings.NewReader(data.Encode()))
+  req, err := http.NewRequest("POST", conf.EmailsRoot, strings.NewReader(data.Encode()))
   if err != nil {
     log.Printf("[APP] EMAIL request error: %v, %s, %s\n", err, to, subject)
   }
-  req.SetBasicAuth(emailsUser, emailsPass)
+  req.SetBasicAuth(conf.EmailsUser, conf.EmailsPass)
   req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
   client := &http.Client{}
   resp, err := client.Do(req)
@@ -82,15 +82,15 @@ func sendSMS(mobile, message string) bool {
 
   v := url.Values{}
 
-  v.Set("username",   smsUser)
-  v.Set("password",   smsPass)
-  v.Set("from",       smsFrom)
+  v.Set("username",   conf.SmsUser)
+  v.Set("password",   conf.SmsPass)
+  v.Set("from",       conf.SmsFrom)
   v.Set("to",         mobile)
   v.Set("message",    message)
   v.Set("charset",    "utf-8")
   v.Set("resulttype", "urlencoded")
 
-  uri := smsHost + "?" + v.Encode()
+  uri := conf.SmsHost + "?" + v.Encode()
 
   resp, err := http.Get(uri)
   if err != nil {

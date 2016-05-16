@@ -12,7 +12,7 @@ var translations = map[string]map[string]string{}
 var transHelpers = map[string]template.FuncMap{}
 
 func loadTranslations() {
-  for lang, _ := range locales {
+  for lang, _ := range conf.Locales {
     translations[lang] = make(map[string]string)
   }
 
@@ -34,7 +34,7 @@ func loadTranslations() {
 }
 
 func makeTransHelpers() {
-  for lang, _ := range locales {
+  for lang, _ := range conf.Locales {
     trans := translations[lang]
     helper := func(key string, args ...interface{}) string {
       if val, ok := trans[key]; ok { key = val }
@@ -57,4 +57,8 @@ func T(lang, key string, args ...interface{}) string {
 
 func TC(c *gin.Context, key string, args ...interface{}) string {
   return T(getLang(c), key, args...)
+}
+
+func localeDate(lang string) string {
+  return conf.Locales[lang].Date
 }

@@ -1,0 +1,44 @@
+
+ServerName = "My App"
+ServerHost = "my-app.io"
+ServerRoot = "http://my-app.io"
+ServerPort = ":8001"
+AdminEmail = "admin@my-app.io" 
+
+CookieHost = ""
+CookieAuth = "0000000000000000000000000000" # 32 bytes, random
+CookieEncr = "0000000000000000000000000000" # 32 bytes, random
+CookieLife = "1h"  # duration
+
+EmailsRoot = "https://api.mailgun.net/v3/my-app.io/messages"
+EmailsUser = "api"
+EmailsPass = ""
+EmailsFrom = "info@my-app.io"
+
+SmsHost    = "http://sms.coolsmsc.dk:8080/sendsms.php"
+SmsUser    = ""
+SmsPass    = ""
+SmsFrom    = "My App"
+
+CancelCheck = "0 5 * * * *"
+CancelAhead = "5h"  # duration
+CancelRange = "1h"  # duration; ex: 5+1 meaning in 5-6 hours
+AutoConfirm = true
+GracePeriod = "2h"  # duration; only when not autoConfirm
+SmsInPeriod = 24
+
+SiteSecret  = "0000000000000000000000000000" # 32 bytes
+SessionKey  = "session"
+BcryptCost  = 10
+MinPassLen  = 6
+ExpireLink  = "2h" # duration
+
+DefaultPage = "/calendar/week" # not "/"
+DefaultLang = "en"             # one of the locales
+DefaultDate = "2016-01-01"     # service start date, for "Show all"
+
+# for locale dates, use Golang time formats specification
+[locales.en]
+date = "2006-01-02"
+[locales.da]
+date = "02/01 2006"

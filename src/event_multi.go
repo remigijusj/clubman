@@ -202,8 +202,8 @@ func parseEventsForm(form *TeamEventsForm, create bool, lang string) (*TeamEvent
   var data TeamEventsData
 
   var err1, err2 error
-  data.DateFrom, err1 = time.Parse(locales[lang].Date, form.DateFrom)
-  data.DateTill, err2 = time.Parse(locales[lang].Date, form.DateTill)
+  data.DateFrom, err1 = time.Parse(localeDate(lang), form.DateFrom)
+  data.DateTill, err2 = time.Parse(localeDate(lang), form.DateTill)
   if err1 != nil || err2 != nil || data.DateTill.Before(data.DateFrom) {
     return nil, errors.New("Dates must be valid")
   }

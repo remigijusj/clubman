@@ -7,11 +7,11 @@ import (
 
 // NOTE: delayed
 func sendResetLinkEmail(email, lang, expire, token string) {
-  subject := T(lang, "Password reset for %s", serverHost)
+  subject := T(lang, "Password reset for %s", conf.ServerHost)
 
   obj := map[string]string{
-    "host": serverHost,
-    "url":  fmt.Sprintf("%s/reset?email=%s&expire=%s&token=%s", serverRoot, url.QueryEscape(email), expire, token),
+    "host": conf.ServerHost,
+    "url":  fmt.Sprintf("%s/reset?email=%s&expire=%s&token=%s", conf.ServerRoot, url.QueryEscape(email), expire, token),
   }
   message := compileMessage("password_reset_email", lang, obj)
 
@@ -29,12 +29,12 @@ func notifyEventToConfirm(event *EventInfo, user *UserContact) {
 
 func sendEventConfirmLinkEmail(email, lang string, event *EventInfo) {
   subject := T(lang, "Confirm subscription for %s", event.Name)
-  subject = fmt.Sprintf("[%s] %s", serverName, subject)
+  subject = fmt.Sprintf("[%s] %s", conf.ServerName, subject)
 
   obj := map[string]interface{}{
     "lang": lang,
     "event": event,
-    "url":  fmt.Sprintf("%s/assignments/confirm/%d", serverRoot, event.Id),
+    "url":  fmt.Sprintf("%s/assignments/confirm/%d", conf.ServerRoot, event.Id),
   }
   message := compileMessage("event_confirm_email", lang, obj)
 
@@ -45,7 +45,7 @@ func sendEventConfirmLinkSMS(mobile, lang string, event *EventInfo) {
   obj := map[string]interface{}{
     "lang": lang,
     "event": event,
-    "host": serverHost,
+    "host": conf.ServerHost,
   }
   message := compileMessage("event_confirm_sms", lang, obj)
 
@@ -63,12 +63,12 @@ func notifyEventConfirmed(event *EventInfo, user *UserContact) {
 
 func sendEventConfirmedEmail(email, lang string, event *EventInfo) {
   subject := T(lang, "Subscription for %s confirmed", event.Name)
-  subject = fmt.Sprintf("[%s] %s", serverName, subject)
+  subject = fmt.Sprintf("[%s] %s", conf.ServerName, subject)
 
   obj := map[string]interface{}{
     "lang": lang,
     "event": event,
-    "url":  fmt.Sprintf("%s/assignments/delete/%d", serverRoot, event.Id),
+    "url":  fmt.Sprintf("%s/assignments/delete/%d", conf.ServerRoot, event.Id),
   }
   message := compileMessage("event_confirmed_email", lang, obj)
 
@@ -79,7 +79,7 @@ func sendEventConfirmedSMS(mobile, lang string, event *EventInfo) {
   obj := map[string]interface{}{
     "lang": lang,
     "event": event,
-    "host": serverHost,
+    "host": conf.ServerHost,
   }
   message := compileMessage("event_confirmed_sms", lang, obj)
 
@@ -92,13 +92,13 @@ func notifyEventWaitingUp(event *EventInfo, user *UserContact, num int) {
 
 func sendEventWaitingUp(email, lang string, event *EventInfo, num int) {
   subject := T(lang, "Up in the waiting list for %s", event.Name)
-  subject = fmt.Sprintf("[%s] %s", serverName, subject)
+  subject = fmt.Sprintf("[%s] %s", conf.ServerName, subject)
 
   obj := map[string]interface{}{
     "lang": lang,
     "event": event,
     "num":  num,
-    "url":  fmt.Sprintf("%s/assignments/delete/%d", serverRoot, event.Id),
+    "url":  fmt.Sprintf("%s/assignments/delete/%d", conf.ServerRoot, event.Id),
   }
   message := compileMessage("event_waiting_up_email", lang, obj)
 
@@ -116,7 +116,7 @@ func notifyEventCancel(event *EventInfo, user *UserContact) {
 
 func sendEventCancelEmail(email, lang string, event *EventInfo) {
   subject := T(lang, "%s is canceled", event.Name)
-  subject = fmt.Sprintf("[%s] %s", serverName, subject)
+  subject = fmt.Sprintf("[%s] %s", conf.ServerName, subject)
 
   obj := map[string]interface{}{
     "lang": lang,
@@ -148,7 +148,7 @@ func notifyEventUpdate(event *EventInfo, user *UserContact) {
 
 func sendEventUpdateEmail(email, lang string, event *EventInfo) {
   subject := T(lang, "%s is updated", event.Name)
-  subject = fmt.Sprintf("[%s] %s", serverName, subject)
+  subject = fmt.Sprintf("[%s] %s", conf.ServerName, subject)
 
   obj := map[string]interface{}{
     "lang": lang,
@@ -178,7 +178,7 @@ func notifyEventMultiUpdate(data *TeamEventsData, user *UserContact, team *TeamF
 
 func sendEventMultiUpdateEmail(email, lang string, data *TeamEventsData, team *TeamForm) {
   subject := T(lang, "Multiple %s events updated", team.Name)
-  subject = fmt.Sprintf("[%s] %s", serverName, subject)
+  subject = fmt.Sprintf("[%s] %s", conf.ServerName, subject)
 
   obj := map[string]interface{}{
     "lang": lang,
@@ -210,7 +210,7 @@ func sendEventMultiUpdateSMS(mobile, lang string, data *TeamEventsData, team *Te
 
 func sendEventMultiCancelEmail(email, lang string, data *TeamEventsData, team *TeamForm) {
   subject := T(lang, "Multiple %s events canceled", team.Name)
-  subject = fmt.Sprintf("[%s] %s", serverName, subject)
+  subject = fmt.Sprintf("[%s] %s", conf.ServerName, subject)
 
   obj := map[string]interface{}{
     "lang": lang,
@@ -235,7 +235,7 @@ func sendEventMultiCancelSMS(mobile, lang string, data *TeamEventsData, team *Te
 
 func sendAssignmentCreatedEmail(email, lang string, event *EventInfo, confirmed bool) {
   subject := T(lang, "Subscribed for %s", event.Name)
-  subject = fmt.Sprintf("[%s] %s", serverName, subject)
+  subject = fmt.Sprintf("[%s] %s", conf.ServerName, subject)
 
   obj := map[string]interface{}{
     "lang": lang,
@@ -249,7 +249,7 @@ func sendAssignmentCreatedEmail(email, lang string, event *EventInfo, confirmed 
 
 func sendAssignmentDeletedEmail(email, lang string, event *EventInfo) {
   subject := T(lang, "Canceled from %s", event.Name)
-  subject = fmt.Sprintf("[%s] %s", serverName, subject)
+  subject = fmt.Sprintf("[%s] %s", conf.ServerName, subject)
 
   obj := map[string]interface{}{
     "lang": lang,

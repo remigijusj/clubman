@@ -61,7 +61,7 @@ func loginUserByForm(form *LoginForm) (*AuthInfo, error) {
 func generatePasswordReset(form *ForgotForm, lang string) bool {
   password, _, err := fetchUserPassword(form.Email)
   if err != nil { return false }
-  exp_unix := time.Now().Add(expireLink).Unix()
+  exp_unix := time.Now().Add(conf.ExpireLink.Duration).Unix()
   expire := strconv.FormatInt(exp_unix, 10)
   token := computeHMAC(form.Email, expire, password)
   go sendResetLinkEmail(form.Email, lang, expire, token)
@@ -91,8 +91,8 @@ func fetchUserPassword(email string) (string, *AuthInfo, error) {
 }
 
 func updatePassword(email, password string) error {
-  if len(password) < minPassLen {
-    return errorWithA("Password must have at least %d characters", minPassLen)
+  if len(password) < conf.MinPassLen {
+    return errorWithA("Password must have at least %d characters", conf.MinPassLen)
   }
   _, err := query["password_update"].Exec(hashPassword(password), email)
   if err != nil {
@@ -267,8 +267,8 @@ func validateUser(name, email, mobile, password string, allowEmpty bool, languag
   if !regex["mobile_validate"].MatchString(strings.Replace(mobile, " ", "", -1)) {
     return errors.New("Phone number must have format +45 12345678")
   }
-  if len(password) < minPassLen && !(allowEmpty && password == "") {
-    return errorWithA("Password must have at least %d characters", minPassLen)
+  if len(password) < conf.MinPassLen && !(allowEmpty && password == "") {
+    return errorWithA("Password must have at least %d characters", conf.MinPassLen)
   }
   if _, ok := translations[language]; !ok {
     return errors.New("Language is invalid")

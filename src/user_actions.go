@@ -18,7 +18,7 @@ func handleLogin(c *gin.Context) {
     showError(c, err)
   } else {
     setSessionAuthInfo(c, auth)
-    gotoSuccess(c, defaultPage, "")
+    gotoSuccess(c, conf.DefaultPage, "")
   }
 }
 
@@ -65,7 +65,7 @@ func handleReset(c *gin.Context) {
   } else {
     setSessionAuthInfo(c, auth)
     getSavedPath(c) // to avoid early redirect
-    gotoSuccess(c, defaultPage, "")
+    gotoSuccess(c, conf.DefaultPage, "")
   }
 }
 
@@ -79,7 +79,7 @@ func getProfile(c *gin.Context) {
     err = errors.New("missing self")
   }
   if err != nil {
-    gotoWarning(c, defaultPage, panicError)
+    gotoWarning(c, conf.DefaultPage, panicError)
     c.Abort()
   } else {
     c.Set("form", form)
@@ -107,7 +107,7 @@ func handleProfile(c *gin.Context) {
   if err != nil {
     showError(c, err, &form)
   } else {
-    gotoSuccess(c, defaultPage, "User profile has been updated")
+    gotoSuccess(c, conf.DefaultPage, "User profile has been updated")
   }
 }
 

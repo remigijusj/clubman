@@ -129,13 +129,13 @@ func getDateQuery(c *gin.Context, name string) (time.Time, bool) {
 // --- session helpers ---
 
 func setSessionAuthInfo(c *gin.Context, auth *AuthInfo) {
-  session, _ := cookie.Get(c.Request, sessionKey)
+  session, _ := cookie.Get(c.Request, conf.SessionKey)
   defer session.Save(c.Request, c.Writer)
   session.Values["auth"] = auth
 }
 
 func getSessionAuthInfo(c *gin.Context) *AuthInfo {
-  session, _ := cookie.Get(c.Request, sessionKey)
+  session, _ := cookie.Get(c.Request, conf.SessionKey)
   if debugMode() {
     log.Printf("=> SESSION\n   %#v, %#v\n", session.Values, session.Options)
   }
@@ -146,13 +146,13 @@ func getSessionAuthInfo(c *gin.Context) *AuthInfo {
 }
 
 func setSessionAlert(c *gin.Context, alert *Alert) {
-  session, _ := cookie.Get(c.Request, sessionKey)
+  session, _ := cookie.Get(c.Request, conf.SessionKey)
   defer session.Save(c.Request, c.Writer)
   session.AddFlash(alert)
 }
 
 func getSessionAlert(c *gin.Context) *Alert {
-  session, _ := cookie.Get(c.Request, sessionKey)
+  session, _ := cookie.Get(c.Request, conf.SessionKey)
   defer session.Save(c.Request, c.Writer)
   if flashes := session.Flashes(); len(flashes) > 0 {
     if flash, ok := flashes[0].(*Alert); ok {
@@ -189,7 +189,7 @@ func getSavedPath(c *gin.Context) interface{} {
 }
 
 func deleteSession(c *gin.Context) {
-  session, _ := cookie.Get(c.Request, sessionKey)
+  session, _ := cookie.Get(c.Request, conf.SessionKey)
   defer session.Save(c.Request, c.Writer)
   session.Options.MaxAge = -1
 }
@@ -228,7 +228,7 @@ func (self AuthInfo) IsAdmin() bool {
 // --- password-related ---
 
 func hashPassword(password string) string {
-  hash, err := bcrypt.GenerateFromPassword([]byte(password), bcryptCost)
+  hash, err := bcrypt.GenerateFromPassword([]byte(password), conf.BcryptCost)
   if err != nil {
     log.Printf("[APP] BCRYPT error: %s\n", err)
   }
@@ -244,7 +244,7 @@ func comparePassword(stored, given string) bool {
 }
 
 func computeHMAC(parts ...string) string {
-  key := []byte(siteSecret)
+  key := []byte(conf.SiteSecret)
   h := hmac.New(sha256.New, key)
   for _, part := range parts {
     h.Write([]byte(part))
@@ -254,7 +254,7 @@ func computeHMAC(parts ...string) string {
 }
 
 func verifyHMAC(token string, parts ...string) bool {
-  key := []byte(siteSecret)
+  key := []byte(conf.SiteSecret)
   h := hmac.New(sha256.New, key)
   for _, part := range parts {
     h.Write([]byte(part))

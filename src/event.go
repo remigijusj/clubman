@@ -204,7 +204,7 @@ func clearEvents(team_id int) error {
 }
 
 func parseEventForm(form *EventForm, lang string) error {
-  date, err := time.Parse(locales[lang].Date, form.Date)
+  date, err := time.Parse(localeDate(lang), form.Date)
   if err != nil {
     return errors.New("Date must be valid")
   }
@@ -231,8 +231,8 @@ func minutesValid(minutes int) bool {
 // NOTE: delayed, cron, events of tomorrow
 func autoCancelEvents() {
   when := time.Now() // WARNING: need localtime, really
-  from := when.Add(cancelAhead)
-  till := from.Add(1 * time.Hour)
+  from := when.Add(conf.CancelAhead.Duration)
+  till := from.Add(conf.CancelRange.Duration)
 
   list := listEventsUnderLimit(from, till)
   log.Printf("[APP] AUTOCANCEL-EVENT-INFO: %s, %s, %v\n", from.Format(fullFormat), till.Format(fullFormat), list)

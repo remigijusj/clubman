@@ -1,61 +1,83 @@
 package main
 
 import (
+  "io/ioutil"
+  "log"
   "time"
+
+  "github.com/BurntSushi/toml"
 )
+
+type duration struct {
+  time.Duration
+}
 
 type Locale struct {
   Date string
 }
 
-const (
-  serverName = "Nykredit Fitness"
-  serverHost = "nk-fitness.dk"
-  serverRoot = "http://nk-fitness.dk"
-  serverPort = ":8001"
-  adminEmail = "fitness.glaskuben@nykredit.dk" 
+type Conf struct {
+  ServerName  string
+  ServerHost  string
+  ServerRoot  string
+  ServerPort  string // ":8080"
+  AdminEmail  string
 
-  cookieHost = ""
-  cookieAuth = "nk-fitness$$" // 32 bytes
-  cookieEncr = "nk-fitness$$" // 32 bytes
-  cookieLife = 1 * time.Hour
+  CookieHost  string
+  CookieAuth  string
+  CookieEncr  string
+  CookieLife  duration
 
-  emailsRoot = "https://api.mailgun.net/v3/nk-fitness.dk/messages"
-  emailsUser = "api"
-  emailsPass = ""
-  emailsFrom = "info@nk-fitness.dk"
+  EmailsRoot  string
+  EmailsUser  string
+  EmailsPass  string
+  EmailsFrom  string
 
-  smsHost    = "http://sms.coolsmsc.dk:8080/sendsms.php"
-  smsUser    = "sms"
-  smsPass    = ""
-  smsFrom    = "NK Fitness"
+  SmsHost     string
+  SmsUser     string
+  SmsPass     string
+  SmsFrom     string
 
-  cancelCheck = "0 5 * * * *"
-  cancelAhead = 5 * time.Hour // in 5-6 hours
-  autoConfirm = true
-  gracePeriod = 2 * time.Hour // if not autoConfirm
-  smsInPeriod = 24 * time.Hour
+  CancelCheck string
+  CancelAhead duration
+  CancelRange duration
+  AutoConfirm bool
+  GracePeriod duration
+  SmsInPeriod duration
 
-  siteSecret  = "nk-fitness$$" // 32 bytes
-  sessionKey  = "session"
-  bcryptCost  = 10
-  minPassLen  = 6
-  expireLink  = 2 * time.Hour
-  defaultLang = "da"
-  defaultPage = "/calendar/week" // not "/"
-  defaultDate = "2015-01-01"
-)
+  SiteSecret  string
+  SessionKey  string
+  BcryptCost  int
+  MinPassLen  int
+  ExpireLink  duration
 
-var locales = map[string]Locale{
-  "da": Locale{Date: "02/01 2006"},
-  "en": Locale{Date: "2006-01-02"},
+  DefaultPage string
+  DefaultLang string
+  DefaultDate string
+
+  Locales map[string]Locale
 }
 
-const (
-  panicError  = "Critical error happened, please contact website admin"
-  permitError = "You are not authorized to view this page"
+func (d *duration) UnmarshalText(text []byte) error {
+  var err error
+  d.Duration, err = time.ParseDuration(string(text))
+  return err
+}
 
-  timeFormat  = "15:04"
-  dateFormat  = "2006-01-02" // db
-  fullFormat  = "2006-01-02 15:04:05" // db
-)
+func prepareConfig() {
+  var err error
+  data, err := ioutil.ReadFile("config.toml")
+  if err != nil {
+    panic(err)
+  }
+  err = toml.Unmarshal(data, &conf)
+  if err != nil {
+    panic(err)
+  }
+  validateConfig()
+}
+
+func validateConfig() {
+  // TODO: implement
+  log.Printf("CONFIG: %#v\n\n", *conf)
+}

@@ -14,6 +14,7 @@ import (
   "github.com/robfig/cron"
 )
 
+var conf *Conf
 var db *sql.DB
 var query map[string]*sql.Stmt
 var regex map[string]*regexp.Regexp
@@ -32,6 +33,7 @@ func init() {
 
 func main() {
   setGinMode()
+  prepareConfig()
 
   prepareQueries()
   prepareRegexes()
@@ -46,7 +48,7 @@ func main() {
   makeTransHelpers()
 
   defineRoutes(r)
-  r.Run(serverPort)
+  r.Run(conf.ServerPort)
 }
 
 func setGinMode() {
@@ -75,11 +77,11 @@ func prepareRegexes() {
 }
 
 func prepareCookies() {
-  cookie = sessions.NewCookieStore([]byte(cookieAuth), []byte(cookieEncr))
+  cookie = sessions.NewCookieStore([]byte(conf.CookieAuth), []byte(conf.CookieEncr))
   cookie.Options = &sessions.Options{
-    Domain:   cookieHost,
+    Domain:   conf.CookieHost,
     Path:     "/",
-    MaxAge:   int(cookieLife.Seconds()),
+    MaxAge:   int(conf.CookieLife.Seconds()),
     HttpOnly: false,
     Secure:   false,
   }
@@ -87,7 +89,7 @@ func prepareCookies() {
 
 func startCronService() {
   clock = cron.New()
-  clock.AddFunc(cancelCheck, autoCancelEvents)
+  clock.AddFunc(conf.CancelCheck, autoCancelEvents)
   clock.Start()
 }
 
@@ -134,13 +136,13 @@ func adminRequired() gin.HandlerFunc {
     if c.Request.URL.Path != "/" {
       setSessionAlert(c, &Alert{"warning", TC(c, permitError)})
     }
-    c.Redirect(302, defaultPage)
+    c.Redirect(302, conf.DefaultPage)
     c.Abort()
   }
 }
 
 func redirectToDefault(c *gin.Context) {
-  c.Redirect(302, defaultPage)
+  c.Redirect(302, conf.DefaultPage)
 }
 
 func getLang(c *gin.Context) string {
@@ -150,7 +152,7 @@ func getLang(c *gin.Context) string {
   if auth := currentUser(c); auth != nil {
     return auth.Language
   }
-  return defaultLang
+  return conf.DefaultLang
 }
 
 func multiQuery(name string, args ...interface{}) (*sql.Rows, error) {

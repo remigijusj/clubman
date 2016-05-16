@@ -33,12 +33,12 @@ var helpers = template.FuncMap{
   "eventClass":    eventClass,
   "userName":      userName,
   "dict":          dict,
-  "serverName":  func() string { return serverName },
-  "adminEmail":  func() string { return adminEmail },
-  "defaultDate": func() string { return defaultDate },
+  "serverName":  func() string { return conf.ServerName },
+  "adminEmail":  func() string { return conf.AdminEmail },
+  "defaultDate": func() string { return conf.DefaultDate },
   "printTime":   func(t time.Time) string { return t.Format(timeFormat) },
   "printDate":   func(t time.Time) string { return t.Format(dateFormat) },
-  "localDate":   func(t time.Time, lang string) string { return t.Format(locales[lang].Date) },
+  "localDate":   func(t time.Time, lang string) string { return t.Format(localeDate(lang)) },
   "truncate":    func(i int, s string) string { return s[:i] },
   "taketill":    func(delim, s string) string { i := strings.Index(s, delim); if i < 0 { i = len(s) }; return s[:i] },
   "T":           func(key string) string { return key },
@@ -87,7 +87,7 @@ func (r PageRender) Render(w http.ResponseWriter) error {
 }
 
 func setTranslations(t *template.Template, data interface{}) {
-  trans := transHelpers[defaultLang]
+  trans := transHelpers[conf.DefaultLang]
   if obj, ok := data.(gin.H); ok {
     if lang, ok := obj["lang"].(string); ok {
       trans = transHelpers[lang]
