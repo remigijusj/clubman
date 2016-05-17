@@ -119,24 +119,25 @@ func updateEvent(event_id int, form *EventForm, lang string) error {
   err := parseEventForm(form, lang)
   if err != nil { return err }
 
-  clear := form.Status == eventStatusCanceled
-  return performEventAction(event_id, updateEventRecordTx, clear, form)
+  return performEventAction(event_id, updateEventRecordTx, form.Status, form)
 }
 
 func cancelEvent(event_id int) error {
-  return performEventAction(event_id, cancelEventRecordTx, true, nil)
+  return performEventAction(event_id, cancelEventRecordTx, eventStatusCanceled, nil)
 }
 
 func deleteEvent(event_id int) error {
-  return performEventAction(event_id, deleteEventRecordTx, true, nil)
+  return performEventAction(event_id, deleteEventRecordTx, eventStatusDeleted, nil)
 }
 
-func performEventAction(event_id int, action (func(*sql.Tx, int, *EventForm) error), clear bool, form *EventForm) (err error) {
+func performEventAction(event_id int, action (func(*sql.Tx, int, *EventForm) error), status int, form *EventForm) (err error) {
   defer func() {
     if err != nil {
       log.Printf("[APP] EVENT-ACTION error: %s, %d\n", err, event_id)
     }
   }()
+
+  cancel_or_delete := status == eventStatusCanceled || status == eventStatusDeleted
 
   tx, err := db.Begin()
   if err != nil { return }
@@ -144,7 +145,7 @@ func performEventAction(event_id int, action (func(*sql.Tx, int, *EventForm) err
   event, err := fetchEventInfoTx(tx, event_id)
   if err != nil { tx.Rollback(); return }
 
-  users, err := listUsersOfEventTx(tx, event_id, clear)
+  users, err := listUsersOfEventTx(tx, event_id, cancel_or_delete)
   if err != nil { tx.Rollback(); return }
 
   err = action(tx, event_id, form)
@@ -154,11 +155,11 @@ func performEventAction(event_id int, action (func(*sql.Tx, int, *EventForm) err
   if err != nil { return }
 
   // after-callbacks
-  if clear {
+  if status == eventStatusDeleted {
     clearAssignments(event_id)
   }
   if !event.isPast() {
-    if clear {
+    if cancel_or_delete {
       go event.eachUser(users, notifyEventCancel)
     } else if form != nil { // also: !form.StartAt.Equal(event.StartAt)
       go event.eachUser(users, notifyEventUpdate)

@@ -9,6 +9,7 @@ const (
   userStatusWaiting    = -1
   userStatusInstructor = 1
   userStatusAdmin      = 2
+  eventStatusDeleted     = -3 // just for internal signaling
   eventStatusCanceled    = -2
   eventStatusActive      = 0
   assignmentStatusWaiting   = -2

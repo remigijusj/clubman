@@ -95,7 +95,7 @@
     </div>
     {{end}}
   </div>
-  {{if and (eq .form.Status 0) (gt (len .list) 0)}}
+  {{if gt (len .list) 0}}
     {{template "events_assignments_list.tmpl" . }}
   {{end}}
 {{end}}
