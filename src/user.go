@@ -230,12 +230,31 @@ func updateUser(user_id int, form *UserForm) error {
 }
 
 func deleteUser(user_id int) error {
-  _, err := query["user_delete"].Exec(user_id)
+  cnt, err := countUserTeams(user_id)
+  if err != nil || cnt > 0 {
+    log.Printf("[APP] USER-DELETE-PRECONDITION error: %s, %d, %d\n", err, user_id, cnt)
+    return errors.New("User could not be deleted")
+  }
+  _, err = query["user_delete"].Exec(user_id)
   if err != nil {
     log.Printf("[APP] USER-DELETE error: %s, %d\n", err, user_id)
     return errors.New("User could not be deleted")
   }
+  err = pruneAssignments(user_id)
+  if err != nil {
+    log.Printf("[APP] USER-DELETE-ASSIGNMENTS error: %s, %d\n", err, user_id)
+    return errors.New("User assignments could not be deleted")
+  }
   return nil
+}
+
+func countUserTeams(user_id int) (int, error) {
+  var count int
+  err := query["user_teams_count"].QueryRow(user_id).Scan(&count)
+  if err != nil {
+    log.Printf("[APP] USER-TEAMS-COUNT error: %s, %d\n", err, user_id)
+  }
+  return count, err
 }
 
 // NOTE: either hash given, or take existing (if blank)

@@ -102,7 +102,11 @@ func deleteTeam(team_id int) error {
     log.Printf("[APP] TEAM-DELETE error: %s, %d\n", err, team_id)
     return errors.New("Team could not be deleted")
   }
-  clearEvents(team_id)
+  err = clearEvents(team_id)
+  if err != nil {
+    log.Printf("[APP] TEAM-DELETE-ASSIGNMENTS error: %s, %d\n", err, team_id)
+    return errors.New("Team assignments could not be deleted")
+  }
   return nil
 }
 

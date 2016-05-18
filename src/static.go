@@ -36,6 +36,7 @@ var queries = map[string]string{
   "users_of_event":     "SELECT DISTINCT email, mobile, language FROM assignments LEFT JOIN users ON user_id=users.id WHERE event_id IN (?)",
   "instructor_of_event":"SELECT DISTINCT email, mobile, language FROM events LEFT JOIN teams ON team_id=teams.id LEFT JOIN users ON instructor_id=users.id WHERE events.id IN (?)",
   "instructor_of_team": "SELECT email, mobile, language FROM teams LEFT JOIN users ON instructor_id=users.id WHERE teams.id=?",
+  "user_teams_count":   "SELECT count(id) FROM teams WHERE instructor_id=?",
 
   "teams_all":          "SELECT teams.id, teams.name, users.name, users_min, users_max FROM teams LEFT JOIN users ON teams.instructor_id=users.id ORDER BY teams.name",
   "team_names_all":     "SELECT id, name FROM teams ORDER BY name",
@@ -68,6 +69,7 @@ var queries = map[string]string{
   "assignment_update":  "UPDATE assignments SET status=? WHERE event_id=? AND user_id IN (?)",
   "assignment_delete":  "DELETE FROM assignments WHERE event_id=? AND user_id=?",
   "assignments_clear":  "DELETE FROM assignments WHERE event_id IN (?)",
+  "assignments_prune":  "DELETE FROM assignments WHERE user_id=?",
 
   "logs_all":           "SELECT id, created_at FROM logs WHERE created_at >= ?",
 }

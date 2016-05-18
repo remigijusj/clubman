@@ -198,6 +198,14 @@ func clearAssignments(event_ids ...int) error {
   return err
 }
 
+func pruneAssignments(user_id int) error {
+  _, err := query["assignments_prune"].Exec(user_id)
+  if err != nil {
+    log.Printf("[APP] ASSIGNMENTS-PRUNE error: %s, %d\n", err, user_id)
+  }
+  return err
+}
+
 func notifyAssignmentAction(event_id, user_id, status int) {
   tx, err := db.Begin()
   if err != nil { return }
