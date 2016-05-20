@@ -1,0 +1,31 @@
+  <div class="row">
+    <div class="columns">
+      <h4>{{"Translations"|T}}</h4>
+
+      {{$lang := .lang}}
+
+      <form method="POST">
+        <table class="list">
+          <thead>
+            <tr>
+              <td>{{"Text"|T}}</td>
+              <td>{{"Translation"|T}}</td>
+            </tr>
+          </thead>
+          <tbody>
+            {{range .list}}
+            <tr>
+              <td>
+                {{.Key}}
+              </td>
+              <td>
+                {{.Value}}
+              </td>
+            </tr>
+            {{end}}
+          </tbody>
+        </table>
+      </form>
+
+    </div>
+  </div>

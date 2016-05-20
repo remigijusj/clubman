@@ -24,6 +24,7 @@
           <ul class="dropdown">
             <li><a href="/users">{{"Users list"|T}}</a></li>
             <li><a href="/logs">{{"Activity logs"|T}}</a></li>
+            <li><a href="/translations">{{"Translations"|T}}</a></li>
           </ul>
         </li>
         {{end}}
@@ -123,6 +124,8 @@
 
         {{else if eq .page "logs"}}
           {{template "logs.tmpl" . }}
+        {{else if eq .page "translations"}}
+          {{template "translations.tmpl" . }}
 
         {{else if eq .page "calendar_week"}}
           {{template "calendar_week.tmpl" . }}
