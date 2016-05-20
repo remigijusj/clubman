@@ -86,8 +86,9 @@ func defineRoutesAdmin(a *gin.RouterGroup) {
 
     ad.POST("/assignments/confirm/:event_id", handleAssignmentConfirm)
 
-    ad.GET("/logs",               getLogList, displayPage)
-    ad.GET("/translations",       getTranslationList, displayPage)
+    ad.GET("/logs",                           getLogList, displayPage)
+    ad.GET("/translations",                   getTranslationList, displayPage)
+    ad.GET("/translations/update/:id",        getTranslationForm, displayPage)
 
     if debugMode() {
       ad.GET("/events/auto_cancel", func(c *gin.Context) { autoCancelEvents() }, redirectCalendar)

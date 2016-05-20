@@ -17,6 +17,8 @@ var regexes = map[string]string{
 
 var queries = map[string]string{
   "translations":       "SELECT lang, key, value FROM translations ORDER BY lang, key",
+  "translations_lang":  "SELECT rowid, key, value FROM translations WHERE lang=? ORDER BY value",
+  "translation_select": "SELECT lang, key, value FROM translations WHERE rowid=?",
 
   "credentials_get":    "SELECT password, id, name, status, language FROM users WHERE email=? AND status>=0",
   "password_select":    "SELECT password FROM users WHERE id=?",

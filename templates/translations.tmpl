@@ -2,24 +2,27 @@
     <div class="columns">
       <h4>{{"Translations"|T}}</h4>
 
-      {{$lang := .lang}}
+      <p>
+        <a href="?language=da">Dansk</a> |
+        <a href="?language=en">English</a>
+      </p>
 
       <form method="POST">
         <table class="list">
           <thead>
             <tr>
-              <td>{{"Text"|T}}</td>
               <td>{{"Translation"|T}}</td>
+              <td>{{"Actions"|T}}</td>
             </tr>
           </thead>
           <tbody>
             {{range .list}}
             <tr>
               <td>
-                {{.Key}}
+                {{.Value}}
               </td>
               <td>
-                {{.Value}}
+                <a href="/translations/update/{{.Rowid}}">{{"Edit"|T}}</a>
               </td>
             </tr>
             {{end}}

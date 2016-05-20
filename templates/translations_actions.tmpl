@@ -1,0 +1,19 @@
+{{define "translations_update.tmpl"}}
+  <div class="row">
+    <div class="large-6 medium-8 columns">
+      <h4>{{"Update translation"|T}}</h4>
+
+      <div class="panel">
+        <form action="/translations/update/{{.rowid}}" method="POST">
+          {{template "translations_form.tmpl" . }}
+          <div class="row end">
+            <div class="columns">
+              <input type="submit" class="button tiny radius" value="{{"Update"|T}}" />
+              <a href="/translations" class="info button tiny radius right">{{"Back"|T}}</a>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+{{end}}

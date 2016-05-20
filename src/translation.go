@@ -2,18 +2,29 @@ package main
 
 import (
   "database/sql"
+  "errors"
   "log"
   "net/url"
 )
 
 type TranslationRecord struct {
-  Lang  string
+  Rowid string
   Key   string
   Value string
 }
 
+type TranslationForm struct {
+  Lang         string `form:"lang"`
+  Key          string `form:"key"`
+  Value        string `form:"value" binding:"required"`
+}
+
 func listTranslationsByQuery(q url.Values) []TranslationRecord {
-  return listTranslations(query["translations"].Query())
+  language := q.Get("language")
+  if language == "" {
+    language = conf.DefaultLang
+  }
+  return listTranslations(query["translations_lang"].Query(language))
 }
 
 func listTranslations(rows *sql.Rows, err error) (list []TranslationRecord) {
@@ -30,11 +41,21 @@ func listTranslations(rows *sql.Rows, err error) (list []TranslationRecord) {
 
   for rows.Next() {
     var item TranslationRecord
-    err = rows.Scan(&item.Lang, &item.Key, &item.Value)
+    err = rows.Scan(&item.Rowid, &item.Key, &item.Value)
     if err != nil { return }
     list = append(list, item)
   }
   err = rows.Err()
 
   return
+}
+
+func fetchTranslation(rowid int) (TranslationForm, error) {
+  var form TranslationForm
+  err := query["translation_select"].QueryRow(rowid).Scan(&form.Lang, &form.Key, &form.Value)
+  if err != nil {
+    log.Printf("[APP] TRANSLATION-SELECT error: %s, %#v\n", err, form)
+    err = errors.New("Translation was not found")
+  }
+  return form, err
 }

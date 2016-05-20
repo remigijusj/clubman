@@ -126,6 +126,8 @@
           {{template "logs.tmpl" . }}
         {{else if eq .page "translations"}}
           {{template "translations.tmpl" . }}
+        {{else if eq .page "translations_update"}}
+          {{template "translations_update.tmpl" . }}
 
         {{else if eq .page "calendar_week"}}
           {{template "calendar_week.tmpl" . }}
