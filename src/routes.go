@@ -89,6 +89,7 @@ func defineRoutesAdmin(a *gin.RouterGroup) {
     ad.GET("/logs",                           getLogList, displayPage)
     ad.GET("/translations",                   getTranslationList, displayPage)
     ad.GET("/translations/update/:id",        getTranslationForm, displayPage)
+    ad.POST("/translations/update/:id",       handleTranslationUpdate)
 
     if debugMode() {
       ad.GET("/events/auto_cancel", func(c *gin.Context) { autoCancelEvents() }, redirectCalendar)

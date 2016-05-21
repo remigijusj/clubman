@@ -1,6 +1,8 @@
 package main
 
 import (
+  "errors"
+
   "github.com/gin-gonic/gin"
 )
 
@@ -22,5 +24,22 @@ func getTranslationForm(c *gin.Context) {
   } else {
     c.Set("rowid", rowid)
     c.Set("form",  form)
+  }
+}
+
+func handleTranslationUpdate(c *gin.Context) {
+  var form TranslationForm
+  if ok := bindForm(c, &form); !ok {
+    showError(c, errors.New("Please provide all details"), &form)
+    return
+  }
+  rowid, err := getIntParam(c, "id")
+  if err == nil {
+    err = updateTranslation(rowid, &form)
+  }
+  if err != nil {
+    showError(c, err, &form)
+  } else {
+    gotoSuccess(c, "/translations", "Translation has been updated")
   }
 }

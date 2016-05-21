@@ -15,7 +15,7 @@ type TranslationRecord struct {
 
 type TranslationForm struct {
   Lang         string `form:"lang"`
-  Key          string `form:"key"`
+  Key          string `form:"key" binding:"required"`
   Value        string `form:"value" binding:"required"`
 }
 
@@ -58,4 +58,41 @@ func fetchTranslation(rowid int) (TranslationForm, error) {
     err = errors.New("Translation was not found")
   }
   return form, err
+}
+
+func updateTranslation(rowid int, form *TranslationForm) error {
+  err := checkTranslation(rowid, form)
+  if err != nil {
+    return err
+  }
+  _, err = query["translation_update"].Exec(form.Value, rowid)
+  if err != nil {
+    log.Printf("[APP] TRANSLATION-UPDATE error: %s, %d\n", err, rowid)
+    return errors.New("Translation could not be updated")
+  }
+  err = replaceTranslation(form.Lang, form.Key, form.Value)
+  if err != nil {
+    log.Printf("[APP] TRANSLATION-REPLACE error: %s, %s, %s\n", err, form.Lang, form.Key)
+    return errors.New("Critical error happened, please contact website admin")
+  }
+  return nil
+}
+
+func checkTranslation(rowid int, form *TranslationForm) error {
+  saved, err := fetchTranslation(rowid)
+  if err != nil {
+    return err
+  }
+  if form.Lang != saved.Lang || form.Key != saved.Key {
+    return errors.New("Version mismatch with saved record")
+  }
+  if !equalPlaceholders(form.Key, form.Value) {
+    return errors.New("Placeholders must match with English string")
+  }
+  return nil
+}
+
+// TODO: implement
+func equalPlaceholders(one, two string) bool {
+  return true
 }

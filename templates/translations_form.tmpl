@@ -1,12 +1,9 @@
   <div class="row">
     <div class="small-4 columns">
-      <label for="name">{{"English"|T}}</label>
+      <label>{{"English"|T}}</label>
     </div>
     <div class="small-8 columns">
-      {{.form.Key}}
-    </div>
-    <div class="small-12 columns description">
-      {{"The original string"|T}}
+      <textarea id="key" name="key" rows="3" readonly>{{.form.Key}}</textarea>
     </div>
   </div>
   <div class="row">
@@ -14,9 +11,7 @@
       <label for="value">{{"Dansk"|T}}</label>
     </div>
     <div class="small-8 columns">
-      <input id="value" name="value" type="text" value="{{.form.Value}}" />
-    </div>
-    <div class="small-12 columns description">
-      {{"The translation"|T}}
+      <textarea id="value" name="value" rows="3">{{.form.Value}}</textarea>
     </div>
   </div>
+  <input type="hidden" name="lang" value="{{.form.Lang}}" />
