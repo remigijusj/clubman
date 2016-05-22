@@ -5,6 +5,7 @@ import (
   "errors"
   "log"
   "net/url"
+  "strings"
 )
 
 type TranslationRecord struct {
@@ -61,6 +62,7 @@ func fetchTranslation(rowid int) (TranslationForm, error) {
 }
 
 func updateTranslation(rowid int, form *TranslationForm) error {
+  form.Value = strings.Trim(form.Value, " ")
   err := checkTranslation(rowid, form)
   if err != nil {
     return err
@@ -70,11 +72,7 @@ func updateTranslation(rowid int, form *TranslationForm) error {
     log.Printf("[APP] TRANSLATION-UPDATE error: %s, %d\n", err, rowid)
     return errors.New("Translation could not be updated")
   }
-  err = replaceTranslation(form.Lang, form.Key, form.Value)
-  if err != nil {
-    log.Printf("[APP] TRANSLATION-REPLACE error: %s, %s, %s\n", err, form.Lang, form.Key)
-    return errors.New("Critical error happened, please contact website admin")
-  }
+  replaceTranslation(form.Lang, form.Key, form.Value)
   return nil
 }
 
@@ -83,16 +81,28 @@ func checkTranslation(rowid int, form *TranslationForm) error {
   if err != nil {
     return err
   }
+  if form.Value == "" {
+    return errors.New("Translation cannot be empty")
+  }
   if form.Lang != saved.Lang || form.Key != saved.Key {
-    return errors.New("Version mismatch with saved record")
+    return errors.New("Version mismatch with the saved record")
   }
   if !equalPlaceholders(form.Key, form.Value) {
-    return errors.New("Placeholders must match with English string")
+    return errors.New("Placeholders must match with the English string")
   }
   return nil
 }
 
-// TODO: implement
 func equalPlaceholders(one, two string) bool {
+  ones := regex["string_placeholder"].FindAllString(one, -1)
+  twos := regex["string_placeholder"].FindAllString(two, -1)
+  if len(ones) != len(twos) {
+    return false
+  }
+  for i, ph := range ones {
+    if ph != twos[i] {
+      return false
+    }
+  }
   return true
 }

@@ -33,9 +33,12 @@ func loadTranslations() {
   if err := rows.Err(); err != nil { panic(err) }
 }
 
-// TODO: implement
-func replaceTranslation(lang, key, value string) error {
-  return nil
+func replaceTranslation(lang, key, value string) {
+  if trans, ok := translations[lang]; ok {
+    if _, ok := trans[key]; ok {
+      trans[key] = value
+    }
+  }
 }
 
 func makeTransHelpers() {

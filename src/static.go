@@ -10,9 +10,10 @@ const (
 )
 
 var regexes = map[string]string{
-  "name_validate":   `\pL\s+\pL`,
-  "email_validate":  `^\w[-._\w]*\w@\w[-._\w]*\w\.\w{2,3}$`,
-  "mobile_validate": `^\+?\d{8,11}$`,
+  "name_validate":      `\pL\s+\pL`,
+  "email_validate":     `^\w[-._\w]*\w@\w[-._\w]*\w\.\w{2,3}$`,
+  "mobile_validate":    `^\+?\d{8,11}$`,
+  "string_placeholder": `%[sd]`,
 }
 
 var queries = map[string]string{
