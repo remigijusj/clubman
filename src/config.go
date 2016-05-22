@@ -81,6 +81,6 @@ func prepareConfig() {
 func validateConfig() {
   // TODO: implement
   if debugMode() {
-    log.Printf("CONFIG: %#v\n\n", *conf)
+    log.Printf("=> CONFIG: %#v\n\n", *conf)
   }
 }

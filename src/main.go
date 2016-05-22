@@ -22,13 +22,13 @@ var clock *cron.Cron
 var cookie *sessions.CookieStore
 
 func init() {
-  log.SetFlags(0)
   gob.Register(&Alert{})
   gob.Register(&AuthInfo{})
   gob.Register(&UserForm{})
   gob.Register(&TeamForm{})
   gob.Register(&TeamEventsForm{})
   gob.Register(&EventForm{})
+  gob.Register(&TranslationForm{})
 }
 
 func main() {

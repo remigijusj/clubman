@@ -4,7 +4,6 @@ import (
   "bytes"
   "html/template"
   "io/ioutil"
-  "log"
   "net/http"
   "net/url"
   "strings"
@@ -38,7 +37,7 @@ func loadMailTemplates(pattern string) {
 
 func sendEmail(to, subject, body string, args ...string) bool {
   if debugMode() {
-    log.Printf("[APP] DEBUG EMAIL to %s: %s\n", to, subject)
+    logPrintf("DEBUG EMAIL to %s: %s\n", to, subject)
     return true
   }
 
@@ -53,7 +52,7 @@ func sendEmail(to, subject, body string, args ...string) bool {
 
   req, err := http.NewRequest("POST", conf.EmailsRoot, strings.NewReader(data.Encode()))
   if err != nil {
-    log.Printf("[APP] EMAIL request error: %v, %s, %s\n", err, to, subject)
+    logPrintf("EMAIL request error: %v, %s, %s\n", err, to, subject)
   }
   req.SetBasicAuth(conf.EmailsUser, conf.EmailsPass)
   req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
@@ -62,21 +61,21 @@ func sendEmail(to, subject, body string, args ...string) bool {
   _ = resp
 
   if err != nil {
-    log.Printf("[APP] EMAIL sending error: %v, %s, %s\n", err, to, subject)
+    logPrintf("EMAIL sending error: %v, %s, %s\n", err, to, subject)
   }
   return err == nil
 /*
   defer resp.Body.Close()
   b, err := ioutil.ReadAll(resp.Body)
   if err != nil {
-    log.Printf("[APP] EMAIL error: %v, %s, %s, [%s]\n", err, to, subject, b)
+    logPrintf("EMAIL error: %v, %s, %s, [%s]\n", err, to, subject, b)
   }
 */
 }
 
 func sendSMS(mobile, message string) bool {
   if debugMode() {
-    log.Printf("[APP] DEBUG SMS to %s: %s\n", mobile, message)
+    logPrintf("DEBUG SMS to %s: %s\n", mobile, message)
     return true
   }
 
@@ -94,24 +93,24 @@ func sendSMS(mobile, message string) bool {
 
   resp, err := http.Get(uri)
   if err != nil {
-    log.Printf("[APP] SMS error: sending %s\n", err)
+    logPrintf("SMS error: sending %s\n", err)
     return false
   }
   defer resp.Body.Close()
 
   body, err := ioutil.ReadAll(resp.Body)
   if err != nil {
-    log.Printf("[APP] SMS error: response %s\n", err)
+    logPrintf("SMS error: response %s\n", err)
     return false
   }
   val, err := url.ParseQuery(string(body))
   if err != nil {
-    log.Printf("[APP] SMS error: response body %s (%s)\n", err, body)
+    logPrintf("SMS error: response body %s (%s)\n", err, body)
     return false
   }
   status := val.Get("status")
   if status != "success" {
-    log.Printf("[APP] SMS error: response status %s (%s)\n", status, body)
+    logPrintf("SMS error: response status %s (%s)\n", status, body)
   }
 
   return true

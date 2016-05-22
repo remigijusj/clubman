@@ -4,7 +4,6 @@ import (
   "database/sql"
   "errors"
   "fmt"
-  "log"
   "time"
 )
 
@@ -62,7 +61,7 @@ func listEventQueueItemsTx(tx *sql.Tx, event_id int) (list []EventQueueItem, err
 
   defer func() {
     if err != nil {
-      log.Printf("[APP] ASSIGNMENTS-QUEUE: %v, %d\n", err, event_id)
+      logPrintf("ASSIGNMENTS-QUEUE: %v, %d\n", err, event_id)
     }
   }()
 
@@ -115,7 +114,7 @@ func updateAssignmentStatusTx(tx *sql.Tx, event_id, status int, user_ids ...int)
   qry, list := multi(queries["assignment_update"], status, event_id, user_ids)
   res, err := tx.Exec(qry, list...)
   if err != nil {
-    log.Printf("[APP] ASSIGNMENT-UPDATE-STATUS error: %s, %d, %d\n", err, event_id, user_ids)
+    logPrintf("ASSIGNMENT-UPDATE-STATUS error: %s, %d, %d\n", err, event_id, user_ids)
     return err
   }
   num, err := res.RowsAffected()
@@ -138,7 +137,7 @@ func notifyWaitingList(event *EventInfo, users []UserContact, lucky_cnt int) {
 func confirmAssignmentTx(tx *sql.Tx, event_id, user_id int) (err error) {
   defer func() {
     if err != nil {
-      log.Printf("[APP] ASSIGNMENT-CONFIRM-STATUS error: %s, %d, %d\n", err, event_id, user_id)
+      logPrintf("ASSIGNMENT-CONFIRM-STATUS error: %s, %d, %d\n", err, event_id, user_id)
     }
   }()
 
@@ -165,7 +164,7 @@ func revertAssignmentToWaiting(event_id, user_id int) (int, bool) {
   var err error
   defer func() {
     if err != nil {
-      log.Printf("[APP] EXPIRE-AFTER-GRACE error: %s, %d, %d\n", err, event_id, user_id)
+      logPrintf("EXPIRE-AFTER-GRACE error: %s, %d, %d\n", err, event_id, user_id)
     }
   }()
 

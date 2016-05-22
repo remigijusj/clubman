@@ -2,7 +2,6 @@ package main
 
 import (
   "html/template"
-  "log"
   "net/http"
   "strings"
   "time"
@@ -53,7 +52,7 @@ func loadHtmlTemplates(pattern string, engine *gin.Engine) {
 func (r *PageTemplate) loadTemplates() error {
   tmpl, err := template.New("").Funcs(helpers).ParseGlob(r.TemplateGlob)
   if err != nil {
-    log.Printf("[APP] TEMPLATE ERROR: %s", err)
+    logPrintf("TEMPLATE ERROR: %s", err)
   }
   r.templates = tmpl
   return err

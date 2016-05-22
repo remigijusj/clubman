@@ -7,6 +7,7 @@ const (
   timeFormat  = "15:04"
   dateFormat  = "2006-01-02" // db
   fullFormat  = "2006-01-02 15:04:05" // db
+  logsPrefix  = "[APP] 2006/01/02 - 15:04:05 | "
 )
 
 var regexes = map[string]string{

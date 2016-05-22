@@ -3,7 +3,6 @@ package main
 import (
   "database/sql"
   "errors"
-  "log"
   "net/url"
   "strings"
 )
@@ -16,8 +15,8 @@ type TranslationRecord struct {
 
 type TranslationForm struct {
   Lang         string `form:"lang"`
-  Key          string `form:"key" binding:"required"`
-  Value        string `form:"value" binding:"required"`
+  Key          string `form:"key"`
+  Value        string `form:"value"`
 }
 
 func listTranslationsByQuery(q url.Values) []TranslationRecord {
@@ -33,7 +32,7 @@ func listTranslations(rows *sql.Rows, err error) (list []TranslationRecord) {
 
   defer func() {
     if err != nil {
-      log.Printf("[APP] TRANSLATION-LIST error: %s\n", err)
+      logPrintf("TRANSLATION-LIST error: %s\n", err)
     }
   }()
   if err != nil { return }
@@ -55,7 +54,7 @@ func fetchTranslation(rowid int) (TranslationForm, error) {
   var form TranslationForm
   err := query["translation_select"].QueryRow(rowid).Scan(&form.Lang, &form.Key, &form.Value)
   if err != nil {
-    log.Printf("[APP] TRANSLATION-SELECT error: %s, %#v\n", err, form)
+    logPrintf("TRANSLATION-SELECT error: %s, %#v\n", err, form)
     err = errors.New("Translation was not found")
   }
   return form, err
@@ -69,7 +68,7 @@ func updateTranslation(rowid int, form *TranslationForm) error {
   }
   _, err = query["translation_update"].Exec(form.Value, rowid)
   if err != nil {
-    log.Printf("[APP] TRANSLATION-UPDATE error: %s, %d\n", err, rowid)
+    logPrintf("TRANSLATION-UPDATE error: %s, %d\n", err, rowid)
     return errors.New("Translation could not be updated")
   }
   replaceTranslation(form.Lang, form.Key, form.Value)

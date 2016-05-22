@@ -3,7 +3,6 @@ package main
 import (
   "database/sql"
   "errors"
-  "log"
   "net/url"
 )
 
@@ -31,7 +30,7 @@ func listTeams(rows *sql.Rows, err error) (list []TeamRecord) {
 
   defer func() {
     if err != nil {
-      log.Printf("[APP] TEAM-LIST error: %s\n", err)
+      logPrintf("TEAM-LIST error: %s\n", err)
     }
   }()
   if err != nil { return }
@@ -64,7 +63,7 @@ func fetchTeam(team_id int) (TeamForm, error) {
   var form TeamForm
   err := query["team_select"].QueryRow(team_id).Scan(&form.Name, &form.UsersMin, &form.UsersMax, &form.InstructorId)
   if err != nil {
-    log.Printf("[APP] TEAM-SELECT error: %s, %#v\n", err, form)
+    logPrintf("TEAM-SELECT error: %s, %#v\n", err, form)
     err = errors.New("Team was not found")
   }
   return form, err
@@ -77,7 +76,7 @@ func createTeam(form *TeamForm) error {
   }
   _, err = query["team_insert"].Exec(form.Name, form.UsersMin, form.UsersMax, form.InstructorId)
   if err != nil {
-    log.Printf("[APP] TEAM-INSERT error: %s, %v\n", err, form)
+    logPrintf("TEAM-INSERT error: %s, %v\n", err, form)
     return errors.New("Team could not be created")
   }
   return nil
@@ -90,7 +89,7 @@ func updateTeam(team_id int, form *TeamForm) error {
   }
   _, err = query["team_update"].Exec(form.Name, form.UsersMin, form.UsersMax, form.InstructorId, team_id)
   if err != nil {
-    log.Printf("[APP] TEAM-UPDATE error: %s, %d\n", err, team_id)
+    logPrintf("TEAM-UPDATE error: %s, %d\n", err, team_id)
     return errors.New("Team could not be updated")
   }
   return nil
@@ -99,12 +98,12 @@ func updateTeam(team_id int, form *TeamForm) error {
 func deleteTeam(team_id int) error {
   _, err := query["team_delete"].Exec(team_id)
   if err != nil {
-    log.Printf("[APP] TEAM-DELETE error: %s, %d\n", err, team_id)
+    logPrintf("TEAM-DELETE error: %s, %d\n", err, team_id)
     return errors.New("Team could not be deleted")
   }
   err = clearEvents(team_id)
   if err != nil {
-    log.Printf("[APP] TEAM-DELETE-ASSIGNMENTS error: %s, %d\n", err, team_id)
+    logPrintf("TEAM-DELETE-ASSIGNMENTS error: %s, %d\n", err, team_id)
     return errors.New("Team assignments could not be deleted")
   }
   return nil
@@ -121,7 +120,7 @@ func maxTeamUsersTx(tx *sql.Tx, event_id int) (int, error) {
   var max int
   err := tx.Stmt(query["team_users_max"]).QueryRow(event_id).Scan(&max)
   if err != nil {
-    log.Printf("[APP] TEAM-USERS-MAX error: %s, %d\n", err, event_id)
+    logPrintf("TEAM-USERS-MAX error: %s, %d\n", err, event_id)
   }
   return max, err
 }

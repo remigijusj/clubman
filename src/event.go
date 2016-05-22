@@ -3,7 +3,6 @@ package main
 import (
   "database/sql"
   "errors"
-  "log"
   "time"
 )
 
@@ -43,7 +42,7 @@ func listEvents(rows *sql.Rows, err error) (list []EventRecord) {
 
   defer func() {
     if err != nil {
-      log.Printf("[APP] LIST-EVENTS error: %s\n", err)
+      logPrintf("LIST-EVENTS error: %s\n", err)
     }
   }()
   if err != nil { return }
@@ -74,7 +73,7 @@ func listEventsIds(rows *sql.Rows, err error) (list []int) {
   list = []int{}
   defer func() {
     if err != nil {
-      log.Printf("[APP] LIST-EVENTS-IDS error: %s\n", err)
+      logPrintf("LIST-EVENTS-IDS error: %s\n", err)
     }
   }()
   if err != nil { return }
@@ -96,7 +95,7 @@ func fetchEvent(event_id int) (EventForm, error) {
   var form EventForm
   err := query["event_select"].QueryRow(event_id).Scan(&form.TeamId, &form.StartAt, &form.Minutes, &form.Status)
   if err != nil {
-    log.Printf("[APP] EVENT-SELECT error: %s, %#v\n", err, form)
+    logPrintf("EVENT-SELECT error: %s, %#v\n", err, form)
     err = errors.New("Event was not found")
   }
   // WARNING: see the comment in listEvents
@@ -108,7 +107,7 @@ func fetchEventInfoTx(tx *sql.Tx, event_id int) (EventInfo, error) {
   var event EventInfo
   err := tx.Stmt(query["event_select_info"]).QueryRow(event_id).Scan(&event.Id, &event.Name, &event.StartAt, &event.Minutes, &event.Status)
   if err != nil {
-    log.Printf("[APP] FETCH-EVENT-INFO: %v, %d\n", err, event_id)
+    logPrintf("FETCH-EVENT-INFO: %v, %d\n", err, event_id)
   } else {
     event.StartAt = event.StartAt.UTC()
   }
@@ -133,7 +132,7 @@ func deleteEvent(event_id int) error {
 func performEventAction(event_id int, action (func(*sql.Tx, int, *EventForm) error), status int, form *EventForm) (err error) {
   defer func() {
     if err != nil {
-      log.Printf("[APP] EVENT-ACTION error: %s, %d\n", err, event_id)
+      logPrintf("EVENT-ACTION error: %s, %d\n", err, event_id)
     }
   }()
 
@@ -172,7 +171,7 @@ func performEventAction(event_id int, action (func(*sql.Tx, int, *EventForm) err
 func updateEventRecordTx(tx *sql.Tx, event_id int, form *EventForm) error {
   _, err := tx.Stmt(query["event_update"]).Exec(form.TeamId, form.StartAt, form.Minutes, form.Status, event_id)
   if err != nil {
-    log.Printf("[APP] EVENT-UPDATE-TX: error %v, %d, %v\n", err, event_id, *form)
+    logPrintf("EVENT-UPDATE-TX: error %v, %d, %v\n", err, event_id, *form)
     err = errors.New("Event could not be updated")
   }
   return err
@@ -181,7 +180,7 @@ func updateEventRecordTx(tx *sql.Tx, event_id int, form *EventForm) error {
 func cancelEventRecordTx(tx *sql.Tx, event_id int, form *EventForm) error {
   _, err := tx.Stmt(query["event_status"]).Exec(eventStatusCanceled, event_id)
   if err != nil {
-    log.Printf("[APP] EVENT-CANCEL-TX: error %v, %d\n", err, event_id)
+    logPrintf("EVENT-CANCEL-TX: error %v, %d\n", err, event_id)
     err = errors.New("Event could not be canceled")
   }
   return err
@@ -190,7 +189,7 @@ func cancelEventRecordTx(tx *sql.Tx, event_id int, form *EventForm) error {
 func deleteEventRecordTx(tx *sql.Tx, event_id int, form *EventForm) error {
   _, err := tx.Stmt(query["event_delete"]).Exec(event_id)
   if err != nil {
-    log.Printf("[APP] EVENT-DELETE-TX: error %v, %d\n", err, event_id)
+    logPrintf("EVENT-DELETE-TX: error %v, %d\n", err, event_id)
     err = errors.New("Event could not be deleted")
   }
   return err
@@ -199,7 +198,7 @@ func deleteEventRecordTx(tx *sql.Tx, event_id int, form *EventForm) error {
 func clearEvents(team_id int) error {
   _, err := query["events_clear"].Exec(team_id)
   if err != nil {
-    log.Printf("[APP] EVENTS-CLEAR error: %s, %d\n", err, team_id)
+    logPrintf("EVENTS-CLEAR error: %s, %d\n", err, team_id)
   }
   return err
 }
@@ -236,7 +235,7 @@ func autoCancelEvents() {
   till := from.Add(conf.CancelRange.Duration)
 
   list := listEventsUnderLimit(from, till)
-  log.Printf("[APP] AUTOCANCEL-EVENT-INFO: %s, %s, %v\n", from.Format(fullFormat), till.Format(fullFormat), list)
+  logPrintf("AUTOCANCEL-EVENT-INFO: %s, %s, %v\n", from.Format(fullFormat), till.Format(fullFormat), list)
   for _, event_id := range list {
     cancelEvent(event_id)
   }

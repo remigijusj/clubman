@@ -4,7 +4,6 @@ import (
   "database/sql"
   "errors"
   "fmt"
-  "log"
   "strconv"
   "strings"
   "time"
@@ -50,7 +49,7 @@ func (self TeamEventsData) eventIds(team_id int) (list []int, near bool) {
   var err error
   defer func() {
     if err != nil {
-      log.Printf("[APP] EVENTS-MULTI error: %s, %d, %v\n", err, team_id, self)
+      logPrintf("EVENTS-MULTI error: %s, %d, %v\n", err, team_id, self)
     }
   }()
 
@@ -96,7 +95,7 @@ func createEvents(team_id int, form *TeamEventsForm, lang string) (int, error) {
   cnt := data.eachTime(func(date time.Time) int {
     res, err := query["event_insert"].Exec(team_id, date, data.Minutes, eventStatusActive)
     if err != nil {
-      log.Printf("[APP] EVENT-INSERT error: %s, %d, %s, %d\n", err, team_id, date, data.Minutes)
+      logPrintf("EVENT-INSERT error: %s, %d, %s, %d\n", err, team_id, date, data.Minutes)
       return 0
     }
     num, _ := res.RowsAffected()
@@ -159,7 +158,7 @@ func updateEventsRecords(event_ids []int, data *TeamEventsData) (sql.Result, err
   qry, list := multi(qry, event_ids)
   res, err := db.Exec(qry, list...)
   if err != nil {
-    log.Printf("[APP] EVENT-UPDATE-MULTI error: %s, %v, %v\n", err, data, event_ids)
+    logPrintf("EVENT-UPDATE-MULTI error: %s, %v, %v\n", err, data, event_ids)
   }
   return res, err
 }
@@ -193,7 +192,7 @@ func deleteEvents(team_id int, form *TeamEventsForm, lang string) (int, error) {
 func deleteEventsRecords(event_ids []int) (sql.Result, error) {
   res, err := multiExec("event_delete", event_ids)
   if err != nil {
-    log.Printf("[APP] EVENT-DELETE-MULTI error: %s, %v\n", err, event_ids)
+    logPrintf("EVENT-DELETE-MULTI error: %s, %v\n", err, event_ids)
   }
   return res, err
 }

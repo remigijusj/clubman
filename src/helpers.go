@@ -230,17 +230,14 @@ func (self AuthInfo) IsAdmin() bool {
 func hashPassword(password string) string {
   hash, err := bcrypt.GenerateFromPassword([]byte(password), conf.BcryptCost)
   if err != nil {
-    log.Printf("[APP] BCRYPT error: %s\n", err)
+    logPrintf("BCRYPT error: %s\n", err)
   }
   return string(hash)
 }
 
-func comparePassword(stored, given string) bool {
+func comparePassword(stored, given string) error {
   err := bcrypt.CompareHashAndPassword([]byte(stored), []byte(given))
-  if err != nil {
-    log.Printf("[APP] BCRYPT error: %s\n", err)
-  }
-  return err == nil
+  return err
 }
 
 func computeHMAC(parts ...string) string {
@@ -277,11 +274,16 @@ func errorWithA(message string, args ...interface{}) *ErrorWithArgs {
 
 // --- miscelaneous ---
 
+func logPrintf(format string, v ...interface{}) {
+  prefix := time.Now().Format(logsPrefix)
+  log.Printf(prefix + format, v...)
+}
+
 func listRecords(name string, args ...interface{}) []SimpleRecord {
   list := []SimpleRecord{}
   rows, err := query[name].Query(args...)
   if err != nil {
-    log.Printf("[APP] USER-LIST-STATUS error: %s\n", err)
+    logPrintf("USER-LIST-STATUS error: %s\n", err)
     return list
   }
   defer rows.Close()
@@ -289,13 +291,13 @@ func listRecords(name string, args ...interface{}) []SimpleRecord {
     var item SimpleRecord
     err := rows.Scan(&item.Id, &item.Text)
     if err != nil {
-      log.Printf("[APP] USER-LIST-STATUS error: %s\n", err)
+      logPrintf("USER-LIST-STATUS error: %s\n", err)
     } else {
       list = append(list, item)
     }
   }
   if err := rows.Err(); err != nil {
-    log.Printf("[APP] USER-LIST error: %s\n", err)
+    logPrintf("USER-LIST error: %s\n", err)
   }
   return list
 }

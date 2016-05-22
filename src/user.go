@@ -3,7 +3,6 @@ package main
 import (
   "database/sql"
   "errors"
-  "log"
   "net/url"
   "strconv"
   "strings"
@@ -46,11 +45,12 @@ func loginUserByForm(form *LoginForm) (*AuthInfo, error) {
   var user_password string
   err := query["credentials_get"].QueryRow(form.Email).Scan(&user_password, &auth.Id, &auth.Name, &auth.Status, &auth.Language)
   if err != nil {
-    log.Printf("[APP] LOGIN-FORM failure: %s, %s\n", err, form.Email)
+    logPrintf("LOGIN-FORM failure: %s, %s\n", err, form.Email)
     return nil, errors.New("Invalid password or email")
   }
-  ok := comparePassword(user_password, form.Password)
-  if !ok {
+  err = comparePassword(user_password, form.Password)
+  if err != nil {
+    logPrintf("LOGIN-ERROR: %s used invalid password", form.Email)
     return nil, errors.New("Invalid password or email")
   } else {
     return &auth, nil
@@ -85,7 +85,7 @@ func fetchUserPassword(email string) (string, *AuthInfo, error) {
   var user_password string
   err := query["credentials_get"].QueryRow(email).Scan(&user_password, &auth.Id, &auth.Name, &auth.Status, &auth.Language)
   if err != nil {
-    log.Printf("[APP] PASSWORD-FORGOT error: %s, %s, %s\n", err, email, user_password)
+    logPrintf("PASSWORD-FORGOT error: %s, %s, %s\n", err, email, user_password)
   }
   return user_password, &auth, err
 }
@@ -96,7 +96,7 @@ func updatePassword(email, password string) error {
   }
   _, err := query["password_update"].Exec(hashPassword(password), email)
   if err != nil {
-    log.Printf("[APP] PASSWORD-UPDATE error: %s, %s", err, email)
+    logPrintf("PASSWORD-UPDATE error: %s, %s", err, email)
     return errors.New("User could not be updated")
   }
   return nil
@@ -116,7 +116,7 @@ func listUsers(rows *sql.Rows, err error) (list []UserRecord) {
 
   defer func() {
     if err != nil {
-      log.Printf("[APP] LIST-USERS error: %s\n", err)
+      logPrintf("LIST-USERS error: %s\n", err)
     }
   }()
   if err != nil { return }
@@ -170,7 +170,7 @@ func listUsersContact(rows *sql.Rows, err error) (list []UserContact) {
 
   defer func() {
     if err != nil {
-      log.Printf("[APP] LIST-USERS-CONTACT error: %s\n", err)
+      logPrintf("LIST-USERS-CONTACT error: %s\n", err)
     }
   }()
   if err != nil { return }
@@ -192,7 +192,7 @@ func fetchUserProfile(user_id int) (UserForm, error) {
   var form UserForm
   err := query["user_select"].QueryRow(user_id).Scan(&form.Name, &form.Email, &form.Mobile, &form.Language, &form.Status)
   if err != nil {
-    log.Printf("[APP] PROFILE error: %s, %#v\n", err, form)
+    logPrintf("PROFILE error: %s, %#v\n", err, form)
     err = errors.New("User profile was not found")
   }
   return form, err
@@ -206,7 +206,7 @@ func createUser(form *UserForm) error {
   form.Password = hashPassword(form.Password)
   _, err = query["user_insert"].Exec(form.Name, form.Email, form.Mobile, form.Password, form.Language, form.Status)
   if err != nil {
-    log.Printf("[APP] USER-CREATE error: %s, %v\n", err, form)
+    logPrintf("USER-CREATE error: %s, %v\n", err, form)
     return errors.New("User could not be created. Perhaps email is already used")
   }
   return nil
@@ -223,7 +223,7 @@ func updateUser(user_id int, form *UserForm) error {
   }
   _, err = query["user_update"].Exec(form.Name, form.Email, form.Mobile, form.Password, form.Language, form.Status, user_id)
   if err != nil {
-    log.Printf("[APP] USER-UPDATE error: %s, %d\n", err, user_id)
+    logPrintf("USER-UPDATE error: %s, %d\n", err, user_id)
     return errors.New("User could not be updated. Perhaps email is already used")
   }
   return nil
@@ -232,17 +232,17 @@ func updateUser(user_id int, form *UserForm) error {
 func deleteUser(user_id int) error {
   cnt, err := countUserTeams(user_id)
   if err != nil || cnt > 0 {
-    log.Printf("[APP] USER-DELETE-PRECONDITION error: %s, %d, %d\n", err, user_id, cnt)
+    logPrintf("USER-DELETE-PRECONDITION error: %s, %d, %d\n", err, user_id, cnt)
     return errors.New("User could not be deleted")
   }
   _, err = query["user_delete"].Exec(user_id)
   if err != nil {
-    log.Printf("[APP] USER-DELETE error: %s, %d\n", err, user_id)
+    logPrintf("USER-DELETE error: %s, %d\n", err, user_id)
     return errors.New("User could not be deleted")
   }
   err = pruneAssignments(user_id)
   if err != nil {
-    log.Printf("[APP] USER-DELETE-ASSIGNMENTS error: %s, %d\n", err, user_id)
+    logPrintf("USER-DELETE-ASSIGNMENTS error: %s, %d\n", err, user_id)
     return errors.New("User assignments could not be deleted")
   }
   return nil
@@ -252,7 +252,7 @@ func countUserTeams(user_id int) (int, error) {
   var count int
   err := query["user_teams_count"].QueryRow(user_id).Scan(&count)
   if err != nil {
-    log.Printf("[APP] USER-TEAMS-COUNT error: %s, %d\n", err, user_id)
+    logPrintf("USER-TEAMS-COUNT error: %s, %d\n", err, user_id)
   }
   return count, err
 }
@@ -268,7 +268,7 @@ func checkFormPassword(form *UserForm, user_id int) bool {
     var currentPassword string
     err := query["password_select"].QueryRow(user_id).Scan(&currentPassword)
     if err != nil {
-      log.Printf("[APP] PASSWORD-SELECT error: %s, %d\n", err, user_id)
+      logPrintf("PASSWORD-SELECT error: %s, %d\n", err, user_id)
       return false
     }
     form.Password = currentPassword
@@ -308,7 +308,7 @@ func fetchUserContactTx(tx *sql.Tx, user_id int) (UserContact, error) {
   var user UserContact
   err := tx.Stmt(query["user_contact"]).QueryRow(user_id).Scan(&user.Email, &user.Mobile, &user.Language)
   if err != nil {
-    log.Printf("[APP] USER-CONTACT error: %s, %d, %v\n", err, user_id, user)
+    logPrintf("USER-CONTACT error: %s, %d, %v\n", err, user_id, user)
   }
   return user, err
 }
@@ -320,7 +320,7 @@ func mapUserNames(user_ids []int) (data map[int]string) {
   var err error
   defer func() {
     if err != nil {
-      log.Printf("[APP] USER-NAMES error: %s, %v\n", err, user_ids)
+      logPrintf("USER-NAMES error: %s, %v\n", err, user_ids)
     }
   }()
 

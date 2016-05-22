@@ -2,7 +2,6 @@ package main
 
 import (
   "database/sql"
-  "log"
   "net/url"
   "time"
 )
@@ -21,7 +20,7 @@ func listLogs(rows *sql.Rows, err error) (list []LogRecord) {
 
   defer func() {
     if err != nil {
-      log.Printf("[APP] LOG-LIST error: %s\n", err)
+      logPrintf("LOG-LIST error: %s\n", err)
     }
   }()
   if err != nil { return }

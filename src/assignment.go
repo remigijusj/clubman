@@ -2,7 +2,6 @@ package main
 
 import (
   "database/sql"
-  "log"
   "time"
 )
 
@@ -31,7 +30,7 @@ func listEventAssignments(event_id int) (list []EventAssignment) {
   var err error
   defer func() {
     if err != nil {
-      log.Printf("[APP] ASSIGNMENTS-EVENT error: %s, %d\n", err, event_id)
+      logPrintf("ASSIGNMENTS-EVENT error: %s, %d\n", err, event_id)
     }
   }()
 
@@ -56,7 +55,7 @@ func listUserAssignments(user_id int, date_from time.Time) (list []UserAssignmen
   var err error
   defer func() {
     if err != nil {
-      log.Printf("[APP] ASSIGNMENTS-USER error: %s, %d, %v\n", err, user_id, date_from)
+      logPrintf("ASSIGNMENTS-USER error: %s, %d, %v\n", err, user_id, date_from)
     }
   }()
 
@@ -93,7 +92,7 @@ func fetchAssignmentStatusTx(tx *sql.Tx, event_id, user_id int) (int, int, error
   var status, id int
   err := tx.Stmt(query["assignment_status"]).QueryRow(event_id, user_id).Scan(&id, &status)
   if err != nil {
-    log.Printf("[APP] ASSIGNMENT-STATUS error: %s, %d, %d\n", err, event_id, user_id)
+    logPrintf("ASSIGNMENT-STATUS error: %s, %d, %d\n", err, event_id, user_id)
   }
   return status, id, err
 }
@@ -101,7 +100,7 @@ func fetchAssignmentStatusTx(tx *sql.Tx, event_id, user_id int) (int, int, error
 func createAssignmentTx(tx *sql.Tx, event_id, user_id, status int) error {
   res, err := tx.Stmt(query["assignment_insert"]).Exec(event_id, user_id, status)
   if err != nil {
-    log.Printf("[APP] ASSIGNMENT-INSERT error: %s, %d, %d\n", err, event_id, user_id)
+    logPrintf("ASSIGNMENT-INSERT error: %s, %d, %d\n", err, event_id, user_id)
     return err
   }
   num, err := res.RowsAffected()
@@ -114,7 +113,7 @@ func createAssignmentTx(tx *sql.Tx, event_id, user_id, status int) error {
 func deleteAssignmentTx(tx *sql.Tx, event_id, user_id int) error {
   res, err := tx.Stmt(query["assignment_delete"]).Exec(event_id, user_id)
   if err != nil {
-    log.Printf("[APP] ASSIGNMENT-DELETE error: %s, %d, %d\n", err, event_id, user_id)
+    logPrintf("ASSIGNMENT-DELETE error: %s, %d, %d\n", err, event_id, user_id)
     return err
   }
   num, err := res.RowsAffected()
@@ -130,7 +129,7 @@ func mapAssignedStatus(event_ids []int, user_id int) (data map[int]int) {
   var err error
   defer func() {
     if err != nil {
-      log.Printf("[APP] ASSIGNMENTS-STATUS error: %s, %d, %v\n", err, user_id, event_ids)
+      logPrintf("ASSIGNMENTS-STATUS error: %s, %d, %v\n", err, user_id, event_ids)
     }
   }()
 
@@ -157,7 +156,7 @@ func mapParticipantCounts(event_ids []int) (data map[int]int) {
   var err error
   defer func() {
     if err != nil {
-      log.Printf("[APP] ASSIGNMENTS-COUNTS error: %s, %v\n", err, event_ids)
+      logPrintf("ASSIGNMENTS-COUNTS error: %s, %v\n", err, event_ids)
     }
   }()
 
@@ -182,7 +181,7 @@ func countAssignmentsTx(tx *sql.Tx, event_id int) (int, error) {
   var count int
   err := tx.Stmt(query["assignments_count"]).QueryRow(event_id).Scan(&count)
   if err != nil {
-    log.Printf("[APP] ASSIGNMENTS-COUNT error: %s, %d\n", err, event_id)
+    logPrintf("ASSIGNMENTS-COUNT error: %s, %d\n", err, event_id)
   }
   return count, err
 }
@@ -193,7 +192,7 @@ func clearAssignments(event_ids ...int) error {
   }
   _, err := multiExec("assignments_clear", event_ids)
   if err != nil {
-    log.Printf("[APP] ASSIGNMENTS-CLEAR error: %s, %v\n", err, event_ids)
+    logPrintf("ASSIGNMENTS-CLEAR error: %s, %v\n", err, event_ids)
   }
   return err
 }
@@ -201,7 +200,7 @@ func clearAssignments(event_ids ...int) error {
 func pruneAssignments(user_id int) error {
   _, err := query["assignments_prune"].Exec(user_id)
   if err != nil {
-    log.Printf("[APP] ASSIGNMENTS-PRUNE error: %s, %d\n", err, user_id)
+    logPrintf("ASSIGNMENTS-PRUNE error: %s, %d\n", err, user_id)
   }
   return err
 }
