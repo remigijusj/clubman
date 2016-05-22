@@ -67,7 +67,7 @@
               {{$team := index $teams .TeamId}}
               {{$part := index $assigned .Id}}
               {{$count := index $counts .Id}}
-              {{$class := eventClass $team $count}}
+              {{$class := eventClass $team $count .Status}}
             <div class="inner">
               <a href="/events/view/{{.Id}}" class="{{$class}}">
                 {{if eq $part 1}}<img src="/img/star-gold-16.png" />{{end}}
@@ -84,13 +84,6 @@
         </li>
         {{end}}
       </ul>
-      <div class="description">
-        <p>
-          {{"To view more information about an event - click on it"|T}}.<br/>
-          <span class="under">{{"Not enough participants yet"|T}}.</span>
-          <span class="fits">{{"Still has some place"|T}}.</span>
-          <span class="over">{{"Too many participants, waiting list"|T}}.</span>
-        </p>
-      </div>
+      {{template "calendar_status_description.tmpl" . }}
     </div>
   </div>

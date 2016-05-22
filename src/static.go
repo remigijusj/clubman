@@ -51,7 +51,7 @@ var queries = map[string]string{
   "team_delete":        "DELETE FROM teams WHERE id=?",
 
   "events_team":        "SELECT id, team_id, start_at, minutes, status FROM events WHERE team_id=? AND start_at >= ? ORDER BY start_at",
-  "events_period":      "SELECT id, team_id, start_at, minutes, status FROM events WHERE start_at >= ? AND start_at < ? AND status>=0 ORDER BY start_at",
+  "events_period":      "SELECT id, team_id, start_at, minutes, status FROM events WHERE start_at >= ? AND start_at < ? ORDER BY start_at",
   "events_multi":       "SELECT id, start_at FROM events WHERE team_id=? AND start_at >= ? AND start_at < ?",
   "events_under":       "SELECT events.id FROM events LEFT JOIN teams ON team_id=teams.id LEFT JOIN assignments ON event_id=events.id WHERE start_at >= ? and start_at < ? AND events.status=0 GROUP BY events.id HAVING count(user_id) < users_min",
   "event_select_info":  "SELECT events.id, name, start_at, minutes, events.status FROM events LEFT JOIN teams ON team_id=teams.id WHERE events.id=?",

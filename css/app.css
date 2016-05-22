@@ -30,14 +30,17 @@ meta.foundation-version {font-family:"/5.4.7/";}meta.foundation-mq-small {font-f
   vertical-align: text-top;
 }
 
-.under {
+.under, .under:hover {
   color: #006BD7;
 }
-.fits {
+.fits, .fits:hover {
   color: #008040;
 }
-.over {
+.over, .over:hover {
   color: #C10000;
+}
+.skip, .skip:hover {
+  color: #999999;
 }
 
 .tabs .tab-title {

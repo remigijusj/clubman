@@ -48,8 +48,10 @@ func collectEventIds(list []EventRecord) []int {
   return event_ids
 }
 
-func eventClass(team TeamRecord, count int) string {
+func eventClass(team TeamRecord, count int, status int) string {
   switch {
+  case status == eventStatusCanceled:
+    return "skip"
   case count < team.UsersMin:
     return "under"
   case count >= team.UsersMax && team.UsersMax > 0:
