@@ -48,6 +48,7 @@ func main() {
   makeTransHelpers()
 
   defineRoutes(r)
+  logPrintf("STARTUP: server running on port %s\n", conf.ServerPort)
   r.Run(conf.ServerPort)
 }
 

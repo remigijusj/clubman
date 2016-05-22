@@ -41,7 +41,7 @@ type SimpleRecord struct {
 // --- controller helpers ---
 
 func bindForm(c *gin.Context, obj interface{}) bool {
-  err := c.BindWith(obj, binding.Form)
+  err := binding.Form.Bind(c.Request, obj)
   if it, is := obj.(EmailFixer); is {
     it.fixEmail()
   }

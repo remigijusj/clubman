@@ -14,9 +14,9 @@ type TranslationRecord struct {
 }
 
 type TranslationForm struct {
-  Lang         string `form:"lang"`
-  Key          string `form:"key"`
-  Value        string `form:"value"`
+  Lang         string `form:"lang"  binding:"required"`
+  Key          string `form:"key"   binding:"required"`
+  Value        string `form:"value" binding:"required"`
 }
 
 func listTranslationsByQuery(q url.Values) []TranslationRecord {
