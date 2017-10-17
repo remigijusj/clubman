@@ -70,7 +70,7 @@ func (r PageTemplate) Instance(name string, data interface{}) render.Render {
 }
 
 func (r PageRender) Render(w http.ResponseWriter) error {
-  writeContentType(w, htmlContentType)
+  r.WriteContentType(w)
 
   setTranslations(r.Template, r.Data)
 
@@ -83,6 +83,17 @@ func (r PageRender) Render(w http.ResponseWriter) error {
   return nil
 }
 
+func (r PageRender) WriteContentType(w http.ResponseWriter) {
+  writeContentType(w, htmlContentType)
+}
+
+func writeContentType(w http.ResponseWriter, value []string) {
+  header := w.Header()
+  if val := header["Content-Type"]; len(val) == 0 {
+    header["Content-Type"] = value
+  }
+}
+
 func setTranslations(t *template.Template, data interface{}) {
   trans := transHelpers[conf.DefaultLang]
   if obj, ok := data.(gin.H); ok {
@@ -91,11 +102,4 @@ func setTranslations(t *template.Template, data interface{}) {
     }
   }
   t.Funcs(trans)
-}
-
-func writeContentType(w http.ResponseWriter, value []string) {
-  header := w.Header()
-  if val := header["Content-Type"]; len(val) == 0 {
-    header["Content-Type"] = value
-  }
 }

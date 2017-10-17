@@ -20,3 +20,14 @@ Implemented in Go, using [gin-gonic](https://gin-gonic.github.io/gin/) web frame
 ## Websites
 
 * http://nk-fitness.dk
+
+## Build & Run
+
+`go build -o clubman ./src`
+
+`./clubman 2>&1 | tee -a ./clubman.log`
+
+## Compatibility
+
+* Go v1.9.1
+* Deps last updated 2017-10-17
