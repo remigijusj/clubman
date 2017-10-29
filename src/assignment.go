@@ -135,7 +135,7 @@ func mapAssignedStatus(event_ids []int, user_id int) (data map[int]int) {
 
   if len(event_ids) == 0 { return }
 
-  rows, err := multiQuery("assignments_status", event_ids, user_id)
+  rows, err := multiQuery("assignments_status", user_id, event_ids)
   if err != nil { return }
   defer rows.Close()
 

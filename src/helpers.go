@@ -328,7 +328,7 @@ func dict(values ...interface{}) (map[string]interface{}, error) {
 
 func sqlOrderById(list []int) string {
   buf := bytes.NewBufferString(" ORDER BY case id")
-  buf.Grow(len(list) * 15 + 4)
+  buf.Grow(len(list) * 16 + 4)
   for i, id := range list {
     buf.WriteString(fmt.Sprintf(" when %d then %d", id, i))
   }

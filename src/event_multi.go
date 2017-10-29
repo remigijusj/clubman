@@ -140,7 +140,7 @@ func updateEventsRecords(event_ids []int, data *TeamEventsData) (sql.Result, err
   cond := make([]string, 0, 3)
 
   if !data.OnlyAt.IsZero() && !data.StartAt.IsZero() {
-    part := fmt.Sprintf("start_at=datetime(start_at, 'start of day', '%d hours', '%d minutes')", data.StartAt.Hour(), data.StartAt.Minute())
+    part := fmt.Sprintf("start_at=date(start_at) + time '%d:%d'", data.StartAt.Hour(), data.StartAt.Minute())
     cond = append(cond, part)
   }
 
@@ -154,7 +154,7 @@ func updateEventsRecords(event_ids []int, data *TeamEventsData) (sql.Result, err
     cond = append(cond, part)
   }
 
-  qry := fmt.Sprintf("UPDATE events SET %s WHERE id IN (?)", strings.Join(cond, ", "))
+  qry := fmt.Sprintf("UPDATE events SET %s WHERE id IN ($1)", strings.Join(cond, ", "))
   qry, list := multi(qry, event_ids)
   res, err := db.Exec(qry, list...)
   if err != nil {

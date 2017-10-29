@@ -1,17 +1,18 @@
 package main
 
 import (
+  "bytes"
   "database/sql"
   "encoding/gob"
+  "fmt"
   "log"
   "os"
   "regexp"
-  "strings"
 
   "github.com/gin-gonic/gin"
   "github.com/gorilla/sessions"
-  _ "github.com/mattn/go-sqlite3" // tdm-gcc
   "github.com/robfig/cron"
+  _ "github.com/lib/pq"
 )
 
 var conf *Conf
@@ -63,10 +64,14 @@ func debugMode() bool {
 }
 
 func prepareQueries() {
-  db, _ = sql.Open("sqlite3", "./main.db")
+  var err error
+  db, err = sql.Open("postgres", "user=postgres dbname='nk-fitness' sslmode=disable")
+  if err != nil { panic(err) }
+
   query = make(map[string]*sql.Stmt, len(queries))
   for name, sql := range queries {
-    query[name], _ = db.Prepare(sql)
+    query[name], err = db.Prepare(sql)
+    if err != nil { log.Printf("BAD-QUERY %s: %s", name, err) }
   }
 }
 
@@ -166,20 +171,46 @@ func multiExec(name string, args ...interface{}) (sql.Result, error) {
   return db.Exec(qry, list...)
 }
 
-// expands int slice arguments for IN-queries
-// WARNING: caller is reponsible for ensuring non-empty slices
+// rewrites query placeholders and expands argument list
 func multi(qry string, args ...interface{}) (string, []interface{}) {
   list := []interface{}{}
-  for _, item := range args {
-    if ints, ok := item.([]int); ok {
-      for _, it := range ints {
-        list = append(list, it)
+  pt := 0
+  qry = regex["query_placeholder"].ReplaceAllStringFunc(qry, func(s string) string {
+    if pt >= len(args) {
+      log.Printf("=> BAD-MULTI: %s\n=> ARGS: %v\n", qry, args)
+      return s
+    }
+    seq := len(list)+1
+    item := args[pt]
+    pt = pt+1
+    if s[0] == '(' {
+      if ints, ok := item.([]int); ok {
+        for _, it := range ints {
+          list = append(list, it)
+        }
+        return replaceList(seq, len(ints))
+      } else {
+        list = append(list, item)
+        return replaceList(seq, 1)
       }
-      // WARNING: a hack, only works once!
-      qry = strings.Replace(qry, "(?)", "(?"+strings.Repeat(",?", len(ints)-1)+")", 1)
     } else {
       list = append(list, item)
+      return fmt.Sprintf("$%d", seq)
     }
+  })
+  if debugMode() {
+    log.Printf("=> MULTI-RES: %s\n=> ARGS: %#v\n", qry, list)
   }
   return qry, list
+}
+
+func replaceList(from int, size int) string {
+  buf := bytes.NewBufferString("(")
+  buf.Grow(size * 3)
+  for i := from; i < from+size; i++ {
+    if i > from { buf.WriteString(",") }
+    buf.WriteString(fmt.Sprintf("$%d", i))
+  }
+  buf.WriteString(")")
+  return buf.String()
 }
