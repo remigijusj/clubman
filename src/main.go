@@ -49,8 +49,8 @@ func main() {
   makeTransHelpers()
 
   defineRoutes(r)
-  logPrintf("STARTUP: server running on port %s\n", conf.ServerPort)
-  r.Run(conf.ServerPort)
+  logPrintf("STARTUP: server running on port %s\n", os.Getenv("PORT"))
+  r.Run(fmt.Sprintf(":%s", os.Getenv("PORT")))
 }
 
 func setGinMode() {

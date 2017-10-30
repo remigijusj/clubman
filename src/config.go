@@ -22,7 +22,6 @@ type Conf struct {
   ServerName  string
   ServerHost  string
   ServerRoot  string
-  ServerPort  string
   AdminEmail  string
   LogoImgUrl  string
 
