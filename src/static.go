@@ -1,6 +1,9 @@
 package main
 
 const (
+  configFile  = "config.toml"
+  configVar   = "CONFIG_TOML"
+
   panicError  = "Critical error happened, please contact website admin"
   permitError = "You are not authorized to view this page"
 

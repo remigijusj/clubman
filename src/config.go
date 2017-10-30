@@ -2,7 +2,9 @@ package main
 
 import (
   "io/ioutil"
+  "fmt"
   "log"
+  "os"
   "time"
 
   "github.com/BurntSushi/toml"
@@ -67,7 +69,7 @@ func (d *duration) UnmarshalText(text []byte) error {
 
 func prepareConfig() {
   var err error
-  data, err := ioutil.ReadFile("config.toml")
+  data, err := readConfig()
   if err != nil {
     panic(err)
   }
@@ -76,6 +78,19 @@ func prepareConfig() {
     panic(err)
   }
   validateConfig()
+}
+
+func readConfig() ([]byte, error) {
+  if _, err := os.Stat(configFile); os.IsNotExist(err) {
+    value := os.Getenv(configVar)
+    if value == "" {
+      return nil, fmt.Errorf("Both %s and env %s are missing", configFile, configVar)
+    } else {
+      return []byte(value), nil
+    }
+  } else {
+    return ioutil.ReadFile(configFile)
+  }
 }
 
 func validateConfig() {
