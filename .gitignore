@@ -1,8 +1,7 @@
-*.db
-*.db-journal
 *.csv
 *.exe
 *.log
-*.toml
 .*
+vendor/
+config.toml
 img/logo.gif
