@@ -65,7 +65,7 @@ func debugMode() bool {
 
 func prepareQueries() {
   var err error
-  db, err = sql.Open("postgres", "user=postgres dbname='nk-fitness' sslmode=disable")
+  db, err = sql.Open("postgres", os.Getenv("DATABASE_URL"))
   if err != nil { panic(err) }
 
   query = make(map[string]*sql.Stmt, len(queries))
