@@ -4,9 +4,9 @@ import (
   "bytes"
   "html/template"
   "io/ioutil"
+  "encoding/json"
   "net/http"
   "net/url"
-  "strings"
   "time"
 )
 
@@ -14,6 +14,27 @@ const (
   contactEmail = 1
   contactSMS   = 2
 )
+
+type EmailAddress struct {
+  Email   string  `json:"email"`
+}
+
+type Personalization struct {
+  To      []EmailAddress  `json:"to"`
+}
+
+type EmailContent struct {
+  Type    string  `json:"type"`
+  Value   string  `json:"value"`
+}
+
+type EmailPayload struct {
+  Personalizations []Personalization `json:"personalizations"`
+  From    EmailAddress   `json:"from"`
+  ReplyTo EmailAddress   `json:"reply_to,omitempty"`
+  Subject string         `json:"subject"`
+  Content []EmailContent `json:"content"`
+}
 
 // NOTE: user not used now; might have preferred method attr
 func (self UserContact) chooseMethod(when time.Time) int {
@@ -41,21 +62,39 @@ func sendEmail(to, subject, body string, args ...string) bool {
     return true
   }
 
-  data := url.Values{}
-  data.Add("from",    conf.EmailsFrom)
-  data.Add("to",      to)
-  data.Add("subject", subject)
-  data.Add("html",    body)
+  content := EmailContent{
+    Type: "text/html",
+    Value: body,
+  }
+  email_to := EmailAddress{
+    Email: to,
+  }
+  personalization := Personalization{
+    To:    []EmailAddress{email_to},
+  }
+  emailPayload := EmailPayload{
+    Personalizations: []Personalization{personalization},
+    From:    EmailAddress{Email: conf.EmailsFrom},
+    ReplyTo: EmailAddress{Email: conf.EmailsFrom},
+    Subject: subject,
+    Content: []EmailContent{content},
+  }
   if len(args) > 0 && args[0] != "" {
-    data.Add("h:Reply-To", args[0])
+    emailPayload.ReplyTo.Email = args[0]
   }
-
-  req, err := http.NewRequest("POST", conf.EmailsRoot, strings.NewReader(data.Encode()))
+  var jsonPayload []byte
+  jsonPayload, err := json.Marshal(emailPayload)
   if err != nil {
-    logPrintf("EMAIL request error: %v, %s, %s\n", err, to, subject)
+    logPrintf("EMAIL build error: %v, %s, %s, %s\n", err, to, subject, string(jsonPayload))
   }
-  req.SetBasicAuth(conf.EmailsUser, conf.EmailsPass)
-  req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+  logPrintf("SENDGRID PAYLOAD: %s\n", string(jsonPayload))
+
+  req, err := http.NewRequest("POST", conf.EmailsRoot, bytes.NewReader(jsonPayload))
+  if err != nil {
+    logPrintf("EMAIL request error: %v, %s\n", err, string(jsonPayload))
+  }
+  req.Header.Set("Authorization", "Bearer " + conf.EmailsKey)
+  req.Header.Set("Content-Type", "application/json")
   client := &http.Client{}
   resp, err := client.Do(req)
   _ = resp

@@ -31,8 +31,7 @@ type Conf struct {
   CookieLife  duration
 
   EmailsRoot  string
-  EmailsUser  string
-  EmailsPass  string
+  EmailsKey   string
   EmailsFrom  string
 
   SmsHost     string
